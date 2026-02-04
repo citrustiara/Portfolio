@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>URL Notepad</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        textarea {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            outline: none;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Courier New', Courier, monospace;
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="editor" placeholder="Start typing..."></textarea>
+
+    <script>
+        const editor = document.getElementById('editor');
+
+        window.onload = () => {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const decompressed = LZString.decompressFromEncodedURIComponent(hash);
+                if (decompressed) editor.value = decompressed;
+            }
+        };
+
+        let timeout = null;
+        editor.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const compressed = LZString.compressToEncodedURIComponent(editor.value);
+                const newUrl = window.location.pathname + '#' + compressed;
+                window.history.replaceState(null, null, newUrl);
+            }, 654);
+        });
+    </script>
+</body>
+
+</html>
