@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Budowa platformy dynamometrycznej - wyzwania software'owe">
+    <title>Wyzwania Software'owe - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../projekty.html" class="nav-link">Projekty</a>
+                <a href="../blog.html" class="nav-link active">Blog</a>
+                <a href="../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../blog.html" class="nav-link" style="font-size: 0.875rem;"><svg class="arrow-icon arrow-back"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Blog</a>
+
+                <h1 style="margin-top: 1rem;">Budowa platformy dynamometrycznej - wyzwania software'owe</h1>
+                <div class="article-meta">2026 · Maciej Łukasiewicz</div>
+                <div class="article-content">
+                    <p>
+                        W świecie inżynierii sportowej terminy takie jak "platforma dynamometryczna" i "platforma
+                        tensometryczna" oznaczają to samo. Urządzenie mierzące siłę reakcji podłoża.
+                    </p>
+
+                    <h2>Start: Prototyp z tektury i marzeń</h2>
+                    <p>
+                        Pierwszy prototyp powstał we wrześniu 2025 roku i był daleki od
+                        perfekcji. Sercem układu była chińska podróbka Arduino Uno, a zamiast profesjonalnych belek
+                        tensometrycznych użyłem czujników nacisku <strong>FSR402</strong> (Force Sensitive Resistor).
+                    </p>
+                    <p>
+                        FSR to w zasadzie rezystor, który zmienia opór pod wpływem nacisku. W praktyce działało to
+                        bardziej jak przycisk: albo jest nacisk, albo go nie ma.
+                        Podłączyłem to bezpośrednio do Arduino, do tego mały ekranik OLED wyświetlający wysokość skoku.
+                    </p>
+                    <p>
+                        Konstrukcja opierała się na płycie OSB 1m x 1m, która pod moim ciężarem uginała się tak bardzo,
+                        że środkiem dotykała podłogi (i czujników FSR). To generowało masę fałszywych odczytów.
+                        Jednak największym wyzwaniem software'owym okazało się <strong>błędne wykrywanie fazy
+                            lotu</strong>.
+                    </p>
+                    <p>
+                        Podczas szybkiego zejścia w dół przed skokiem (tzw. unweighting phase), siła nacisku spada.
+                        Dla mojego prostego programu spadek siły oznaczał lot. Platforma mierzyła skok zanim w
+                        ogóle oderwałem się od ziemi.
+                        Jako szybki fix wprowadziłem minimalny czas trwania "lotu", co trochę pomogło, ale platforma
+                        była niestabilna, kod nie nadawał się do rozbudowy, a debugowanie na małym ekranie OLED to
+                        koszmar.
+                        Brakowało pomiaru mocy, prędkości, w sumie to wszystkiego. Mimo to, ten prototyp dał mi
+                        motywację żeby
+                        zrobić to porządnie.
+                    </p>
+
+                    <h2>ESP32 i "Prawdziwa Fizyka"</h2>
+                    <p>
+                        Wyrzuciłem FSR i Arduino. W nowej wersji użyłem <strong>ESP32</strong>, 8 belek
+                        tensometrycznych (takich jak w wagach łazienkowych) i precyzyjnego przetwornika ADC
+                        <strong>CS1238</strong>.
+                    </p>
+
+                    <h3>Ślepa uliczka czyli Odbiornik bezprzewodowy</h3>
+                    <p>
+                        Na początku wymyśliłem sobie, że platforma będzie w pełni samodzielna. Jedno ESP32 w platformie
+                        mierzy i mieli dane, a drugie ESP32 (jako odbiornik z ekranem LCD) wyświetla wyniki.
+                        Cała matematyka działała po stronie platformy.
+                    </p>
+                    <p>
+                        Szybko zderzyłem się ze ścianą. Ograniczenia pamięci, trudności w debugowaniu, brak bazy danych
+                        i wykresów.
+                        Zrozumiałem, że takie narzędzie potrzebuje mocy obliczeniowej PC i wygodnego interfejsu.
+                        Pomysł z dedykowanym odbiornikiem wylądował w koszu.
+                    </p>
+
+                    <h3>Ostateczna Architektura: Dumb Hardware, Smart Software</h3>
+                    <p>
+                        Przeszedłem na model, w którym ESP32 robi tylko to, co konieczne: taruje czujniki na starcie,
+                        pilnuje częstotliwości próbkowania i wypluwa surowe dane przez port szeregowy.
+                    </p>
+                    <p>
+                        Resztę – czyli całą logikę, fizykę i UI – przejęła aplikacja desktopowa w Pythonie,
+                        korzystająca z biblioteki <strong>DearPyGui</strong>.
+                        Po pierwszych kilku godzinach kodowania miałem działający wykres i podstawowy pomiar.
+                        Pomyślałem, że to już 90% roboty.
+                    </p>
+                    <p>
+                        Od tamtego momentu minęły trzy tygodnie pracy nad tym programem.
+                        Dopiero teraz mogę powiedzieć, że algorytm działa poprawnie (przynajmniej tak mi się wydaje).
+                        Oto niektóre z napotkanych problemów:
+                    </p>
+
+                    <h2>Problemy i Rozwiązania</h2>
+
+                    <h3>Problem 1: Nieznana masa i szum</h3>
+                    <p>
+                        Aby policzyć moc, muszę znać prędkość. Aby znać prędkość, muszę znać przyspieszenie. A żeby
+                        znać przyspieszenie, muszę znać <strong>masę</strong>.
+                        Ale jak ją zmierzyć, gdy sygnał z tensometrów jest niestabilny?
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> Algorytm stabilności oparty na blokach. Uśredniam sygnał w bloki
+                        po 25 sampli. Jeśli 10 takich bloków
+                        pod rząd mieści się w wąskim zakresie błędu to ustawiana jest masa ciała. To działa dużo lepiej
+                        niż
+                        zwykłe min/max na zaszumionym sygnale.
+                    </p>
+                    <p>
+                        Podobnie z wykresem na żywo, nie ma sensu rysować 1280 punktów na sekundę, Na ekran trafiają
+                        uśrednione bloki.
+                    </p>
+
+                    <h3>Problem 2: Uciekająca waga i Drift</h3>
+                    <p>
+                        Temperatura, wilgotność, zmęczenie materiału – wszystko to sprawia, że
+                        zero w tensometrach przestaje być zerem.
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> Jeśli platforma jest w stanie IDLE (czyli nikt na niej nie stoi,
+                        siła poniżej progu powietrza), ale odczyt nie jest bliski zeru, następuje <strong>automatyczne
+                            tarowanie</strong>. Dzieje się to płynnie w tle.
+                    </p>
+
+                    <h3>Problem 3: Błąd całkowania (Dryf prędkości)</h3>
+                    <p>
+                        Całkowanie zaszumionego sygnału jest problematyczne. Każdy najmniejszy błąd pomiaru
+                        siły sumuje się w czasie, powodując że wyliczona prędkość "odpływa" w kosmos, nawet gdy
+                        stoisz nieruchomo.
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> Agresywne resetowanie. Program ciągle szuka krótkich momentów
+                        stabilności (nawet ułamków sekund) po zważeniu, aby wyzerować akumulację prędkości i
+                        ewentualnie skorygować masę ciała. Dzięki temu, w momencie gdy zaczynasz skok, całkowanie
+                        startuje od zera i błąd nie zdąży narosnąć.
+                    </p>
+
+                    <h3>Problem 4: Początek ruchu</h3>
+                    <p>
+                        Jeśli zacznę całkować dopiero, gdy siła zmieni się o np. 10%, to jestem spóźniony. Straciłem
+                        początek impulsu, więc moja wyliczona prędkość końcowa będzie zaniżona.
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> <strong>Retrospekcja</strong>. System posiada bufor
+                        (historię pomiarów). Gdy wykryję przekroczenie progu (stan PROPULSION), algorytm "cofa się"
+                        o 75ms w tym buforze i zaczyna całkować od momentu, gdzie sygnał faktycznie zaczął się
+                        zmieniać.
+                    </p>
+
+                    <h3>Problem 5: Lot czy Odciążenie?</h3>
+                    <p>
+                        Przed wyskokiem robisz szybki przysiad (countermovement).
+                        Wtedy siła nacisku spada drastycznie, czasem prawie do zera. Głupi algorytm myśli: "mała siła =
+                        lot".
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> Jeśli siła jest mała, ale prędkość jest ujemna (lecisz w dół), to
+                        znaczy że to
+                        dopiero zamach (odciążenie).
+                        Jeśli siła jest mała, a prędkość dodatnia dopiero wtedy jesteś w powietrzu.
+                    </p>
+                    <p>
+                        Dodatkowo: Jeśli "lot" przy ujemnej prędkości trwa dłużej niż 0.5s, zakładam że ktoś po prostu
+                        zeszedł z platformy (wtedy timeout wynosi 0.5s zamiast standardowych 1.5s).
+                    </p>
+
+                    <h3>Problem 6: Drgania płyty (Bounce)</h3>
+                    <p>
+                        Płyta OSB jest sprężysta. Przy wybiciu i lądowaniu potrafi wpaść w rezonans. Może to
+                        spowodować, że w trakcie lotu pojawi się "pik" siły (rzekome lądowanie) albo po lądowaniu
+                        siła spadnie do zera (rzekomy kolejny skok).
+                    </p>
+                    <p>
+                        <strong>Rozwiązanie:</strong> Kod celowo ignoruje odczyty
+                        przez krótki czas (kilkadziesiąt ms) bezpośrednio po wykryciu startu i lądowania.
+                    </p>
+
+                    <h3>Rozdzielenie faz skoku</h3>
+                    <ul>
+                        <li><strong>Unweighting (Odciążenie):</strong> Zaczyna się, gdy siła wywarta na platformę spada
+                            poniżej masy ciała. Gdy człowiek osiąga zauważalną wartość ujemną (np. -0.1 m/s) cofamy się
+                            w buforze i oznaczamy ostatni moment zerowej masy jako początek fazy odciążenia.</li>
+                        <li><strong>Braking (Hamowanie):</strong> Gdy prędkość przestaje maleć i zaczyna rosnąć (ale
+                            wciąż jest ujemna).</li>
+                        <li><strong>Propulsion (Wybicie):</strong> Gdy prędkość przekracza zero i staje się dodatnia.
+                        </li>
+                    </ul>
+
+                    <p>
+                        Więcej technicznych szczegółów znajdziecie w sekcji
+                        <a href="../projekty/forceplate/index.html">skrót dokumentacji projektu</a>.
+                    </p>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

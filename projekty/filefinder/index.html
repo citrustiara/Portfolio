@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileFinder - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Blog</a>
+                <a href="../../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="nav-link" style="font-size: 0.875rem;"><svg
+                        class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Projekty</a>
+
+                <h1 style="margin-top: 1rem;">FileFinder</h1>
+                <div class="article-meta">2025 · <a href="https://github.com/citrustiara/FileFinder" target="_blank"
+                        rel="noopener">GitHub</a></div>
+
+                <h2>1. O projekcie</h2>
+                <p>
+                    FileFinder to szybka i wydajna aplikacja do wyszukiwania plików na systemy Windows.
+                    W przeciwieństwie do standardowego wyszukiwania Windows, FileFinder korzysta bezpośrednio z
+                    mechanizmu <strong>NTFS USN Journal</strong> (Update Sequence Number Journal), co pozwala na
+                    błyskawiczne indeksowanie i wyszukiwanie plików bez obciążania systemu ciągłym skanowaniem dysku.
+                </p>
+
+                <h2>2. Kluczowe Funkcje</h2>
+                <ul>
+                    <li><strong>Błyskawiczne Indeksowanie:</strong> Wykorzystuje niskopoziomowe API NTFS do szybkiego
+                        mapowania struktury plików.</li>
+                    <li><strong>Monitorowanie w Czasie Rzeczywistym:</strong> Automatycznie śledzi zmiany w systemie
+                        plików (nowe pliki, zmiany nazw, usunięcia) dzięki USN Journal.</li>
+                    <li><strong>Zaawansowane Wyszukiwanie:</strong> Filtrowanie po nazwie i rozszerzeniach plików.</li>
+                    <li><strong>Nowoczesny UI:</strong> Przejrzysty interfejs zbudowany w technologii WPF.</li>
+                    <li><strong>Menu Kontekstowe:</strong> Szybkie akcje na wynikach wyszukiwania (otwórz, kopiuj
+                        ścieżkę, pokaż w eksploratorze).</li>
+                </ul>
+
+                <h2>3. Szczegóły Techniczne</h2>
+                <h3>Integracja z USN Journal</h3>
+                <p>
+                    Aplikacja komunikuje się bezpośrednio ze sterownikiem systemu plików NTFS, używając kodów
+                    sterujących (FSCTL):
+                </p>
+                <ul>
+                    <li><code>FSCTL_ENUM_USN_DATA</code>: Do wykonania początkowego, pełnego skanu dysku.</li>
+                    <li><code>FSCTL_READ_USN_JOURNAL</code>: Do nasłuchiwania zmian w czasie rzeczywistym.</li>
+                </ul>
+
+                <h3>Struktura Bazy Danych</h3>
+                <p>
+                    Aby zapewnić optymalną wydajność, FileFinder używa dwóch oddzielnych tabel w lokalnej bazie danych
+                    SQLite:
+                </p>
+                <ul>
+                    <li><strong>files.db:</strong> Przechowuje informacje o plikach (FRN, ParentFRN, Nazwa).</li>
+                    <li><strong>folders.db:</strong> Przechowuje strukturę katalogów, co pozwala na szybkie odtwarzanie
+                        pełnych ścieżek.</li>
+                </ul>
+
+                <p>
+                    Projekt jest przykładem zaawansowanego programowania systemowego na platformę Windows, łączącego
+                    wydajność niskopoziomowych API z wygodą interfejsu .NET/WPF.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

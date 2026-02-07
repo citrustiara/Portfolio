@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infix to Postfix - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Blog</a>
+                <a href="../../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="nav-link" style="font-size: 0.875rem;"><svg
+                        class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Projekty</a>
+
+                <h1 style="margin-top: 1rem;">Infix to Postfix (ONP)</h1>
+                <div class="article-meta">2024 · <a href="https://github.com/citrustiara/InfixToPostfix" target="_blank"
+                        rel="noopener">GitHub</a></div>
+
+                <h2>1. O projekcie</h2>
+                <p>
+                    Kalkulator działający w wierszu poleceń, napisany w języku C++, służący do konwersji wyrażeń
+                    matematycznych
+                    z notacji infiksowej (klasycznej) na odwrotną notację polską (ONP/RPN). Program nie tylko konwertuje
+                    wyrażenia,
+                    ale również oblicza ich wartość, prezentując proces krok po kroku.
+                </p>
+
+                <h2>2. Kluczowe Funkcje</h2>
+                <ul>
+                    <li><strong>Konwersja Infiks -> ONP:</strong> Zamiana standardowego zapisu matematycznego na notację
+                        postfiksową.</li>
+                    <li><strong>Obsługa Liczb Zmiennoprzecinkowych:</strong> W przeciwieństwie do wielu prostych
+                        implementacji, ten program obsługuje liczby dziesiętne (np. 3.5, 4.2).</li>
+                    <li><strong>Podstawowe Operacje:</strong> Dodawanie, odejmowanie, mnożenie, dzielenie.</li>
+                    <li><strong>Funkcje Wbudowane:</strong> Obsługa funkcji <code>min()</code> i <code>max()</code> ze
+                        zmienną liczbą argumentów.</li>
+                    <li><strong>Wsparcie dla Nawiasów:</strong> Poprawna obsługa zagnieżdżonych nawiasów i kolejności
+                        wykonywania działań.</li>
+                    <li><strong>Podgląd Obliczeń:</strong> Wyświetlanie szczegółowych kroków obliczeń (idealne do celów
+                        edukacyjnych).</li>
+                </ul>
+
+                <h2>3. Implementacja Techniczna</h2>
+                <h3>Stos Operatorów</h3>
+                <p>
+                    Algorytm wykorzystuje podejście oparte na stosie do parsowania wyrażeń.
+                    Priorytety operatorów:
+                </p>
+                <ul>
+                    <li>Mnożenie i dzielenie: priorytet 2</li>
+                    <li>Dodawanie i odejmowanie: priorytet 1</li>
+                </ul>
+
+                <h3>Kodowanie Funkcji</h3>
+                <p>
+                    Unikalną cechą projektu jest sposób obsługi funkcji <code>min</code> i <code>max</code>.
+                    Podczas parsowania liczba argumentów funkcji jest zakodowana i przechowywana na stosie, co pozwala
+                    na
+                    elastyczne obliczanie wartości dla dowolnej liczby parametrów.
+                </p>
+
+                <h3>Algorytm Obliczania</h3>
+                <ol>
+                    <li>Liczby są odkładane na stos.</li>
+                    <li>Operatory pobierają wymagane operandy ze stosu, wykonują działanie i odkładają wynik.</li>
+                    <li>Funkcje pobierają najpierw liczbę argumentów, a następnie same argumenty.</li>
+                </ol>
+
+                <p>
+                    Projekt jest przykładem zastosowania klasycznych struktur danych (stos) w praktycznym problemie
+                    algorytmicznym.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

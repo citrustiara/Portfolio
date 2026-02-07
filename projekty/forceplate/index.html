@@ -124,8 +124,8 @@
                     </svg>Projekty</a>
 
                 <h1 style="margin-top: 1rem;">Budowa Platformy Tensometrycznej</h1>
-                <div class="article-meta">2026 · Maciej Łukasiewicz · <a
-                        href="https://github.com/citrustiara/Force-Plate-PRO" target="_blank" rel="noopener">GitHub</a>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/Force-Plate-PRO"
+                        target="_blank" rel="noopener">GitHub</a>
                 </div>
 
                 <h2>1. Wstęp</h2>
@@ -142,7 +142,10 @@
                     skoku,
                     czasu lotu, mocy oraz prędkości startu. Platforma komunikuje się z aplikacją desktopową poprzez port
                     szeregowy,
-                    z planowaną przyszłą integracją Bluetooth.
+                    z planowaną przyszłą integracją Bluetooth. W przeciwieństwie do komercyjnych rozwiązań, które
+                    kosztują tysiące dolarów, ten projekt wykorzystuje przystępne cenowo, gotowe komponenty (ESP32,
+                    Belki Tensometryczne), zachowując jednocześnie wysoką jakość danych dzięki zaawansowanemu
+                    przetwarzaniu programowemu.
                 </p>
 
                 <div class="figure">
@@ -336,41 +339,53 @@
                 <p>
                     System rejestruje również moc szczytową (peak power) oraz stosuje wzory empiryczne Haramana i
                     Sayersa
-                    do walidacji wyników.
-                </p>
+                <h3>3.3. Kluczowe Funkcje Algorytmiczne</h3>
+                <ul>
+                    <li><strong>Retrospektywna Całkowanie Impulsu (Retroactive Pulse Integration):</strong> System
+                        buforuje dane w sposób ciągły. Po wykryciu ruchu algorytm "cofa się" o ~75ms, aby uchwycić
+                        początek impulsu, który wystąpił przed przekroczeniem progu wyzwalania.</li>
+                    <li><strong>Automatyczna Detekcja Faz:</strong> Precyzyjne rozróżnianie fazy głębokiego odciążenia
+                        (<em>Unweighting</em>) od fazy lotu (<em>Flight</em>) na podstawie analizy prędkości i czasu
+                        trwania niskiej wagi.</li>
+                    <li><strong>Dynamiczna Kontrola Stabilności:</strong> Podczas ważenia system analizuje statystyki
+                        (średnia, wariancja) w oknach 300ms, aby zatwierdzić pomiar tylko przy idealnym bezruchu.</li>
+                    <li><strong>Kompensacja Dryfu (Smart Auto-Tare):</strong> Monitorowanie platformy w stanie spoczynku
+                        (IDLE). Jeśli przez 1 sekundę nie wykryto ruchu, a waga dryfuje powyżej 0.2 kg lecz poniżej
+                        AIR_THRESHOLD, następuje
+                        automatyczne zerowanie czujników.</li>
+                    <li><strong>Fizyka Skoków Seryjnych:</strong> Przy skokach wielokrotnych (rebound), prędkość
+                        uderzenia z poprzedniego skoku (wyliczona z czasu lotu) jest zachowywana jako prędkość
+                        początkowa kolejnego, co zapewnia zachowanie pędu.</li>
+                    <li><strong>Ochrona przed Drganiami (Bounce Protection):</strong> Inteligentne filtrowanie ignoruje
+                        drgania mechaniczne platformy bezpośrednio po wybiciu, zapobiegając fałszywym detekcjom
+                        lądowania.</li>
+                </ul>
 
                 <h2>4. Aplikacja Desktopowa</h2>
                 <p>
-                    Aplikacja napisana w Python (PyQt5) umożliwia wizualizację danych w czasie rzeczywistym
-                    oraz analizę zarejestrowanych skoków. Główne funkcje:
+                    Aplikacja napisana w Python (DearPyGui) umożliwia wizualizację danych w czasie rzeczywistym
+                    oraz analizę zarejestrowanych skoków.
                 </p>
-                <ul>
-                    <li>Wykres siły, prędkości i mocy w funkcji czasu</li>
-                    <li>Automatyczny pomiar masy ciała</li>
-                    <li>Tarowanie i kalibracja platformy</li>
-                    <li>Historia skoków z zapisem do bazy danych SQLite</li>
-                    <li>Różne tryby pracy: Single Jump, Jump Estimation, Contact Time</li>
-                </ul>
 
                 <div class="figure">
                     <img src="example.png" alt="Screenshot aplikacji">
-                    <div class="figure-caption">Rys. 8. Zrzut ekranu aplikacji – analiza pojedynczego skoku z wykresem
-                        siły, prędkości i mocy</div>
+                    <div class="figure-caption">Rys. 8. Interfejs aplikacji – analiza skoku z wykresem Siły, Prędkości i
+                        Mocy</div>
                 </div>
 
                 <h2>5. Komunikacja</h2>
                 <p>
                     Obecnie platforma komunikuje się z komputerem poprzez port szeregowy USB (baud rate 921600).
-                    Mikrokontroler przesyła surowe dane pomiarowe w formacie JSON:
+                    Mikrokontroler przesyła czysty strumień JSON zawierający surową wartość:
                 </p>
                 <div class="formula">
-                    <code>{"w":156234,"t":1234567890}</code> – surowa wartość obciążenia z timestampem (mikrosekundy)
+                    <code>{"w":156234}</code> – surowa wartość z przetwornika ADC
                 </div>
                 <p>
-                    Aplikacja desktopowa odbiera te dane i wykonuje wszystkie obliczenia fizyczne (prędkość, moc,
-                    wysokość)
-                    lokalnie, co pozwala na elastyczność algorytmów i łatwe wprowadzanie poprawek bez konieczności
-                    aktualizacji firmware'u mikrokontrolera.
+                    Timestamping (znacznik czasu) jest nadawany przez aplikację na PC w momencie odebrania pakietu.
+                    Pozwala to na uproszczenie firmware'u mikrokontrolera (plik <code>platform_send.ino</code>), który
+                    zajmuje się jedynie szybkim próbkowaniem.
+                    Aplikacja desktopowa wykonuje wszystkie obliczenia fizyczne.
                 </p>
                 <p>
                     W przyszłości planowana jest komunikacja bezprzewodowa poprzez Bluetooth Low Energy (BLE)
@@ -385,7 +400,7 @@
                 <ul>
                     <li>Częstotliwość próbkowania 1280 Hz zapewniająca wysoką rozdzielczość czasową</li>
                     <li>Automatyczny pomiar masy ciała z detekcją stabilności</li>
-                    <li>Całkowanie impulsowe do obliczenia prędkości i wysokości skoku</li>
+                    <li>Całkowanie impulsowe do obliczenia prędkości, mocy i wysokości skoku</li>
                     <li>Wizualizacja danych w czasie rzeczywistym</li>
                 </ul>
                 <p>

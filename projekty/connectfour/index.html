@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Four - Maciej Łukasiewicz</title>
+    <title>Multi Connect Four - Maciej Łukasiewicz</title>
     <link rel="stylesheet" href="../../styles.css">
 </head>
 
@@ -37,33 +37,55 @@
                     </svg>Projekty</a>
 
                 <h1 style="margin-top: 1rem;">Multi Connect Four</h1>
-                <div class="article-meta">
-                    <a href="https://github.com/citrustiara/connect-four" target="_blank" rel="noopener">GitHub</a> ·
+                <div class="article-meta">2025 ·
+                    <a href="https://github.com/citrustiara/MultiConnect4" target="_blank" rel="noopener">GitHub</a> ·
                     <a href="demo.html">Demo</a>
                 </div>
 
-                <h2>Opis</h2>
+                <h2>1. O projekcie</h2>
                 <p>
-                    Gra w czwórki (Connect Four) z przeciwnikiem AI wykorzystującym algorytm alpha-beta pruning.
-                    Gracz rywalizuje jednocześnie na czterech planszach, co wymaga strategicznego myślenia
-                    i planowania ruchów.
+                    Multi Connect 4 to unikalna wariacja klasycznej gry "Cztery w rzędzie". W tej wersji gracz
+                    musi prowadzić rozgrywkę na <strong>czterech planszach jednocześnie</strong> przeciwko sztucznej
+                    inteligencji.
+                </p>
+                <p>
+                    Zasady są brutalne: przegrywasz natychmiast, jeśli AI wygra na KTÓREJKOLWIEK z plansz.
+                    Aby wygrać grę, musisz ukończyć (wygrać lub zremisować) wszystkie cztery plansze.
+                    Wymaga to strategicznego balansowania między atakiem a obroną w wielu miejscach naraz.
                 </p>
 
-                <h2>Technologie</h2>
+                <h2>2. Sztuczna Inteligencja (Alpha-Beta Pruning)</h2>
+                <p>
+                    Przeciwnikiem w grze jest algorytm oparty na metodzie <strong>Minimax</strong> z optymalizacją
+                    <strong>Alpha-Beta Pruning</strong>. Dzięki temu AI potrafi:
+                </p>
                 <ul>
-                    <li>JavaScript (vanilla)</li>
-                    <li>Algorytm Minimax z alpha-beta pruning</li>
-                    <li>CSS Grid do layoutu plansz</li>
+                    <li>Przewidywać ruchy na kilka kroków w przód.</li>
+                    <li>Efektywnie ucinać gałęzie drzewa decyzyjnego, które nie prowadzą do optymalnych rozwiązań.</li>
+                    <li>Stosować heurystyki oceny pozycji (kontrola środka, blokowanie zagrożeń, tworzenie szans na
+                        wygraną).</li>
                 </ul>
 
-                <h2>Funkcje</h2>
+                <h2>3. Stack Technologiczny</h2>
+                <p>
+                    Gra została napisana w czystym <strong>JavaScript</strong> bez użycia zewnętrznych frameworków, co
+                    demonstruje
+                    zrozumienie fundamentalnych mechanizmów języka i architektury aplikacji.
+                </p>
                 <ul>
-                    <li>4 równoległe plansze</li>
-                    <li>AI z konfigurowalnąym poziomem trudności</li>
-                    <li>Obsługa klawiatury (1-7) i myszy</li>
-                    <li>Animacje spadających żetonów</li>
+                    <li><strong>Architektura:</strong> Czyste oddzielenie logiki gry (<code>Connect4 Class</code>),
+                        sztucznej inteligencji (<code>AlphaBetaAgent</code>) i interfejsu użytkownika.</li>
+                    <li><strong>UI:</strong> Responsywny interfejs obsługujący zarówno myszkę, jak i skróty klawiszowe
+                        (1-7).</li>
                 </ul>
 
+                <h2>4. Jak grać?</h2>
+                <ol>
+                    <li>Grasz kolorem czerwonym (O), AI gra żółtym (X).</li>
+                    <li>Aktywna plansza jest podświetlona na zielono.</li>
+                    <li>Po każdym ruchu gra przełącza się automatycznie na kolejną planszę.</li>
+                    <li>Zadanie: Nie pozwól AI wygrać na żadnej z 4 plansz.</li>
+                </ol>
             </article>
         </div>
     </main>

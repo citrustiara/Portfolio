@@ -114,7 +114,7 @@ a:hover {
 
 /* --- Header --- */
 header {
-    padding: 0.25rem 0;
+    padding: 0rem 0;
     border-bottom: 1px solid var(--border);
 }
 
