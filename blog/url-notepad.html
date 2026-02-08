@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Notepad - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../projekty.html" class="nav-link">Projekty</a>
+                <a href="../blog.html" class="nav-link active">Blog</a>
+                <a href="../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../blog.html" class="nav-link" style="font-size: 0.875rem;"><svg class="arrow-icon arrow-back"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Blog</a>
+
+                <h1 style="margin-top: 1rem;">URL Notepad</h1>
+                <div class="article-meta">2026 · Maciej Łukasiewicz</div>
+
+                <p>
+                    URL Notepad to coś jak Pastebin, tylko prostsze. Tekst zapisywany jest bezpośrednio w adresie URL,
+                    więc nie potrzeba żadnego serwera ani bazy danych. Wystarczy skopiować link i go udostępnić.
+                </p>
+
+                <h2>Jak to działa?</h2>
+                <p>
+                    Wpisany tekst jest kompresowany za pomocą biblioteki <code>lz-string</code> i umieszczany w hashu
+                    URL (część po <code>#</code>). Przy każdej zmianie tekstu URL jest aktualizowany automatycznie.
+                    Po otwarciu linka tekst jest dekompresowany i wyświetlany w edytorze.
+                </p>
+
+                <h2>Funkcje</h2>
+                <p>
+                    Na dole strony są dwa przyciski:
+                </p>
+                <ul>
+                    <li><strong>copy URL</strong> – kopiuje aktualny adres z tekstem do schowka.</li>
+                    <li><strong>copy text</strong> – kopiuje sam tekst bez URLa.</li>
+                </ul>
+
+                <h2>Ograniczenia</h2>
+                <p>
+                    Maksymalna długość URLa zależy od przeglądarki, zwykle około 2000 znaków. Dla krótkich notatek
+                    w zupełności wystarcza.
+                </p>
+
+                <p>
+                    <a href="../projekty/urlnotepad/demo.html" class="project-link">Wypróbuj URL Notepad</a>
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
