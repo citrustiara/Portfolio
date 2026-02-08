@@ -40,8 +40,112 @@
                 <h1 style="margin-top: 1rem;">Budowa platformy dynamometrycznej - wyzwania hardware'owe</h1>
                 <div class="article-meta">2025 · Maciej Łukasiewicz</div>
                 <div class="article-content">
-                    <p>Opis wyzwań związanych z budową hardware'u platformy siłowej...</p>
-                    <p>Tematy do poruszenia: dobór czujników tensometrycznych, projekt PCB, obudowa.</p>
+
+                    <h2>Pierwszy prototyp: Arduino + FSR</h2>
+                    <p>
+                        Pierwszy prototyp opierał się na chińskiej replice Arduino Uno oraz czujniku nacisku
+                        <strong>FSR402</strong>. Pomysł na takie połączenie wziąłem z podobnego projektu na
+                        Instructables.
+                    </p>
+                    <p>
+                        Problemy pojawiły się szybko. ADC w Arduino ma tylko 10 bitów. FSR działa
+                        praktycznie zero-jedynkowo: albo jest nacisk, albo go nie ma. Ciężko z tego wyciągnąć
+                        użyteczne dane o sile.
+                    </p>
+                    <p>
+                        Konstrukcja polegała na uginaniu się płyty OSB. Gdy płyta się uginała, dotykała czujnika FSR
+                        umieszczonego pod spodem. Czujnik leżał na stosie desek do krojenia, żeby ustawić odpowiednią
+                        wysokość. Lekkie przesunięcie i pomiar przestawał działać.
+                    </p>
+                    <p>
+                        Górna płyta, na której się stało, ślizgała się po reszcie konstrukcji. Nie mogłem jej
+                        przymocować na stałe, bo ciągle musiałem grzebać w środku. Arduino nie mieściło się w
+                        platformie, więc od czujnika FSR (który był po środku) szedł długi kabel na zewnątrz.
+                        Arduino nie miało baterii, więc musiało być cały czas podłączone do laptopa.
+                    </p>
+                    <p>
+                        Cały prototyp ledwo działał i szczerze był niebezpieczny. Połączenie FSR z Arduino do tego
+                        zastosowania się nie nadawało.
+                    </p>
+
+                    <h2>Obecna wersja: ESP32 + Tensometry</h2>
+                    <p>
+                        Research zajął mi sporo czasu, bo nie do końca wiedziałem czego potrzebuję. Ostatecznie
+                        wybrałem:
+                    </p>
+                    <ul>
+                        <li><strong>Tensometry 50kg</strong> – takie jak w wagach łazienkowych. 8 sztuk z plastikowymi
+                            obudowami za około 50 zł. Pojedynczy przemysłowy tensometr kosztuje więcej. Jak wszystko
+                            będzie działać idealnie, przejdę na lepsze.</li>
+                        <li><strong>CS1238</strong> – przetwornik ADC. 24 bity, 1280 Hz odświeżania. Dużo szybszy niż
+                            popularny HX711. Łatwy w podłączeniu.</li>
+                        <li><strong>ESP32</strong> – popularny mikrokontroler z WiFi, Bluetooth i ESP-NOW. Mnóstwo
+                            zasobów w internecie. Wybrany model ma wbudowaną ładowarkę, więc mogę podłączyć baterię
+                            3.7V i ładować przez USB-C.</li>
+                    </ul>
+
+                    <h3>Odbiornik bezprzewodowy</h3>
+                    <p>
+                        Początkowo platforma miała być w pełni samodzielna. Drugie ESP32 z wbudowanym ekranem LCD
+                        miało wyświetlać wyniki. Ten pomysł ostatecznie porzuciłem (więcej w
+                        <a href="force-plate-software.html">wyzwaniach software'owych</a>), ale sam odbiornik
+                        działał bez problemów.
+                    </p>
+
+                    <h3>Kable i lutowanie</h3>
+                    <p>
+                        Największym problemem w tym prototypie były kable. Był to mój pierwszy raz z lutownicą i nie
+                        jestem w tym najlepszy. Schemat był dość skomplikowany:
+                    </p>
+
+                    <p><strong>8 tensometrów → 4 pary (mostek Wheatstone'a):</strong></p>
+                    <ul>
+                        <li>Para górna-lewa (TL): Czujniki 1 i 2</li>
+                        <li>Para górna-prawa (TR): Czujniki 3 i 4</li>
+                        <li>Para dolna-lewa (BL): Czujniki 5 i 6</li>
+                        <li>Para dolna-prawa (BR): Czujniki 7 i 8</li>
+                    </ul>
+
+                    <p><strong>Przewody czarne i żółte (pętla mostka):</strong></p>
+                    <ul>
+                        <li>Czarny TL ↔ Czarny TR (góra)</li>
+                        <li>Czarny BL ↔ Czarny BR (dół)</li>
+                        <li>Żółty TL ↔ Żółty BL (lewa)</li>
+                        <li>Żółty TR ↔ Żółty BR (prawa)</li>
+                    </ul>
+
+                    <p><strong>Przewody czerwone → CS1238:</strong></p>
+                    <ul>
+                        <li>Czerwony TL → E+</li>
+                        <li>Czerwony BR → E−</li>
+                        <li>Czerwony TR → A+</li>
+                        <li>Czerwony BL → A−</li>
+                    </ul>
+
+                    <p><strong>CS1238 → ESP32:</strong></p>
+                    <ul>
+                        <li>DOUT → GPIO 19</li>
+                        <li>SCK → GPIO 18</li>
+                        <li>VDD → 3.3V</li>
+                        <li>GND → GND</li>
+                    </ul>
+
+                    <p>
+                        To w połączeniu z rozmieszczeniem 8 tensometrów spowodowało niezłą plątaninę kabli. Na
+                        szczęście wszystko połączyłem dobrze i zadziałało od pierwszego uruchomienia.
+                    </p>
+
+                    <h3>Co się poprawiło</h3>
+                    <p>
+                        Problem ze ślizgającą się płytą zniknął. Plastikowe obudowy tensometrów mają gumowe
+                        antypoślizgowe elementy, więc górna płyta jest stabilna bez przymocowania na stałe. Mogę ją
+                        ściągać kiedy chcę.
+                    </p>
+                    <p>
+                        Wiele problemów, które wydawały się hardwareowe, ostatecznie zostało rozwiązanych w
+                        oprogramowaniu. Więcej o tym w <a href="force-plate-software.html">wyzwaniach
+                            software'owych</a>.
+                    </p>
                 </div>
             </article>
         </div>
