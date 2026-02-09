@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USN Journal i ExportFromUSN - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../projekty.html" class="nav-link">Projekty</a>
+                <a href="../blog.html" class="nav-link active">Blog</a>
+                <a href="../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../blog.html" class="nav-link" style="font-size: 0.875rem;"><svg class="arrow-icon arrow-back"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Blog</a>
+
+                <h1 style="margin-top: 1rem;">USN Journal i ExportFromUSN</h1>
+                <div class="article-meta">2025 · Maciej Łukasiewicz</div>
+
+                <p>
+                    Wyszukiwanie plików w Eksploratorze Windows jest zepsute. Wchodzę na "Ten komputer", wpisuję
+                    nazwę pliku i czekam. I czekam. Irytujące.
+                </p>
+                <p>
+                    Chciałem zrobić coś na wzór uproszczonego <a href="https://www.voidtools.com/"
+                        target="_blank">Everything</a>
+                    z ładniejszym UI. Żeby to osiągnąć, musiałem zrozumieć jak Everything działa tak szybko.
+                </p>
+
+                <h2>Co to USN Journal?</h2>
+                <p>
+                    USN Journal (Update Sequence Number Journal) to wbudowany mechanizm NTFS, który rejestruje każdą
+                    zmianę w systemie plików. Każdy plik i folder na dysku NTFS ma swój unikalny numer referencyjny
+                    (File Reference Number, FRN). Journal zapisuje co się zmieniło i kiedy.
+                </p>
+                <p>
+                    Zamiast skanować cały dysk plik po pliku, można poprosić system o listę wszystkich rekordów z
+                    Master File Table (MFT). To właśnie robi plik <code>ExportFromUSN.cpp</code> w moim projekcie
+                    FileFinder.
+                </p>
+
+                <h2>winioctl.h i kody FSCTL</h2>
+                <p>
+                    Aby komunikować się z USN Journal, trzeba użyć funkcji <code>DeviceIoControl</code> z Windows API.
+                    Nagłówek <code>winioctl.h</code> definiuje kody sterujące (FSCTL), które mówią systemowi co chcemy
+                    zrobić:
+                </p>
+                <ul>
+                    <li><code>FSCTL_ENUM_USN_DATA</code> – enumeruje rekordy MFT, zwraca listę wszystkich plików i
+                        folderów na dysku.</li>
+                    <li><code>FSCTL_READ_USN_JOURNAL</code> – czyta zmiany z journala w czasie rzeczywistym.</li>
+                    <li><code>FSCTL_QUERY_USN_JOURNAL</code> – sprawdza status journala (czy istnieje, jaki ma zakres
+                        USN).</li>
+                </ul>
+
+                <h2>Struktury danych</h2>
+                <p>
+                    Windows API oferuje kilka wersji struktur do pracy z USN Journal:
+                </p>
+
+                <h3>MFT_ENUM_DATA</h3>
+                <p>
+                    Struktura wejściowa dla <code>FSCTL_ENUM_USN_DATA</code>. Określa zakres USN i od którego numeru
+                    FRN zacząć enumerację. Przy pierwszym wywołaniu <code>StartFileReferenceNumber</code> ustawiam na
+                    0, a przy kolejnych używam wartości zwróconej z poprzedniego wywołania.
+                </p>
+
+                <h3>USN_RECORD</h3>
+                <p>
+                    Rekord zwracany przez system. Istnieje kilka wersji:
+                </p>
+                <ul>
+                    <li><code>USN_RECORD_V2</code> – najczęściej używana, zawiera FRN, ParentFRN, nazwę pliku,
+                        atrybuty.</li>
+                    <li><code>USN_RECORD_V3</code> – używa 128-bitowych FRN (dla ReFS i nowszych wersji Windows).</li>
+                    <li><code>USN_RECORD_V4</code> – dodatkowe informacje o zakresach zmian.</li>
+                </ul>
+                <p>
+                    W moim projekcie używam V2, bo wystarcza do NTFS i jest prostsza w obsłudze. Pole
+                    <code>MajorVersion</code> w rekordzie mówi którą wersję dostaliśmy.
+                </p>
+
+                <h2>Jak działa ExportFromUSN</h2>
+                <p>
+                    Plik wykonuje następujące kroki:
+                </p>
+                <ol>
+                    <li>Otwiera uchwyt do dysku (<code>CreateFile</code> na <code>\\.\C:</code>).</li>
+                    <li>Sprawdza czy USN Journal istnieje (<code>FSCTL_QUERY_USN_JOURNAL</code>).</li>
+                    <li>W pętli wywołuje <code>FSCTL_ENUM_USN_DATA</code>, za każdym razem przesuwając
+                        <code>StartFileReferenceNumber</code>.
+                    </li>
+                    <li>Dla każdego rekordu wyciąga FRN, ParentFRN i nazwę pliku.</li>
+                    <li>Zapisuje dane do pliku CSV (później konwertowanego na SQLite).</li>
+                </ol>
+                <p>
+                    Cały skan dysku z milionami plików trwa kilka sekund. Dla porównania, rekurencyjne przechodzenie
+                    przez <code>FindFirstFile</code>/<code>FindNextFile</code> trwałoby minuty.
+                </p>
+
+                <h2>Wersje struktur</h2>
+                <p>
+                    Microsoft dodaje nowe wersje struktur w kolejnych wersjach Windows. Przy wyborze wersji trzeba
+                    pamiętać o kompatybilności:
+                </p>
+                <ul>
+                    <li><code>USN_JOURNAL_DATA_V0</code>, <code>V1</code>, <code>V2</code> – różne wersje metadanych
+                        journala.</li>
+                    <li><code>USN_RECORD_V2</code>, <code>V3</code>, <code>V4</code> – różne formaty rekordów.</li>
+                </ul>
+                <p>
+                    Używam V2 bo działa na Windows 7+ i nie potrzebuję 128-bitowych FRN.
+                </p>
+
+                <p>
+                    Więcej o projekcie: <a href="../projekty/filefinder/index.html">FileFinder</a>
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
