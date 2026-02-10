@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projektowanie Systemu Zarządzania Dostawami - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .pu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .pu-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pu-card summary {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            user-select: none;
+        }
+
+        .pu-card summary:hover {
+            background: #f0f1f2;
+        }
+
+        .pu-card[open] summary {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .pu-card .pu-body {
+            padding: 1rem;
+        }
+
+        .pu-card .pu-body h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .pu-card .pu-body h4:first-child {
+            margin-top: 0;
+        }
+
+        .pu-card .pu-body p,
+        .pu-card .pu-body ul,
+        .pu-card .pu-body ol {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .pu-card .pu-body ol {
+            padding-left: 1.25rem;
+        }
+
+        .pu-card .pu-body ul {
+            padding-left: 1.25rem;
+        }
+
+        .pu-actor {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .diagram-img {
+            max-width: 100%;
+            margin: 1rem 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .diagram-section {
+            margin-top: 2rem;
+        }
+
+        .variant-block {
+            margin: 0.5rem 0 0.5rem 1rem;
+            padding-left: 0.75rem;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .variant-block strong {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Blog</a>
+                <a href="../../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="nav-link" style="font-size: 0.875rem;"><svg
+                        class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Projekty</a>
+
+                <h1 style="margin-top: 1rem;">Projektowanie Systemu Zarządzania Harmonogramem Dostaw</h1>
+                <div class="article-meta">2025 · Inżynieria Oprogramowania · Maciej Łukasiewicz</div>
+
+                <!-- ===== O PROJEKCIE ===== -->
+                <h2>O projekcie</h2>
+                <p>
+                    Projekt realizowany w ramach przedmiotu Inżynieria Oprogramowania. Nie polega na implementacji
+                    systemu, a na pełnym procesie jego projektowania – od wizji i analizy wymagań, przez przypadki
+                    użycia i model obiektowy, po diagramy dynamiczne. Wszystkie diagramy zostały stworzone w programie
+                    Enterprise Architect.
+                </p>
+                <p>
+                    Projektowany system ma usprawnić zarządzanie harmonogramem dostaw fikcyjnej firmy logistycznej
+                    Phoenix Sp. z o.o. Firma działa na terenie województwa Pomorskiego, obsługuje ~80 klientów
+                    miesięcznie, posiada 20 pojazdów i zatrudnia 15 kierowców. Dotychczas harmonogramy były
+                    tworzone ręcznie w arkuszach kalkulacyjnych.
+                </p>
+
+                <!-- ===== ETAPY ===== -->
+                <h2>Etapy projektowania</h2>
+
+                <h3>Etap 1: Wizja Systemu</h3>
+                <p>
+                    Analiza organizacji, identyfikacja problemów, interesariusze i ich punkty widzenia, kontekst
+                    systemu (użytkownicy i ich specyfika, systemy zewnętrzne), wymagania funkcjonalne z priorytetami
+                    MoSCoW, wymagania jakościowe, ograniczenia.
+                </p>
+
+                <h3>Etap 2: Przypadki Użycia</h3>
+                <p>
+                    Diagram przypadków użycia z aktorami i granicą systemu. Ustrukturyzowane opisy 20 PU:
+                    warunki początkowe, scenariusz interakcji, scenariusze alternatywne i wyjątkowe, warunki końcowe.
+                    Związki include i extend między przypadkami.
+                </p>
+
+                <h3>Etap 3: Model Obiektowy (Diagram Klas)</h3>
+                <p>
+                    Klasy z dziedziny problemowej z atrybutami i operacjami. Związki: asocjacje z licznościami,
+                    generalizacja, agregacja i kompozycja. Klasy wynikające z przypadków użycia.
+                </p>
+
+                <h3>Etap 4: Diagramy Dynamiczne</h3>
+                <p>Sześć diagramów czterech typów:</p>
+                <ul>
+                    <li>3 diagramy sekwencji – zarządzanie harmonogramem, składanie zamówienia, reagowanie na
+                        opóźnienia</li>
+                    <li>1 diagram komunikacji</li>
+                    <li>1 diagram czynności</li>
+                    <li>1 diagram stanów</li>
+                </ul>
+
+                <!-- ===== PROBLEMY ===== -->
+                <h2>Główne problemy organizacji</h2>
+                <ul>
+                    <li>Nieoptymalne wykorzystanie kierowców – średnio 5 kursów dziennie zamiast możliwych 6
+                        (potencjalny wzrost przychodów o 20%).</li>
+                    <li>Wysokie koszty operacyjne – 2 dyspozytorów planuje ręcznie, system mógłby ograniczyć
+                        zapotrzebowanie o połowę.</li>
+                    <li>Brak możliwości samodzielnego sprawdzania terminów dostaw przez klientów.</li>
+                    <li>Brak podglądu statusu tras w czasie rzeczywistym – ryzyko kar umownych.</li>
+                </ul>
+
+                <!-- ===== UŻYTKOWNICY ===== -->
+                <h2>Użytkownicy systemu</h2>
+                <ul>
+                    <li><strong>Dyspozytor</strong> – tworzenie harmonogramów, optymalizacja tras, monitorowanie
+                        dostaw. Biegły w IT.</li>
+                    <li><strong>Kierowca</strong> – podgląd zleceń, aktualizacja statusu. Niski poziom IT, aplikacja
+                        mobilna z dużymi przyciskami i powiadomieniami głosowymi.</li>
+                    <li><strong>Obsługa klienta</strong> – wyszukiwanie informacji o dostawach, wprowadzanie
+                        zamówień.</li>
+                    <li><strong>Księgowość</strong> – eksport danych do systemu FK, generowanie raportów.</li>
+                    <li><strong>Klient</strong> – portal webowy: składanie zamówień, sprawdzanie terminów, śledzenie
+                        statusu.</li>
+                </ul>
+
+                <!-- ===== SYSTEMY ZEWNĘTRZNE ===== -->
+                <h2>Systemy zewnętrzne</h2>
+                <ul>
+                    <li><strong>System GPS</strong> – lokalizacja pojazdów, aktualizacja co 60 sekund.</li>
+                    <li><strong>System powiadomień SMS/e-mail</strong> – automatyczne komunikaty o zmianach statusu
+                        dostawy.</li>
+                    <li><strong>System księgowy</strong> – integracja przez eksport/import CSV.</li>
+                </ul>
+
+                <!-- ===== DIAGRAM PU ===== -->
+                <div class="diagram-section">
+                    <h2>Diagram przypadków użycia</h2>
+                    <img src="PU.png" alt="Diagram przypadków użycia" class="diagram-img">
+                </div>
+
+                <!-- ===== OPISY PU ===== -->
+                <h2>Opisy przypadków użycia</h2>
+
+                <div class="pu-grid">
+
+                    <!-- PU: Zarządzanie harmonogramem dostaw -->
+                    <details class="pu-card">
+                        <summary>Zarządzanie harmonogramem dostaw</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Dyspozytor</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Dyspozytor jest zalogowany w systemie.</li>
+                                <li>Trwa dzień roboczy poprzedzający dzień, którego dotyczy harmonogram.</li>
+                                <li>Bieżący czas systemowy to godzina wcześniejsza niż 16:00.</li>
+                                <li>W systemie istnieją zlecenia o statusie „Nowe".</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Dyspozytor wybiera opcję zarządzania harmonogramem na kolejny dzień roboczy.</li>
+                                <li>System wyświetla interfejs planowania z listą nieprzydzielonych zleceń i dostępnych
+                                    kierowców.</li>
+                                <li>Dyspozytor wykonuje operacje zarządcze: tworzy nową trasę i przypisuje kierowcę
+                                    oraz pojazd; dodaje/usuwa zlecenia; zmienia kolejność; modyfikuje parametry trasy.
+                                </li>
+                                <li>[«extend»] Dyspozytor może uruchomić PU: „Automatyczna optymalizacja tras".</li>
+                                <li>Dyspozytor zatwierdza i „publikuje" harmonogram (najpóźniej o 16:00).</li>
+                                <li>System wysyła sfinalizowane trasy do aplikacji mobilnych kierowców.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>1a.</strong> Próba edycji po 16:00 – system wyświetla harmonogram w trybie
+                                    tylko do odczytu.</li>
+                                <li><strong>1b.</strong> Pilna modyfikacja po 16:00 – dyspozytor uruchamia PU:
+                                    „Reagowanie na opóźnienia lub awarie".</li>
+                                <li><strong>3a.</strong> Brak dostępnych zasobów – system informuje o braku kierowców
+                                    lub pojazdów.</li>
+                                <li><strong>5a.</strong> Anulowanie zmian – system cofa niezapisane zmiany po
+                                    potwierdzeniu.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Harmonogram na następny dzień roboczy jest utworzony, zatwierdzony i wysłany do
+                                kierowców. Wszystkie zlecenia przypisane do tras.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Reagowanie na opóźnienia lub awarie -->
+                    <details class="pu-card">
+                        <summary>Reagowanie na opóźnienia lub awarie</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Dyspozytor</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Dyspozytor jest zalogowany w systemie.</li>
+                                <li>W systemie zarejestrowane jest zgłoszenie opóźnienia/awarii LUB system automatycznie
+                                    wykrył problem.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>System wyświetla powiadomienie o problemie: typ, kierowca, pojazd, lokalizacja,
+                                    szacowane opóźnienie, zagrożone dostawy.</li>
+                                <li>Dyspozytor wybiera opcję szczegółowego podglądu.</li>
+                                <li>System prezentuje rekomendowane opcje reakcji.</li>
+                                <li>Dyspozytor wybiera jedną z opcji:</li>
+                            </ol>
+                            <div class="variant-block">
+                                <strong>Wariant A: Akceptacja opóźnienia</strong> – system przelicza ETA i wysyła
+                                powiadomienia do klientów.<br>
+                                <strong>Wariant B: Zmiana kolejności</strong> – dyspozytor modyfikuje kolejność ręcznie
+                                lub automatycznie, system aktualizuje trasę.<br>
+                                <strong>Wariant C: Anulowanie dostaw</strong> – dyspozytor zaznacza dostawy, system
+                                wyświetla konsekwencje (kary umowne), po potwierdzeniu wysyła powiadomienia.<br>
+                                <strong>Wariant D: Kontakt z kierowcą</strong> – dyspozytor kontaktuje się z kierowcą
+                                i wprowadza notatkę, powrót do wyboru opcji.
+                            </div>
+                            <ol start="5">
+                                <li>Dyspozytor dodaje komentarz opisujący podjęte działania.</li>
+                                <li>Po rozwiązaniu dyspozytor zamyka zgłoszenie.</li>
+                                <li>System oznacza zgłoszenie jako „Rozwiązane" z timestampem i archiwizuje.</li>
+                            </ol>
+                            <h4>Warunki końcowe</h4>
+                            <p>Harmonogram zaktualizowany, kierowcy i klienci powiadomieni, zgłoszenie zamknięte z
+                                dokumentacją.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Monitorowanie statusu dostaw w czasie rzeczywistym -->
+                    <details class="pu-card">
+                        <summary>Monitorowanie statusu dostaw w czasie rzeczywistym</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Dyspozytor</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Dyspozytor jest zalogowany w systemie.</li>
+                                <li>Harmonogram na bieżący dzień roboczy został zatwierdzony.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Dyspozytor wybiera funkcję „Monitorowanie floty".</li>
+                                <li>System wyświetla mapę i listę tras na bieżący dzień.</li>
+                                <li>System cyklicznie (co 60 s) odświeża: [«include»] pobiera dane z systemu GPS,
+                                    aktualizuje pozycje na mapie, odbiera statusy od kierowców, przelicza ETA.</li>
+                                <li>Dyspozytor może wybrać konkretną trasę do podglądu szczegółów.</li>
+                                <li>[«extend»] Wykrycie problemu → automatycznie uruchamia PU: „Reagowanie na
+                                    opóźnienia lub awarie".</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>3a.</strong> Brak danych GPS – system wyświetla ostatnią pozycję z ikoną
+                                    ostrzeżenia.</li>
+                                <li><strong>3b.</strong> Brak aktualizacji statusu od kierowcy >2h – system oznacza
+                                    trasę i sugeruje kontakt.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Dyspozytor posiada aktualną informację o statusie wszystkich dostaw.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Automatyczna optymalizacja tras -->
+                    <details class="pu-card">
+                        <summary>Automatyczna optymalizacja tras</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Dyspozytor</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Dyspozytor jest zalogowany.</li>
+                                <li>System w trybie tworzenia/zarządzania harmonogramem.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Dyspozytor wybiera trasę do optymalizacji.</li>
+                                <li>System pobiera współrzędne punktów dostawy.</li>
+                                <li>System stosuje algorytm optymalizacyjny minimalizujący dystans/czas.</li>
+                                <li>System prezentuje porównanie: dotychczasowa vs. zoptymalizowana trasa (dystans,
+                                    czas, oszczędność paliwa).</li>
+                                <li>Dyspozytor akceptuje lub odrzuca.</li>
+                                <li>Jeśli akceptuje – system aktualizuje kolejność zleceń.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>4a.</strong> Brak lepszej trasy – system informuje o braku możliwości
+                                    optymalizacji.</li>
+                                <li><strong>5a.</strong> Trasa narusza ograniczenia czasowe – system wyświetla
+                                    ostrzeżenie z informacją o dotkniętych klientach.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Trasa zoptymalizowana lub pozostawiona bez zmian.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Aktualizacja statusu dostawy -->
+                    <details class="pu-card">
+                        <summary>Aktualizacja statusu dostawy</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Kierowca</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Kierowca zalogowany, ma przydzielone zlecenia.</li>
+                                <li>Pojazd jest zatrzymany (wymaganie bezpieczeństwa).</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Kierowca wybiera aktualizację statusu.</li>
+                                <li>System wyświetla listę zleceń z aktualnym statusem.</li>
+                                <li>Kierowca wybiera zlecenie i nowy status: „Rozpoczęta", „Dostarczona", „Nieudana
+                                    dostawa".</li>
+                                <li>Przy statusie „Nieudana dostawa" – przyczyna z listy (brak odbiorcy, odmowa,
+                                    nieprawidłowy adres, inne).</li>
+                                <li>Kierowca opcjonalnie dodaje komentarz i zatwierdza.</li>
+                                <li>System zapisuje status z datą/godziną i wysyła powiadomienie do klienta.</li>
+                            </ol>
+                            <h4>Warunki końcowe</h4>
+                            <p>Status zaktualizowany, klient powiadomiony.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Podgląd przydzielonych zleceń -->
+                    <details class="pu-card">
+                        <summary>Podgląd przydzielonych zleceń</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Kierowca</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Kierowca zalogowany, ma przydzielone zlecenia na bieżący dzień.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Kierowca wybiera podgląd zleceń.</li>
+                                <li>System wyświetla listę w kolejności realizacji: numer, adres, preferowana godzina,
+                                    kontakt do klienta, uwagi.</li>
+                                <li>Kierowca może wybrać zlecenie do szczegółowego podglądu: pełny adres, dane
+                                    kontaktowe, rodzaj towaru, instrukcje specjalne.</li>
+                                <li>System wyświetla przycisk nawigacji uruchamiający aplikację map.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>2a.</strong> Brak przydzielonych zleceń – system informuje kierowcę.</li>
+                                <li><strong>6a.</strong> Brak aplikacji nawigacyjnej – system wyświetla adres w
+                                    formie tekstowej.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Kierowca posiada pełną informację o swoich zleceniach.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Zgłaszanie opóźnień lub awarii -->
+                    <details class="pu-card">
+                        <summary>Zgłaszanie opóźnień lub awarii</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Kierowca</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Kierowca zalogowany, w trakcie realizacji trasy.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>Kierowca wybiera opcję zgłoszenia problemu.</li>
+                                <li>System wyświetla formularz: typ problemu, szacowany czas opóźnienia (min), opis.
+                                </li>
+                                <li>Kierowca zatwierdza – system zapisuje z datą, godziną, lokalizacją GPS.</li>
+                                <li>System wysyła powiadomienia do dyspozytora i dotkniętych klientów.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>4a.</strong> Anulowanie zgłoszenia – system powraca bez zapisywania.</li>
+                                <li><strong>5a.</strong> Brak połączenia sieciowego – system zapisuje lokalnie i wysyła
+                                    po przywróceniu połączenia.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Zgłoszenie zapisane, powiadomienia wysłane.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Wysłanie powiadomienia o awarii lub opóźnieniu -->
+                    <details class="pu-card">
+                        <summary>Wysłanie powiadomienia o awarii lub opóźnieniu</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">System powiadomień SMS/e-mail</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Zarejestrowane zgłoszenie opóźnienia/awarii przez kierowcę.</li>
+                                <li>Zdefiniowani odbiorcy powiadomień.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>System identyfikuje dotkniętych klientów i pobiera ich dane kontaktowe.</li>
+                                <li>Generuje wiadomości i wysyła e-mail do klientów.</li>
+                                <li>Opóźnienie >60 min → dodatkowo SMS do klientów.</li>
+                                <li>Wysyła e-mail do dyspozytora.</li>
+                                <li>Awaria krytyczna lub opóźnienie >120 min → SMS do dyspozytora.</li>
+                                <li>Zapisuje informacje o wysłanych powiadomieniach.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>4a.</strong> Błąd e-mail – system loguje i oznacza klienta do kontaktu
+                                    telefonicznego.</li>
+                                <li><strong>5a.</strong> Błąd SMS – ponowienie po 2 min, max 3 próby.</li>
+                                <li><strong>2a.</strong> Brak danych kontaktowych – system tworzy zadanie dla obsługi
+                                    klienta.</li>
+                                <li><strong>1a.</strong> Brak dostępu do systemu powiadomień – kolejkowanie, ponawianie
+                                    co 5 min, alert do admina.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Powiadomienia e-mail i SMS wysłane, informacje zapisane w systemie.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Pobranie danych o lokalizacji z systemu GPS -->
+                    <details class="pu-card">
+                        <summary>Pobranie danych o lokalizacji z systemu GPS</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">System GPS</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>System GPS w pojazdach aktywny, połączenie sieciowe dostępne.</li>
+                                <li>Istnieją aktywne trasy „W realizacji".</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>System co 60 s inicjuje zapytanie do GPS o lokalizacje aktywnych pojazdów.</li>
+                                <li>GPS zwraca: identyfikator pojazdu, pozycję, czas pomiaru, prędkość.</li>
+                                <li>System waliduje poprawność i kompletność danych.</li>
+                                <li>Aktualizuje pozycje w bazie z timestampem.</li>
+                                <li>Udostępnia dane do modułu monitorowania.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>1a.</strong> Brak odpowiedzi GPS – zachowanie ostatnich pozycji, ponowienie
+                                    w następnym cyklu, alert po 3 próbach.</li>
+                                <li><strong>3a.</strong> Nieprawidłowy format – odrzucenie wadliwych danych, alert po 5
+                                    błędach dla pojazdu.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Zaktualizowane pozycje pojazdów, dane dostępne dla monitorowania.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Wyszukiwanie informacji o dostawie -->
+                    <details class="pu-card">
+                        <summary>Wyszukiwanie informacji o dostawie</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Obsługa klienta</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Pracownik zalogowany, w systemie istnieją zlecenia.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>Pracownik wprowadza kryteria wyszukiwania: numer zlecenia, klient, data, status,
+                                    telefon.</li>
+                                <li>System wyświetla listę znalezionych dostaw.</li>
+                                <li>Pracownik wybiera dostawę – system wyświetla pełne informacje i lokalizację
+                                    na mapie (jeśli w trakcie).</li>
+                                <li>Pracownik może przejść do obsługi reklamacji [«include»].</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>4a.</strong> Brak wyników – system proponuje rozszerzenie kryteriów.</li>
+                                <li><strong>2a.</strong> Brak kryteriów – system wymaga min. jednego pola.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Pracownik posiada pełną informację o wyszukanej dostawie.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Obsługa reklamacji klienta -->
+                    <details class="pu-card">
+                        <summary>Obsługa reklamacji klienta</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Obsługa klienta</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Pracownik zalogowany, klient zgłosił problem.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>Pracownik wybiera opcję obsługi reklamacji dla wyświetlanej dostawy.</li>
+                                <li>System wyświetla formularz: typ problemu, opis, priorytet, proponowane
+                                    rozwiązanie.</li>
+                                <li>Pracownik wypełnia i zatwierdza.</li>
+                                <li>System generuje unikalny numer reklamacji i zapisuje.</li>
+                                <li>System wysyła e-mail potwierdzający do klienta z numerem sprawy.</li>
+                            </ol>
+                            <h4>Warunki końcowe</h4>
+                            <p>Reklamacja zapisana i przypisana do dostawy.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Wprowadzenie nowego zlecenia dostawy -->
+                    <details class="pu-card">
+                        <summary>Wprowadzenie nowego zlecenia dostawy</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Obsługa klienta</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Klient kontaktuje się z firmą w celu zamówienia dostawy.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Pracownik wybiera opcję nowego zlecenia.</li>
+                                <li>System wyświetla formularz: klient, adres dostawy, data, godzina, rodzaj towaru,
+                                    waga/wymiary, uwagi, priorytet.</li>
+                                <li>Pracownik wyszukuje klienta po nazwie lub NIP.</li>
+                                <li>Pracownik wypełnia pola, system prezentuje dostępne terminy.</li>
+                                <li>Pracownik wybiera termin i zatwierdza.</li>
+                                <li>System waliduje, generuje numer zlecenia, zapisuje.</li>
+                                <li>Pracownik przekazuje klientowi numer zlecenia.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Dodawanie nowego klienta – formularz danych: nazwa, NIP, adres,
+                                    kontakt, weryfikacja, zapis.</li>
+                                <li><strong>9a.</strong> Nieprawidłowe dane – system wyświetla komunikaty błędów.</li>
+                                <li><strong>7a.</strong> Brak terminów – system proponuje alternatywne.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Nowe zlecenie zapisane, wygenerowany numer, klient poinformowany.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Eksport danych do systemu FK -->
+                    <details class="pu-card">
+                        <summary>Eksport danych do systemu finansowo-księgowego</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Księgowość</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Pracownik zalogowany, istnieją niewyeksportowane dostawy.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Pracownik wybiera eksport danych.</li>
+                                <li>System wyświetla formularz: zakres dat, status rozliczenia, klient, status
+                                    dostawy.</li>
+                                <li>Pracownik wprowadza kryteria i zatwierdza.</li>
+                                <li>System wyświetla podgląd: liczba zleceń, łączna wartość, zakres dat.</li>
+                                <li>Pracownik potwierdza eksport.</li>
+                                <li>System generuje plik CSV (identyfikator, dane klienta, data, wartość, status
+                                    rozliczenia, nr faktury/WZ).</li>
+                                <li>System oznacza dostawy jako „Wyeksportowane" z datą.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Brak danych – powrót do kryteriów.</li>
+                                <li><strong>6a.</strong> Niekompletne dane – ostrzeżenie, opcja eksportu bez tych
+                                    rekordów.</li>
+                                <li><strong>8a.</strong> Błąd generowania – logowanie, opcja ponowienia.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Plik CSV wygenerowany, dostawy oznaczone jako wyeksportowane.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Generowanie raportów kosztów transportu -->
+                    <details class="pu-card">
+                        <summary>Generowanie raportów kosztów transportu</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Księgowość</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Pracownik zalogowany, istnieją zrealizowane dostawy z danymi o kosztach.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Pracownik wybiera generowanie raportów kosztów.</li>
+                                <li>System wyświetla formularz: typ raportu (podsumowanie/ wg kierowców/ wg klientów/
+                                    wg tras), zakres dat, format (PDF/Excel/CSV).</li>
+                                <li>System oblicza: łączne koszty, średni koszt na zlecenie, wskaźnik rentowności,
+                                    porównanie z poprzednim okresem.</li>
+                                <li>System generuje raport z wykresami i tabelami.</li>
+                                <li>Pracownik przegląda i pobiera raport.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Brak danych za okres – propozycja zmiany zakresu.</li>
+                                <li><strong>7a.</strong> Błąd generowania – logowanie, opcja ponowienia.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Raport wygenerowany, dostępny do pobrania.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Rejestracja w systemie -->
+                    <details class="pu-card">
+                        <summary>Rejestracja w systemie</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Klient</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Użytkownik nie posiada konta, ma dostęp do portalu rejestracyjnego.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Użytkownik wybiera rejestrację nowego konta.</li>
+                                <li>System wyświetla formularz: nazwa firmy, NIP, adres, osoba kontaktowa, telefon,
+                                    e-mail, hasło.</li>
+                                <li>Użytkownik wypełnia formularz, akceptuje regulamin.</li>
+                                <li>System weryfikuje dane (format NIP, e-mail, zgodność haseł).</li>
+                                <li>System sprawdza unikalność NIP/e-mail.</li>
+                                <li>System tworzy konto, generuje ID, wysyła e-mail z linkiem aktywacyjnym.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>6a.</strong> Nieprawidłowe dane – komunikat przy błędnym polu.</li>
+                                <li><strong>7a.</strong> Klient już zarejestrowany – propozycja odzyskania hasła.</li>
+                                <li><strong>4a.</strong> Brak akceptacji regulaminu – wymuszenie akceptacji.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Konto klienta utworzone (nieaktywne), e-mail z linkiem aktywacyjnym wysłany.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Logowanie do systemu -->
+                    <details class="pu-card">
+                        <summary>Logowanie do systemu</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Wszyscy użytkownicy</span>
+                            <p>Standardowy przypadek użycia logowania – bez szczegółowego opisu.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Składanie zamówienia przez stronę/aplikację -->
+                    <details class="pu-card">
+                        <summary>Składanie zamówienia przez stronę/aplikację</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Klient</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Klient jest zalogowany do systemu.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>Klient wybiera złożenie nowego zamówienia.</li>
+                                <li>System wyświetla formularz: adres (z zapisanych lub nowy), rodzaj towaru,
+                                    waga/wymiary, preferowana data, uwagi.</li>
+                                <li>Klient wypełnia dane zamówienia.</li>
+                                <li>[«include»] System sprawdza dostępne terminy dostawy.</li>
+                                <li>System prezentuje terminy z cenami.</li>
+                                <li>Klient wybiera termin i godzinę.</li>
+                                <li>System wyświetla podsumowanie: adres, termin, cena, szacowany czas.</li>
+                                <li>Klient zatwierdza zamówienie.</li>
+                                <li>System generuje numer, zapisuje, wysyła potwierdzenie e-mail.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Brak terminów – propozycja alternatywnych.</li>
+                                <li><strong>9a.</strong> Nieprawidłowe dane – komunikaty błędów.</li>
+                                <li><strong>3a.</strong> Nowy adres – formularz, opcja zapisu na przyszłość.</li>
+                                <li><strong>11a.</strong> Błąd e-mail – zapis zamówienia, ostrzeżenie o problemie.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Zamówienie zapisane, numer wygenerowany, potwierdzenie wysłane.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Sprawdzenie dostępnych terminów dostawy -->
+                    <details class="pu-card">
+                        <summary>Sprawdzenie dostępnych terminów dostawy</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">System (wewnętrzny)</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>System ma dostęp do aktualnego harmonogramu, określony adres dostawy.</li>
+                            </ul>
+                            <h4>Scenariusz interakcji</h4>
+                            <ol>
+                                <li>System odbiera zapytanie o terminy z adresem i szacowanym czasem dostawy.</li>
+                                <li>Pobiera harmonogramy na najbliższe 14 dni.</li>
+                                <li>Analizuje obłożenie tras, oblicza dostępny czas i okna czasowe.</li>
+                                <li>Identyfikuje dni z wystarczającą ilością wolnego czasu.</li>
+                                <li>Oblicza cenę dla każdego terminu.</li>
+                                <li>Zwraca listę terminów z podziałem na dni i godziny.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Brak terminów w 14 dniach – podaje pierwszy przewidywany wolny
+                                    termin.</li>
+                                <li><strong>3a.</strong> Niespójne dane – logowanie, kontynuacja z pominięciem błędnych
+                                    rekordów.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Lista dostępnych terminów z cenami zwrócona.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Przegląd statusu dostaw -->
+                    <details class="pu-card">
+                        <summary>Przegląd statusu dostaw</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Klient</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Klient zalogowany, ma aktywne/historyczne zamówienia.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>Klient wybiera przegląd swoich dostaw.</li>
+                                <li>System wyświetla listę w zakładkach: aktywne, zaplanowane, zrealizowane.</li>
+                                <li>Klient wybiera dostawę – system wyświetla szczegóły i lokalizację na mapie (jeśli
+                                    w trakcie).</li>
+                                <li>System automatycznie odświeża status co 2 min.</li>
+                                <li>[«extend»] Klient może przejść do zgłoszenia reklamacji.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>2a.</strong> Brak zamówień – propozycja złożenia nowego.</li>
+                                <li><strong>4a.</strong> Brak danych GPS – ostatnia znana lokalizacja.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Klient posiada aktualną informację o statusie swoich dostaw.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Odbieranie powiadomień -->
+                    <details class="pu-card">
+                        <summary>Odbieranie powiadomień</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Klient</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Klient zalogowany, w systemie występują zmiany statusu.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>System wykrywa zdarzenie (zmiana statusu, opóźnienie, dostawa zrealizowana).</li>
+                                <li>Generuje treść: typ, numer zamówienia, opis, nowy ETA.</li>
+                                <li>Wysyła e-mail. Opóźnienie >30 min lub status „Dostarczona" → SMS.</li>
+                                <li>Wyświetla powiadomienie w interfejsie (pop-up/baner).</li>
+                                <li>Klient klika powiadomienie → szczegóły dostawy.</li>
+                                <li>System oznacza jako „Przeczytane", archiwizuje w historii.</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>3a.</strong> Błąd e-mail – system kolejkuje, ponawia co 5 min, max 3 próby.
+                                </li>
+                                <li><strong>6a.</strong> Klient niezalogowany – powiadomienie czeka na kolejne
+                                    logowanie.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Klient poinformowany, powiadomienie zapisane w historii.</p>
+                        </div>
+                    </details>
+
+                    <!-- PU: Zgłaszanie reklamacji/uwag -->
+                    <details class="pu-card">
+                        <summary>Zgłaszanie reklamacji/uwag przez klienta</summary>
+                        <div class="pu-body">
+                            <span class="pu-actor">Klient</span>
+                            <h4>Warunki początkowe</h4>
+                            <ul>
+                                <li>Klient zalogowany, system wyświetla szczegóły dostawy.</li>
+                            </ul>
+                            <h4>Scenariusz</h4>
+                            <ol>
+                                <li>Klient wybiera opcję zgłoszenia reklamacji.</li>
+                                <li>System wyświetla formularz: typ problemu, opis, załączniki zdjęć, preferowany
+                                    sposób kontaktu, oczekiwane rozwiązanie.</li>
+                                <li>Klient wypełnia i zatwierdza.</li>
+                                <li>System waliduje, wyświetla potwierdzenie z numerem zgłoszenia i czasem
+                                    odpowiedzi (do 48h roboczych).</li>
+                            </ol>
+                            <h4>Sytuacje wyjątkowe</h4>
+                            <ul>
+                                <li><strong>5a.</strong> Niepełne dane – komunikat o wymaganych polach.</li>
+                                <li><strong>3b.</strong> Problem krytyczny (brak dostawy, uszkodzenie) – automatyczne
+                                    oznaczenie jako priorytetowe.</li>
+                            </ul>
+                            <h4>Warunki końcowe</h4>
+                            <p>Zgłoszenie zapisane, numer wygenerowany, powiadomienia wysłane do obsługi i klienta.</p>
+                        </div>
+                    </details>
+
+                </div>
+
+                <!-- ===== DIAGRAM KLAS ===== -->
+                <div class="diagram-section">
+                    <h2>Diagram klas</h2>
+                    <img src="diagramklas.png" alt="Diagram klas" class="diagram-img">
+                </div>
+
+                <!-- ===== DIAGRAMY DYNAMICZNE ===== -->
+                <div class="diagram-section">
+                    <h2>Diagramy dynamiczne</h2>
+
+                    <h3>Diagram sekwencji – Zarządzanie harmonogramem</h3>
+                    <img src="sekwencji_zarzadzanieharmonogramem.png"
+                        alt="Diagram sekwencji – zarządzanie harmonogramem" class="diagram-img">
+
+                    <h3>Diagram sekwencji – Składanie zamówienia</h3>
+                    <img src="sekwencji_skladaniezamowienia.png" alt="Diagram sekwencji – składanie zamówienia"
+                        class="diagram-img">
+
+                    <h3>Diagram sekwencji – Reagowanie na opóźnienia</h3>
+                    <img src="sekwencji_reagowanienaopoznienia.png" alt="Diagram sekwencji – reagowanie na opóźnienia"
+                        class="diagram-img">
+
+                    <h3>Diagram komunikacji</h3>
+                    <img src="komunikacji.png" alt="Diagram komunikacji" class="diagram-img">
+
+                    <h3>Diagram czynności</h3>
+                    <img src="czynnosci.png" alt="Diagram czynności" class="diagram-img">
+
+                    <h3>Diagram stanów</h3>
+                    <img src="stanow.png" alt="Diagram stanów" class="diagram-img">
+                </div>
+
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
