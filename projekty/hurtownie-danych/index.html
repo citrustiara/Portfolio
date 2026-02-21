@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System BI dla Transportu Tramwajowego - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .diagram-img {
+            max-width: 100%;
+            margin: 1rem 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .diagram-section {
+            margin-top: 2rem;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0.75rem 0;
+        }
+
+        .tech-list li {
+            background: #f0f1f2;
+            padding: 0.3rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .note-box {
+            background: #f8f9fa;
+            border-left: 3px solid #6c757d;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .screenshot-grid figure {
+            margin: 0;
+        }
+
+        .screenshot-grid figcaption {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 0.35rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">ML</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav>
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Blog</a>
+                <a href="../../kontakt.html" class="nav-link">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="nav-link" style="font-size: 0.875rem;"><svg
+                        class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>Projekty</a>
+
+                <h1 style="margin-top: 1rem;">System BI dla Transportu Tramwajowego w Gdańsku</h1>
+                <div class="article-meta">2025 ·
+                    <a href="https://github.com/citrustiara/data-warehouse" target="_blank" rel="noopener">GitHub</a>
+                </div>
+
+                <!-- ===== O PROJEKCIE ===== -->
+                <h2>O projekcie</h2>
+                <p>
+                    Projekt grupowy realizowany w ramach przedmiotu Hurtownie Danych na Politechnice Gdańskiej.
+                    Celem było zaprojektowanie i wdrożenie kompletnego systemu Business Intelligence dla fikcyjnej
+                    organizacji transportu tramwajowego ZTM Gdańsk – od specyfikacji procesów biznesowych,
+                    przez projektowanie i implementację hurtowni danych, generowanie danych źródłowych,
+                    proces ETL, aż po zapytania analityczne MDX, dashboard Power BI i optymalizację zapytań.
+                </p>
+                <div class="note-box">
+                    <strong>Uwaga:</strong> Był to projekt grupowy. Etapy od specyfikacji procesów biznesowych
+                    po projekt i implementację hurtowni danych (etapy 1–5) były realizowane wspólnie.
+                    Proces ETL (etap 6) zrealizowałem samodzielnie w całości. Etapy końcowe – zapytania MDX,
+                    dashboard Power BI oraz optymalizacja zapytań – były realizowane przez pozostałych członków
+                    zespołu.
+                </div>
+
+                <!-- ===== ORGANIZACJA ===== -->
+                <h2>Opis organizacji</h2>
+                <p>
+                    ZTM to fikcyjna firma odpowiedzialna za przewozy tramwajami na terenie Gdańska.
+                    Organizacja jest zainteresowana analizą opóźnień i awarii swoich tramwajów.
+                    Główne cele biznesowe to:
+                </p>
+                <ul>
+                    <li>Miesięczna redukcja całkowitych opóźnień tramwajów o co najmniej <strong>2%</strong></li>
+                    <li>Miesięczna redukcja całkowitej liczby awarii tramwajów o co najmniej <strong>3%</strong></li>
+                </ul>
+                <p>
+                    Dane pochodzą z dwóch typów źródeł: relacyjnej bazy danych w formacie GTFS (General Transit Feed
+                    Specification – standardowy format opisujący rozkłady jazdy, trasy, przystanki i kursy transportu
+                    publicznego) oraz plików CSV zawierających dane o awariach i kierowcach. Procesy biznesowe
+                    obejmują operacyjne przejazdy tramwajów (monitorowanie czasu przyjazdu, rejestracja opóźnień)
+                    oraz obsługę serwisową (zgłaszanie i naprawa awarii).
+                </p>
+
+                <!-- ===== ETAPY ===== -->
+                <h2>Etapy projektu</h2>
+
+                <h3>Etap 1: Specyfikacja procesów biznesowych</h3>
+                <p>
+                    Analiza organizacji ZTM i zdefiniowanie dwóch kluczowych procesów biznesowych: przejazdów
+                    tramwajów oraz obsługi serwisowej. Określenie celów mierzalnych – redukcja opóźnień o 2%
+                    i awarii o 3% miesięcznie. Sformułowanie przykładowych zapytań analitycznych dla każdego procesu.
+                </p>
+
+                <h3>Etap 2: Specyfikacja wymagań</h3>
+                <p>
+                    Zaprojektowanie struktur dwóch źródeł danych – relacyjnej bazy danych GTFS (tabele: Agency,
+                    Routes, Calendar_Dates, Trips, Stops, Stop_Times) oraz plików CSV (malfunctions.csv,
+                    drivers.csv). Zdefiniowanie strategii integracji danych między źródłami. Sformułowanie
+                    12 zapytań analitycznych, w tym zapytań wymagających danych z obu źródeł, zapytania
+                    wymagającego dodatkowego źródła (dane pogodowe) oraz zapytania wymagającego zmiany procesu
+                    biznesowego (dane o doświadczeniu motorniczych).
+                </p>
+
+                <h3>Etap 3: Generator danych</h3>
+                <p>
+                    Implementacja generatorów danych w Python (pandas, numpy) do tworzenia realistycznych
+                    zbiorów danych. Generatory tworzą dane o kursach tramwajów, czasach przejazdu z opóźnieniami
+                    (uwzględniając godziny szczytu, warunki pogodowe, propagację opóźnień), awariach i kierowcach.
+                    Dane generowane w dwóch snapshotach czasowych (T1, T2) z możliwością skalowania do miliona
+                    rekordów. Ładowanie danych metodą BULK loading.
+                </p>
+
+                <h3>Etap 4: Projekt hurtowni danych</h3>
+                <p>
+                    Zaprojektowanie hurtowni danych w schemacie gwiazdy. Centralna tabela faktów
+                    <strong>TRIP_OPERATIONS_FACT</strong> z miarami: opóźnienie, planowany czas przejazdu,
+                    opóźnienie spowodowane awarią, czas naprawy, oraz miary kalkulowane (procent punktualności,
+                    procent napraw na miejscu). Osiem tabel wymiarów:
+                </p>
+                <ul>
+                    <li><strong>DATE_DIM</strong> – wymiar hierarchiczny (Rok → Miesiąc → Dzień)</li>
+                    <li><strong>TIME_DIM</strong> – wymiar hierarchiczny (Kategoria pory dnia → Godzina)</li>
+                    <li><strong>ROUTE_DIM</strong> – linie tramwajowe</li>
+                    <li><strong>STOP_DIM</strong> – przystanki z lokalizacją i dzielnicą</li>
+                    <li><strong>DRIVER_DIM</strong> – motorniczy, <strong>SCD Type 2</strong> (śledzenie zmian
+                        kategorii doświadczenia)</li>
+                    <li><strong>TRAM_DIM</strong> – pojazdy tramwajowe</li>
+                    <li><strong>TRIP_DIM</strong> – kursy tramwajów</li>
+                    <li><strong>MALFUNCTION_DIM</strong> – typy awarii (nullable)</li>
+                </ul>
+
+                <!-- ===== SCHEMAT ===== -->
+                <div class="diagram-section">
+                    <h3>Schemat hurtowni danych</h3>
+                    <img src="projectreport.png" alt="Schemat gwiazdy hurtowni danych" class="diagram-img">
+                </div>
+
+                <h3>Etap 5: Implementacja hurtowni danych</h3>
+                <p>
+                    Implementacja schematu hurtowni w MS SQL Server – skrypty DDL tworzące tabelę faktów
+                    i tabele wymiarów, skrypty ładujące dane z bazy źródłowej i plików CSV do hurtowni
+                    z generowaniem kluczy zastępczych (surrogate keys). Weryfikacja poprawności danych
+                    i możliwości realizacji wszystkich 10 zapytań analitycznych.
+                </p>
+
+                <h3>Etap 6: Proces ETL (SSIS)</h3>
+                <p>
+                    Implementacja procesu ETL w SQL Server Integration Services (SSIS) w Visual Studio 2022.
+                    Proces obsługuje ładowanie danych w dwóch momentach czasowych – pierwszy załadowanie pełnych
+                    danych, drugi dołączenie nowych i zaktualizowanych rekordów. Implementacja ładowania danych
+                    do wymiaru SCD Type 2 (DRIVER_DIM) z wersjonowaniem rekordów. Automatyczne przetwarzanie
+                    kostki OLAP po zakończeniu ETL.
+                </p>
+
+                <!-- ===== SCREENSHOTS ===== -->
+                <div class="screenshot-grid">
+                    <figure>
+                        <img src="VS_cube.png" alt="Kostka OLAP w Visual Studio" class="diagram-img">
+                        <figcaption>Struktura kostki OLAP (TripOperationsCube) w Visual Studio – Data Source View
+                            z tabelą faktów i wymiarami</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="automation.png" alt="Proces ETL w SSIS" class="diagram-img">
+                        <figcaption>Control Flow procesu ETL w SSIS – sekwencja ładowania wymiarów statycznych,
+                            kierowców, awarii, tramwajów, przystanków, tras, kursów i tabeli faktów</figcaption>
+                    </figure>
+                </div>
+
+                <h3>Etap 7: Zapytania MDX i KPI</h3>
+                <p>
+                    Sformułowanie i wykonanie zapytań MDX odpowiadających zapytaniom ze specyfikacji wymagań.
+                    Wykorzystanie: calculated members, klauzuli WHERE, funkcji operujących na hierarchii wymiarów
+                    (PrevMember, Children), funkcji TopCount/BottomCount, operacji numerycznych i filtrów.
+                    Implementacja KPI w Visual Studio Data Tools – m.in. KPI redukcji opóźnień porównujący
+                    bieżący miesiąc z poprzednim.
+                </p>
+
+                <h3>Etap 8: Dashboard Power BI</h3>
+                <p>
+                    Implementacja interaktywnych raportów w Power BI – minimum 8 stron z prezentacją KPI
+                    dla różnych okresów czasowych, co najmniej 8 różnych typów wykresów, parametryzacja
+                    raportów (wybór roku, linii, przystanku). Wizualizacja trendów opóźnień, rozkładu awarii,
+                    porównań między liniami i analiz czasowych.
+                </p>
+
+                <h3>Etap 9: Optymalizacja zapytań</h3>
+                <p>
+                    Porównanie wydajności różnych fizycznych modeli kostek OLAP (MOLAP, ROLAP, HOLAP)
+                    z agregacjami i bez. Testy obejmujące czasy wykonywania zapytań oraz czasy przetwarzania
+                    kostki. Analiza wyników i porównanie z założeniami teoretycznymi.
+                </p>
+
+                <!-- ===== TECH STACK ===== -->
+                <h2>Stos technologiczny</h2>
+                <ul class="tech-list">
+                    <li>MS SQL Server</li>
+                    <li>SSIS (SQL Server Integration Services)</li>
+                    <li>SSAS (SQL Server Analysis Services)</li>
+                    <li>Visual Studio 2022</li>
+                    <li>Power BI</li>
+                    <li>Python (pandas, numpy)</li>
+                    <li>MDX</li>
+                    <li>T-SQL</li>
+                </ul>
+
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
