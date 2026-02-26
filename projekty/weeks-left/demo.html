@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weeks Left</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            /* === LIGHT THEME VARIABLES FROM STYLES.CSS === */
+            --bg: #fffdf7;
+            --text: #1a1a1a;
+            --text-muted: #494949;
+            --accent: #222222;
+            --border: #e0dfd8;
+            --font-sans: 'JetBrains Mono', monospace;
+            --max-width: 1000px;
+            --spacing: 1rem;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: var(--spacing);
+        }
+
+        textarea {
+            width: 100%;
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: var(--font-sans);
+            resize: none;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: var(--bg);
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: inherit;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .btn:hover {
+            color: var(--accent);
+        }
+
+        #birthDate {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font-sans);
+            padding: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            width: fit-content;
+            align-self: center;
+        }
+
+        #birthDate:focus {
+            border-color: var(--accent);
+        }
+
+        #weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(104, 1fr);
+            gap: 1px;
+        }
+
+        .week {
+            width: 8px;
+            height: 8px;
+            background-color: var(--border);
+        }
+
+        .week.passed {
+            background-color: var(--accent);
+        }
+
+        .result {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        p {
+            margin-top: 3rem;
+            margin-bottom: 0;
+        }
+
+        #summary {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            display: none;
+        }
+
+        #summary b {
+            color: var(--text);
+        }
+    </style>
+</head>
+
+<body>
+    <script src="script.js"></script>
+    <!-- <h1 id="title">WEEKS LEFT</h1> -->
+    <p style="text-align: center;" id="birthdatetext">enter your birth date:</p>
+    <input type="date" id="birthDate" onkeydown="if(event.key === 'Enter') calculateWeeksLeft()">
+    <button class="btn" id="okbutton" onclick="calculateWeeksLeft();">OK</button>
+    <p class="result" id="result"></p>
+    <div class="weeks-grid" id="weeks-grid"></div>
+    <p id="summary"></p>
+</body>
+
+</html>
