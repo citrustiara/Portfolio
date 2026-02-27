@@ -17,7 +17,17 @@
             --border: #e0dfd8;
             --font-sans: 'JetBrains Mono', monospace;
             --max-width: 1000px;
-            --spacing: 1rem;
+            --spacing: 2rem;
+            --dot-size: 8px;
+            --grid-cols: 52;
+        }
+
+        @media (max-width: 600px) {
+            :root {
+                --spacing: 1rem;
+                --dot-size: 4px;
+                --grid-cols: 52;
+            }
         }
 
         body,
@@ -34,6 +44,8 @@
             max-width: var(--max-width);
             margin: 0 auto;
             padding: var(--spacing);
+            align-items: center;
+            text-align: center;
         }
 
         textarea {
@@ -100,13 +112,15 @@
 
         #weeks-grid {
             display: grid;
-            grid-template-columns: repeat(104, 1fr);
-            gap: 1px;
+            grid-template-columns: repeat(var(--grid-cols), 1fr);
+            gap: 2px;
+            margin: 0 auto;
+            width: fit-content;
         }
 
         .week {
-            width: 8px;
-            height: 8px;
+            width: var(--dot-size);
+            height: var(--dot-size);
             background-color: var(--border);
         }
 
@@ -117,6 +131,14 @@
         .result {
             font-size: 3rem;
             font-weight: bold;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .result {
+                font-size: 1.8rem;
+                margin-top: 1rem;
+            }
         }
 
         p {
