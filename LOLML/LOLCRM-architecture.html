@@ -313,67 +313,69 @@
                 title: "2. Inbound Email Flow (Receive → Tag → Process)", code: `sequenceDiagram
     participant GR as gmail-receive
     participant EBR as emailbison-receive
-    participant DB as emails table
-    participant COMP as companies table
+    participant DB as PostgreSQL-DB
+    participant COMP as companies-table
     participant OP as outreach-processor
     participant CP as conversation-processor
-    participant LLM as OpenRouter
+    participant UP as utility-processor
+    participant LLM as OpenRouter-LLM
     participant PEND as pending_slack_replies
     participant OB as outbound_messages
 
-    GR->>GR: Pull PubSub / poll Gmail API
-    GR->>GR: Normalize message format
-    GR->>GR: Tag: OUTREACH_REPLY / CONVERSATION / FIRST_CONTACT / UTILITY
-    GR->>DB: UPSERT (provider='gmail', source='live', message_types=[...])
+    GR->>GR: "Pull PubSub / poll Gmail API"
+    GR->>GR: "Normalize message format"
+    GR->>GR: "Tag: OUTREACH / CONVERSATION / UTILITY"
+    GR->>DB: "UPSERT (provider='gmail')"
 
-    EBR->>EBR: Poll EmailBison /replies
-    EBR->>EBR: Wait-and-verify (60s age gate)
-    EBR->>EBR: Normalize message format
-    EBR->>EBR: Tag based on emailbison_type + thread history
-    EBR->>DB: UPSERT (provider='emailbison', source='live', message_types=[...])
+    EBR->>EBR: "Poll EmailBison /replies"
+    EBR->>EBR: "Normalize message format"
+    EBR->>EBR: "Tag: OUTREACH / CONVERSATION"
+    EBR->>DB: "UPSERT (provider='emailbison')"
 
-    Note over DB: Both processors poll independently
+    Note over DB: "All processors poll independently"
 
-    OP->>DB: SELECT WHERE source='live' AND 'outreach' = ANY(message_types)<br/>AND processed_by NOT LIKE '%outreach-processor%'
-    DB-->>OP: Row with email data
-    OP->>OP: Dedup check (message_id_header)
-    OP->>COMP: Find company by domain (PostgreSQL)
-    OP->>DB: Fetch thread history (PostgreSQL)
-    OP->>LLM: Classify email (SIMPLE/COMPLEX/CONTACT_LATER)
-    OP->>COMP: Update outreach_stage (PostgreSQL)
-
-    alt Slack confirmation needed
-        OP->>PEND: Save email + classification for approval
-        OP->>OB: Enqueue Slack notification (with Approve/Reject buttons)
-    else Auto-reply allowed
-        OP->>OB: Enqueue reply (provider=gmail or emailbison)
-        OP->>OB: Enqueue Slack notification
+    OP->>DB: "SELECT UNPROCESSED OUTREACH"
+    DB-->>OP: "Row data"
+    OP->>COMP: "Find company by domain"
+    OP->>DB: "Fetch thread history"
+    OP->>LLM: "Classify email"
+    
+    alt "Slack confirmation needed"
+        OP->>PEND: "Save for approval"
+        OP->>OB: "Enqueue interactive Slack message"
+    else "Auto-reply allowed"
+        OP->>OB: "Enqueue email reply"
+        OP->>OB: "Enqueue Slack notify"
     end
-    OP->>DB: UPDATE processed_by = processed_by || 'outreach-processor'
+    OP->>DB: "UPDATE processed_by"
 
-    CP->>DB: SELECT WHERE source='live' AND message_types && ['conversation','first_contact']<br/>AND processed_by NOT LIKE '%conversation-processor%'
-    DB-->>CP: Row with email data
-    CP->>DB: Fetch full thread history (PostgreSQL, all providers)
-    CP->>COMP: Find company by domain (PostgreSQL)
-    CP->>LLM: Classify email with full context
-    CP->>COMP: Update stage if needed (PostgreSQL)
-
-    alt Slack confirmation needed
-        CP->>PEND: Save email + classification for approval
-        CP->>OB: Enqueue Slack notification (with Approve/Reject buttons)
-    else Auto-reply allowed
-        CP->>OB: Enqueue reply if applicable
-        CP->>OB: Enqueue Slack notification
+    CP->>DB: "SELECT UNPROCESSED CONVERSATION"
+    DB-->>CP: "Row data"
+    CP->>DB: "Fetch cross-provider history"
+    CP->>COMP: "Find company by domain"
+    CP->>LLM: "Classify with full context"
+    
+    alt "Slack confirmation needed"
+        CP->>PEND: "Save for approval"
+        CP->>OB: "Enqueue interactive Slack message"
+    else "Auto-reply allowed"
+        CP->>OB: "Enqueue email reply"
+        CP->>OB: "Enqueue Slack notify"
     end
-    CP->>DB: UPDATE processed_by = processed_by || ',conversation-processor'` },
+    CP->>DB: "UPDATE processed_by"
+
+    UP->>DB: "SELECT UNPROCESSED UTILITY"
+    DB-->>UP: "Row data"
+    UP->>OB: "Enqueue Slack notification (Admin)"
+    UP->>DB: "UPDATE processed_by"` },
             {
                 title: "3. Followup Engine Flow", code: `sequenceDiagram
     participant FE as followup-engine
-    participant DB as "PostgreSQL DB"
-    participant LLM as "OpenRouter LLM"
-    participant PEND as "pending_slack_replies"
-    participant SA as "slack-receive (webhook)"
-    participant OB as "outbound_messages"
+    participant DB as PostgreSQL-DB
+    participant LLM as OpenRouter-LLM
+    participant PEND as pending_slack_replies
+    participant SA as slack-receive-webhook
+    participant OB as outbound_messages
 
     loop "Every 5 minutes"
         FE->>DB: "SELECT due companies"
@@ -410,7 +412,7 @@
             {
                 title: "4. Agent Worker Flow", code: `sequenceDiagram
     participant AO as agent-orchestrator
-    participant DB as "PostgreSQL DB"
+    participant DB as PostgreSQL-DB
     participant RUNNER as agent-runner
     participant LLM as OpenRouter-LLM
     participant TOOLS as tool-runner
