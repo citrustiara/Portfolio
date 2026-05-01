@@ -4,4 +4,6 @@ blog/forceplate_hardware.txt
 *.docx
 *.txt
 *.tex
+CV/*.tex
+CV/
 projekty/hurtownie-danych/README.md

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOLCRM Architecture Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card-bg: #18181b;
+            --border: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .diagram-section {
+            margin-bottom: 5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .diagram-section:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px var(--accent-glow);
+        }
+
+        .diagram-header {
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .diagram-header h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text);
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .diagram-content {
+            padding: 3rem;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            cursor: zoom-in;
+        }
+
+        .diagram-content svg {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        /* Fullscreen Overlay */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: zoom-out;
+        }
+
+        #overlay svg {
+            max-width: 95%;
+            max-height: 95%;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .badge {
+            background: #1d4ed8;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="overlay"></div>
+    <div class="container">
+        <header>
+            <h1>LOLCRM Architecture</h1>
+            <p class="subtitle">Premium Service & Data Flow Documentation</p>
+        </header>
+
+        <main id="diagrams">
+            <!-- Diagrams will be injected here -->
+        </main>
+
+        <footer class="footer">
+            LOLML CRM Infrastructure &bull; 2026
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            fontFamily: 'Outfit',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+
+        const diagrams = [
+            {
+                title: "1. System Overview", code: `graph TB
+    subgraph External["External Systems"]
+        Gmail[Gmail API]
+        PubSub[Google Pub/Sub]
+        EB[EmailBison API]
+        SlackAPI[Slack Webhooks]
+        Attio[Attio CRM]
+        OpenRouter[OpenRouter LLM]
+    end
+
+    subgraph Receives["Receive Services"]
+        GR[gmail-receive]
+        EBR[emailbison-receive]
+        SR[slack-receive<br/>FastAPI webhook]
+    end
+
+    subgraph DB["PostgreSQL (Single Source of Truth)"]
+        EMAILS[(emails<br/>live + archive)]
+        OUTBOUND[(outbound_messages<br/>send queue)]
+        PENDING[(pending_slack_replies<br/>human approval state)]
+        COMPANIES[(companies<br/>Attio + EmailBison unified)]
+        PEOPLE[(people<br/>Attio + EmailBison unified)]
+        TODO[(ai_todo<br/>agent task queue)]
+        INTERACTIONS[(slack_interactions)]
+    end
+
+    subgraph Processors["Processor Services"]
+        OP[outreach-processor]
+        CP[conversation-processor]
+        UP[utility-processor]
+        FE[followup-engine]
+        AW[agent-worker]
+    end
+
+    subgraph Sends["Send Services"]
+        GS[gmail-send]
+        EBS[emailbison-send]
+        SS[slack-send]
+    end
+
+    %% Ingestion flow
+    PubSub -->|webhook| GR
+    Gmail -->|poll/pull| GR
+    EB -->|poll API| EBR
+    SlackAPI -->|interactive callbacks| SR
+
+    GR -->|normalize + tag| EMAILS
+    EBR -->|normalize + tag| EMAILS
+    SR -->|reads approval state| PENDING
+    SR -->|button clicks| INTERACTIONS
+
+    %% Processing flow
+    EMAILS -->|claims rows by tag| OP
+    EMAILS -->|claims rows by tag| CP
+    EMAILS -->|claims rows by tag| UP
+    COMPANIES -->|due followup dates| FE
+    TODO -->|claim tasks| AW
+
+    OP -->|DB lookup| COMPANIES
+    OP -->|DB lookup| EMAILS
+    OP -->|LLM classify| OpenRouter
+    OP -->|auto-reply| OUTBOUND
+    OP -->|needs confirmation| PENDING
+    CP -->|DB lookup| COMPANIES
+    CP -->|DB lookup| EMAILS
+    CP -->|LLM classify| OpenRouter
+    CP -->|auto-reply| OUTBOUND
+    CP -->|needs confirmation| PENDING
+    UP -->|Slack notify| OUTBOUND
+    FE -->|LLM draft| OpenRouter
+    FE -->|drafts for approval| PENDING
+    FE -->|Slack notify| OUTBOUND
+    AW -->|tools| COMPANIES
+    AW -->|enqueue emails| OUTBOUND
+    AW -->|direct notify| SlackAPI
+    OP -.->|async sync| Attio
+    CP -.->|async sync| Attio
+
+    %% Approval flow
+    PENDING -->|human clicks Approve| SR
+    SR -->|approve → enqueue reply| OUTBOUND
+    SR -->|approve/reject| INTERACTIONS
+
+    %% Sending flow
+    OUTBOUND -->|provider=gmail| GS
+    OUTBOUND -->|provider=emailbison| EBS
+    OUTBOUND -->|provider=slack| SS
+    GS --> Gmail
+    EBS --> EB
+    SS --> SlackAPI` },
+            {
+                title: "2. Inbound Email Flow (Receive → Tag → Process)", code: `sequenceDiagram
+    participant GR as gmail-receive
+    participant EBR as emailbison-receive
+    participant DB as emails table
+    participant COMP as companies table
+    participant OP as outreach-processor
+    participant CP as conversation-processor
+    participant LLM as OpenRouter
+    participant PEND as pending_slack_replies
+    participant OB as outbound_messages
+
+    GR->>GR: Pull PubSub / poll Gmail API
+    GR->>GR: Normalize message format
+    GR->>GR: Tag: OUTREACH_REPLY / CONVERSATION / FIRST_CONTACT / UTILITY
+    GR->>DB: UPSERT (provider='gmail', source='live', message_types=[...])
+
+    EBR->>EBR: Poll EmailBison /replies
+    EBR->>EBR: Wait-and-verify (60s age gate)
+    EBR->>EBR: Normalize message format
+    EBR->>EBR: Tag based on emailbison_type + thread history
+    EBR->>DB: UPSERT (provider='emailbison', source='live', message_types=[...])
+
+    Note over DB: Both processors poll independently
+
+    OP->>DB: SELECT WHERE source='live' AND 'outreach' = ANY(message_types)<br/>AND processed_by NOT LIKE '%outreach-processor%'
+    DB-->>OP: Row with email data
+    OP->>OP: Dedup check (message_id_header)
+    OP->>COMP: Find company by domain (PostgreSQL)
+    OP->>DB: Fetch thread history (PostgreSQL)
+    OP->>LLM: Classify email (SIMPLE/COMPLEX/CONTACT_LATER)
+    OP->>COMP: Update outreach_stage (PostgreSQL)
+
+    alt Slack confirmation needed
+        OP->>PEND: Save email + classification for approval
+        OP->>OB: Enqueue Slack notification (with Approve/Reject buttons)
+    else Auto-reply allowed
+        OP->>OB: Enqueue reply (provider=gmail or emailbison)
+        OP->>OB: Enqueue Slack notification
+    end
+    OP->>DB: UPDATE processed_by = processed_by || 'outreach-processor'
+
+    CP->>DB: SELECT WHERE source='live' AND message_types && ['conversation','first_contact']<br/>AND processed_by NOT LIKE '%conversation-processor%'
+    DB-->>CP: Row with email data
+    CP->>DB: Fetch full thread history (PostgreSQL, all providers)
+    CP->>COMP: Find company by domain (PostgreSQL)
+    CP->>LLM: Classify email with full context
+    CP->>COMP: Update stage if needed (PostgreSQL)
+
+    alt Slack confirmation needed
+        CP->>PEND: Save email + classification for approval
+        CP->>OB: Enqueue Slack notification (with Approve/Reject buttons)
+    else Auto-reply allowed
+        CP->>OB: Enqueue reply if applicable
+        CP->>OB: Enqueue Slack notification
+    end
+    CP->>DB: UPDATE processed_by = processed_by || ',conversation-processor'` },
+            {
+                title: "3. Followup Engine Flow", code: `sequenceDiagram
+    participant FE as followup-engine
+    participant DB as "PostgreSQL DB"
+    participant LLM as "OpenRouter LLM"
+    participant PEND as "pending_slack_replies"
+    participant SA as "slack-receive (webhook)"
+    participant OB as "outbound_messages"
+
+    loop "Every 5 minutes"
+        FE->>DB: "SELECT due companies"
+        DB-->>FE: "Due companies"
+
+        loop "Per due company"
+            FE->>DB: "Check automation_disabled"
+            DB-->>FE: "Enabled/Disabled"
+            
+            FE->>DB: "Check followup_history (dedup)"
+            DB-->>FE: "Already processed?"
+            
+            FE->>DB: "Check domain allowlist"
+            DB-->>FE: "Allowed/Ignored"
+
+            alt "Interested Now > 21 days → auto age-out to Nurture"
+                FE->>DB: "Update stage to Nurture, next date +182d"
+                FE->>OB: "Enqueue Slack notify"
+            else "Normal followup"
+                FE->>LLM: "Draft followup email with context"
+                LLM-->>FE: "Draft reply"
+                FE->>FE: "Guardrail check"
+                FE->>PEND: "Save pending reply for approval"
+                FE->>OB: "Enqueue interactive Slack message"
+            end
+        end
+    end
+
+    Note over SA: "Human clicks Approve in Slack"
+    SA->>PEND: "approve_pending_reply()"
+    SA->>DB: "Update Attio stage"
+    SA->>OB: "Enqueue email"
+    SA->>PEND: "Delete pending reply"` },
+            {
+                title: "4. Agent Worker Flow", code: `sequenceDiagram
+    participant AO as agent-orchestrator
+    participant DB as "PostgreSQL DB"
+    participant RUNNER as agent-runner
+    participant LLM as OpenRouter-LLM
+    participant TOOLS as tool-runner
+    participant OB as outbound-messages
+    participant SLACK as Slack-Direct
+
+    loop "Polling (10s)"
+        AO->>DB: "SELECT PENDING (FOR UPDATE SKIP LOCKED)"
+        DB-->>AO: "Task from ai_todo"
+        AO->>AO: "Start heartbeat thread"
+        AO->>RUNNER: "run_agent(todo)"
+
+        RUNNER->>DB: "Load workflow (DB-first)"
+        DB-->>RUNNER: "Workflow definition"
+        
+        RUNNER->>DB: "Load agent memory"
+        DB-->>RUNNER: "Memory context"
+
+        loop "Tool Execution Loop"
+            RUNNER->>LLM: "Get tool calls from LLM"
+            LLM-->>RUNNER: "Requested tools"
+            RUNNER->>TOOLS: "Execute lolcrm command"
+            
+            opt "If tool is gmail_send"
+                TOOLS->>OB: "Enqueue outbound message"
+            end
+            
+            TOOLS-->>RUNNER: "stdout and exit code"
+        end
+
+        Note over RUNNER: "Mark TODO as DONE or FAILED"
+
+        RUNNER->>SLACK: "Agent status notification"
+        RUNNER-->>AO: "Execution result"
+    end` },
+            {
+                title: "5. Slack Approval Flow (Two Paths)", code: `flowchart TD
+    subgraph InboundApproval["Inbound Email Approval"]
+        P1[email processor<br/>classification result] --> P2{Slack confirmation<br/>required?}
+        P2 -->|Yes| P3[Save to pending_slack_replies]
+        P3 --> P4[Enqueue Slack notification<br/>with Approve/Reject buttons]
+        P4 --> P5[slack-send delivers<br/>interactive message]
+        P5 --> P6[Human clicks button]
+        P6 --> P7[slack-receive webhook]
+        P7 --> P8{Approve or Reject?}
+        P8 -->|Approve| P9[Update Attio]
+        P9 --> P10[Enqueue reply to<br/>outbound_messages]
+        P10 --> P11[gmail-send or<br/>emailbison-send delivers]
+        P8 -->|Reject| P12[Add to ai_todo<br/>for manual review]
+    end
+
+    subgraph FollowupApproval["Followup Approval"]
+        F1[followup-engine<br/>draft generated] --> F2[Save to pending_slack_replies]
+        F2 --> F3[Enqueue Slack notification<br/>with Send/Skip buttons]
+        F3 --> F4[slack-send delivers]
+        F4 --> F5[Human clicks button]
+        F5 --> F6[slack-receive webhook]
+        F6 --> F7{Approve or Reject?}
+        F7 -->|Approve| F8[Update Attio stage + date]
+        F8 --> F9[Enqueue email to<br/>outbound_messages]
+        F9 --> F10[gmail-send delivers]
+        F7 -->|Reject| F11[Mark as handled]
+    end` },
+            {
+                title: "6. Outbound Message Queue Drain", code: `flowchart LR
+    subgraph Enqueue["Enqueue Sources"]
+        E1[outreach-processor]
+        E2[conversation-processor]
+        E3[utility-processor]
+        E4[followup-engine<br/>via slack approval]
+        E5[agent-worker<br/>via gmail_send tool]
+        E6[slack-receive<br/>via approval]
+    end
+
+    subgraph Queue["outbound_messages table"]
+        Q[(status=pending<br/>provider=gmail / emailbison / slack<br/>scheduled_at, priority)]
+    end
+
+    subgraph Drain["Send Services"]
+        S1[gmail-send<br/>provider='gmail']
+        S2[emailbison-send<br/>provider='emailbison']
+        S3[slack-send<br/>provider='slack']
+    end
+
+    subgraph APIs["External APIs"]
+        A1[Gmail API]
+        A2[EmailBison API]
+        A3[Slack Webhook]
+    end
+
+    E1 --> Q
+    E2 --> Q
+    E3 --> Q
+    E4 --> Q
+    E5 --> Q
+    E6 --> Q
+
+    Q -->|SELECT FOR UPDATE SKIP LOCKED| S1
+    Q -->|SELECT FOR UPDATE SKIP LOCKED| S2
+    Q -->|SELECT FOR UPDATE SKIP LOCKED| S3
+
+    S1 -->|send_message| A1
+    S2 -->|send_reply / compose_new| A2
+    S3 -->|requests.post| A3
+
+    S1 -->|mark sent/failed| Q
+    S2 -->|mark sent/failed| Q
+    S3 -->|mark sent/failed| Q` },
+            {
+                title: "7. Service Independence (Modularity Proof)", code: `graph TB
+    subgraph Minimal["Minimal Viable (2 services)"]
+        direction LR
+        GR2[gmail-receive] --> DB2[(DB)]
+        DB2 --> GS2[gmail-send]
+    end
+
+    subgraph Partial["Partial (missing EmailBison)"]
+        direction LR
+        GR3[gmail-receive] --> DB3[(DB)]
+        DB3 --> OP3[outreach-processor]
+        DB3 --> CP3[conversation-processor]
+        OP3 --> DB3
+        CP3 --> DB3
+        DB3 --> GS3[gmail-send]
+        DB3 --> SS3[slack-send]
+    end
+
+    subgraph Full["Full Stack (11 services)"]
+        direction LR
+        GR4[gmail-receive] --> DB4[(DB)]
+        EBR4[emailbison-receive] --> DB4
+        SR4[slack-receive] --> DB4
+        DB4 --> OP4[outreach-processor]
+        DB4 --> CP4[conversation-processor]
+        DB4 --> UP4[utility-processor]
+        DB4 --> FE4[followup-engine]
+        DB4 --> AW4[agent-worker]
+        OP4 --> DB4
+        CP4 --> DB4
+        UP4 --> DB4
+        FE4 --> DB4
+        AW4 --> DB4
+        DB4 --> GS4[gmail-send]
+        DB4 --> EBS4[emailbison-send]
+        DB4 --> SS4[slack-send]
+    end
+
+    style Minimal fill:#1a472a,color:#fff
+    style Partial fill:#1a3a5c,color:#fff
+    style Full fill:#4a1942,color:#fff` }
+        ];
+
+        const container = document.getElementById('diagrams');
+        const overlay = document.getElementById('overlay');
+
+        overlay.onclick = () => {
+            overlay.style.display = 'none';
+            overlay.innerHTML = '';
+        };
+
+        function downloadSVG(id, filename) {
+            const svg = document.querySelector(`#${id} svg`);
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+            const svgUrl = URL.createObjectURL(svgBlob);
+            const downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = filename + ".svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        diagrams.forEach((d, i) => {
+            const id = `diag-${i}`;
+            const section = document.createElement('div');
+            section.className = 'diagram-section';
+
+            section.innerHTML = `
+                <div class="diagram-header">
+                    <h2>${d.title} <span class="badge">LATEST</span></h2>
+                    <div class="actions">
+                        <button class="btn btn-outline" onclick="downloadSVG('${id}', '${d.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}')">
+                            Download SVG
+                        </button>
+                    </div>
+                </div>
+                <div class="diagram-content" id="${id}" onclick="showOverlay('${id}')">
+                    <pre class="mermaid">
+${d.code}
+                    </pre>
+                </div>
+            `;
+            container.appendChild(section);
+        });
+
+        function showOverlay(id) {
+            const svg = document.querySelector(`#${id} svg`).cloneNode(true);
+            overlay.innerHTML = '';
+            overlay.appendChild(svg);
+            overlay.style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>
