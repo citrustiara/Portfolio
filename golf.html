@@ -850,7 +850,8 @@
     const CUP_PULL_RADIUS = 0.5;
     const CUP_PULL_FORCE = 1.8;
     const CUP_SINK_RADIUS = 0.34;
-    const CUP_SINK_SPEED_MAX = 3.2;
+    const CUP_SINK_SPEED_MAX = 5.0;
+    const CUP_SURFACE_Y = 0.15;
     const FPS_DAMAGE_PER_HIT = 20;
     const FPS_LASER_TTL = 0.08;
     const FPS_BASE_MOUSE_SENSITIVITY = 0.0022;
@@ -1186,7 +1187,7 @@
       }
 
       world.cup = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 40), materials.cup);
-      world.cup.position.y = 0.22;
+      world.cup.position.y = CUP_SURFACE_Y;
       world.cup.receiveShadow = true;
       world.courseRoot.add(world.cup);
 
@@ -1807,7 +1808,7 @@
       world.ball.position.copy(hole.start);
       world.ballVel.set(0, 0, 0);
       world.cup.position.copy(hole.cup);
-      world.cup.position.y = 0.23;
+      world.cup.position.y = CUP_SURFACE_Y;
       game.ballMoving = false;
       shotArrow.classList.add("hidden");
     }
@@ -1989,8 +1990,16 @@
       if (world.ballVel.length() < 0.12) {
         world.ballVel.set(0, 0, 0);
         game.ballMoving = false;
-        if (game.role !== "solo" && game.currentPlayer !== game.localIndex) {
-          send({ type: "golfResolved", state: serializeGolfState() });
+        const shouldAdvanceTurn = game.role === "solo" || game.currentPlayer === game.localIndex;
+        if (shouldAdvanceTurn) {
+          game.currentPlayer = 1 - game.currentPlayer;
+          game.aimPower = 0;
+          input.golfChargeDir = 1;
+          powerFill.style.width = "0%";
+          updateHud();
+          if (game.role !== "solo") {
+            send({ type: "golfResolved", state: serializeGolfState() });
+          }
         }
       }
 
@@ -2098,7 +2107,7 @@
       clearBumpers();
       for (const bumperDef of activeHole.bumpers) addBumper(bumperDef);
       world.cup.position.copy(activeHole.cup);
-      world.cup.position.y = 0.23;
+      world.cup.position.y = CUP_SURFACE_Y;
       world.ball.position.set(state.ball.x, state.ball.y, state.ball.z);
       world.ballVel.set(state.vel.x, state.vel.y, state.vel.z);
       game.ballMoving = world.ballVel.length() > 0.1;
@@ -3091,7 +3100,7 @@
       const banner = document.getElementById("victoryBanner");
       if (banner) banner.remove();
 
-      const winnerLabel = winner === game.localIndex ? "You win" : (game.role === "solo" ? `Player ${winner + 1} wins` : "Opponent wins");
+      const winnerLabel = winner === game.localIndex ? "You win" : (game.role === "solo" ? `Player ${winner + 1} wins` : "You lose");
       resultTitle.textContent = winnerLabel;
       const totals = totalStrokes();
       resultBody.textContent = reason === "deathmatch"
