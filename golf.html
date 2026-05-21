@@ -1010,6 +1010,7 @@
       dragging: false,
       dragStart: { x: 0, y: 0, angle: 0 },
       ballMoving: false,
+      golfResolveToken: 0,
       fpsMockStatic: false,
       countdown: 0,
       result: null,
@@ -2139,6 +2140,7 @@
       game.aimAngle = -Math.PI / 4;
       game.aimPower = 0;
       game.ballMoving = false;
+      game.golfResolveToken += 1;
       game.result = null;
       shotArrow.classList.add("hidden");
       world.ballVel.set(0, 0, 0);
@@ -2273,6 +2275,10 @@
       return game.role === "solo" || game.currentPlayer === game.localIndex;
     }
 
+    function canResolveGolfState() {
+      return game.role === "solo" || game.currentPlayer === game.localIndex;
+    }
+
     function simulateShot(angle, shotPower, announce, countStroke = true) {
       if (game.ballMoving) return;
       game.ballMoving = true;
@@ -2322,11 +2328,16 @@
         world.ballVel.addScaledVector(pull.normalize(), dt * CUP_PULL_FORCE);
       }
       if (cupDistance < CUP_SINK_RADIUS && !ballIsTooFastForCup) {
+        const scoringPlayer = game.currentPlayer;
+        const scoringHole = game.holeIndex;
         world.ball.position.copy(world.cup.position);
         world.ball.position.y = 0.05;
         world.ballVel.set(0, 0, 0);
         game.ballMoving = false;
-        window.setTimeout(resolveCup, 450);
+        if (canResolveGolfState()) {
+          const resolveToken = ++game.golfResolveToken;
+          window.setTimeout(() => resolveCup(scoringPlayer, scoringHole, resolveToken), 450);
+        }
         return;
       }
 
@@ -2390,16 +2401,22 @@
       }
     }
 
-    function resolveCup() {
+    function resolveCup(scoringPlayer = game.currentPlayer, scoringHole = game.holeIndex, resolveToken = game.golfResolveToken) {
       if (game.phase !== "golf") return;
-      game.holeScores[game.currentPlayer][game.holeIndex] = game.strokesThisHole[game.currentPlayer];
+      if (!canResolveGolfState()) return;
+      if (resolveToken !== game.golfResolveToken) return;
+      if (scoringPlayer !== game.currentPlayer || scoringHole !== game.holeIndex) return;
 
-      const playerAComplete = game.holeScores[0][game.holeIndex] !== null;
-      const playerBComplete = game.holeScores[1][game.holeIndex] !== null;
+      game.holeScores[scoringPlayer][scoringHole] = game.strokesThisHole[scoringPlayer];
+
+      const playerAComplete = game.holeScores[0][scoringHole] !== null;
+      const playerBComplete = game.holeScores[1][scoringHole] !== null;
 
       if (playerAComplete && playerBComplete) {
-        if (game.holeIndex === holes.length - 1) {
-          finishGolf();
+        if (scoringHole === holes.length - 1) {
+          updateHud();
+          if (game.role !== "solo") send({ type: "golfResolved", state: serializeGolfState() });
+          finishGolf(game.role === "solo");
           return;
         }
         game.holeIndex += 1;
@@ -2411,13 +2428,13 @@
 
       resetGolfHole();
       updateHud();
-      send({ type: "golfResolved", state: serializeGolfState() });
+      if (game.role !== "solo") send({ type: "golfResolved", state: serializeGolfState() });
     }
 
-    function finishGolf() {
+    function finishGolf(announce = true) {
       const totals = totalStrokes();
       if (totals[0] === totals[1]) {
-        enterFps(true);
+        enterFps(announce);
       } else {
         finishMatch(totals[0] < totals[1] ? 0 : 1, "strokes");
       }
@@ -2440,6 +2457,7 @@
 
     function applyGolfState(state) {
       if (!state) return;
+      game.golfResolveToken += 1;
       game.currentPlayer = state.currentPlayer;
       game.holeIndex = state.holeIndex;
       game.holeScores = state.holeScores;
@@ -2453,6 +2471,11 @@
       world.ballVel.set(state.vel.x, state.vel.y, state.vel.z);
       game.ballMoving = world.ballVel.length() > 0.1;
       updateHud();
+      if (isGolfComplete()) finishGolf(false);
+    }
+
+    function isGolfComplete() {
+      return game.holeScores.every((scores) => scores.every((score) => score !== null));
     }
 
     function updateAimArrow() {
@@ -2779,7 +2802,7 @@
 
     function updateFpsMovement(player, dt) {
       const previousVelocity = player.vel.clone();
-      const slideKeyActive = input.keys.has("ControlLeft") || input.keys.has("ControlRight");
+      const slideKeyActive = input.keys.has("ShiftLeft") || input.keys.has("ShiftRight");
       input.slideKeyWasDown = slideKeyActive;
 
       // Handle slide timer / state
@@ -2904,6 +2927,7 @@
       // 2. Move X and check obstacle collision
       const oldX = player.pos.x;
       player.pos.x += player.vel.x * dt;
+      tryStepUp(player, playerRadius);
       for (const obs of world.obstacles) {
         const box = new THREE.Box3().setFromObject(obs);
         // Add player radius to box for AABB check
@@ -2919,6 +2943,7 @@
       // 3. Move Z and check obstacle collision
       const oldZ = player.pos.z;
       player.pos.z += player.vel.z * dt;
+      tryStepUp(player, playerRadius);
       for (const obs of world.obstacles) {
         const box = new THREE.Box3().setFromObject(obs);
         box.expandByScalar(playerRadius);
@@ -2941,6 +2966,28 @@
 
       if (!player.acc) player.acc = new THREE.Vector3();
       player.acc.copy(player.vel).sub(previousVelocity).multiplyScalar(1 / Math.max(dt, 0.001));
+    }
+
+    function tryStepUp(player, playerRadius) {
+      if (!player.grounded || player.vel.y > 0.1) return;
+      const maxStepHeight = 0.72;
+      let bestTop = player.pos.y;
+
+      for (const platform of world.platforms) {
+        const box = new THREE.Box3().setFromObject(platform);
+        const overlapsX = player.pos.x + playerRadius > box.min.x && player.pos.x - playerRadius < box.max.x;
+        const overlapsZ = player.pos.z + playerRadius > box.min.z && player.pos.z - playerRadius < box.max.z;
+        if (!overlapsX || !overlapsZ) continue;
+        if (box.max.y > player.pos.y - 0.04 && box.max.y <= player.pos.y + maxStepHeight) {
+          bestTop = Math.max(bestTop, box.max.y);
+        }
+      }
+
+      if (bestTop > player.pos.y) {
+        player.pos.y = bestTop;
+        player.vel.y = 0;
+        player.grounded = true;
+      }
     }
 
     function updatePracticeOpponent(dt) {
@@ -3904,7 +3951,7 @@
         world.barrelGroup.scale.set(1, 1, 2.8);
         world.barrelGroup.position.set(0, 0, 0.4);
         if (world.rifleMag) world.rifleMag.visible = false;
-        if (world.sniperScope) world.sniperScope.visible = true;
+        if (world.sniperScope) world.sniperScope.visible = false;
       }
       
       if (world.weaponTip) {
