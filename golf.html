@@ -943,10 +943,10 @@
     const FPS_HEAD_HIT_RADIUS = 0.36;
     const FPS_BODY_HIT_RADIUS = 0.74;
     const GRENADE_COOLDOWN = 4.5;
-    const GRENADE_SPEED = 31;
+    const GRENADE_SPEED = 43;
     const GRENADE_GRAVITY = -36;
-    const GRENADE_SPLASH_RADIUS = 8.5;
-    const GRENADE_MAX_DAMAGE = 85;
+    const GRENADE_SPLASH_RADIUS = 12.5;
+    const GRENADE_MAX_DAMAGE = 125;
 
     const holes = [
       {
@@ -1504,6 +1504,18 @@
       decorBox(12.6, 5.54, 0, 0.5, 0.08, 18, 0xffd166);
       box(-5.7, 9.0, 0, 0.5, 5.6, 0.5, 0x7ee2a8, false);
       box(5.7, 9.0, 0, 0.5, 5.6, 0.5, 0xffd166, false);
+      platformOnly(0, 9.45, -11.4, 5.6, 0.38, 5.6, 0x5ab0ff);
+      platformOnly(8.2, 10.2, -15.8, 4.9, 0.38, 4.9, 0x7ee2a8);
+      platformOnly(15.4, 10.95, -10.2, 5.2, 0.38, 5.2, 0xffd166);
+      platformOnly(0, 9.45, 11.4, 5.6, 0.38, 5.6, 0xff6f61);
+      platformOnly(-8.2, 10.2, 15.8, 4.9, 0.38, 4.9, 0x8d4cff);
+      platformOnly(-15.4, 10.95, 10.2, 5.2, 0.38, 5.2, 0x6be5ff);
+      decorBox(0, 9.16, -11.4, 4.4, 0.18, 4.4, 0x6be5ff, 0, 0, glassMat);
+      decorBox(8.2, 9.91, -15.8, 3.8, 0.18, 3.8, 0xa7ffe0, 0, 0, glassMat);
+      decorBox(15.4, 10.66, -10.2, 4.0, 0.18, 4.0, 0xfff0a6, 0, 0, glassMat);
+      decorBox(0, 9.16, 11.4, 4.4, 0.18, 4.4, 0xff9f88, 0, 0, glassMat);
+      decorBox(-8.2, 9.91, 15.8, 3.8, 0.18, 3.8, 0xd9b7ff, 0, 0, glassMat);
+      decorBox(-15.4, 10.66, 10.2, 4.0, 0.18, 4.0, 0x6be5ff, 0, 0, glassMat);
       stairRun(-14.5, -15.5, 1, 0, 10, 3.0, 1.08, 0.55, 0x225c7a);
       box(-3.7, 5.15, -15.5, 5.2, 0.45, 3.2, 0x3478b8);
       stairRun(14.5, 15.5, -1, 0, 10, 3.0, 1.08, 0.55, 0x7a2835);
@@ -1717,7 +1729,9 @@
       rearSight.position.set(0, 0.25, 0.17);
       const frontSight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.035), matDark);
       frontSight.position.set(0, 0.23, -0.46);
-      world.weapon.add(panelL, panelR, topRail, rearSight, frontSight);
+      world.weaponTopDetails = new THREE.Group();
+      world.weaponTopDetails.add(topRail, rearSight, frontSight);
+      world.weapon.add(panelL, panelR, world.weaponTopDetails);
 
       // 2. Lower Receiver
       const frame = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.5), matLight);
@@ -1800,19 +1814,6 @@
       world.rifleMag.rotation.x = 0.2;
       world.rifleMag.visible = false;
       world.weapon.add(world.rifleMag);
-
-      world.sniperScope = new THREE.Group();
-      world.sniperScope.visible = false;
-      const scopeTube = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.34, 16), matDark);
-      scopeTube.rotation.x = Math.PI / 2;
-      const scopeLens = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.056, 0.012, 16), matCyanGlow);
-      scopeLens.rotation.x = Math.PI / 2;
-      scopeLens.position.z = -0.18;
-      const scopeMount = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.075, 0.08), matGold);
-      scopeMount.position.y = -0.06;
-      world.sniperScope.position.set(0, 0.28, -0.28);
-      world.sniperScope.add(scopeTube, scopeLens, scopeMount);
-      world.weapon.add(world.sniperScope);
 
       // Setup weaponTip for laser traces (placed directly in weapon root to position independently of barrel scaling)
       world.weaponTip = new THREE.Group();
@@ -3941,17 +3942,17 @@
         world.barrelGroup.scale.set(1, 1, 1);
         world.barrelGroup.position.set(0, 0, 0);
         if (world.rifleMag) world.rifleMag.visible = false;
-        if (world.sniperScope) world.sniperScope.visible = false;
+        if (world.weaponTopDetails) world.weaponTopDetails.visible = true;
       } else if (game.primaryWeapon === "rifle") {
         world.barrelGroup.scale.set(1, 1, 1.4);
         world.barrelGroup.position.set(0, 0, 0.1);
         if (world.rifleMag) world.rifleMag.visible = true;
-        if (world.sniperScope) world.sniperScope.visible = false;
+        if (world.weaponTopDetails) world.weaponTopDetails.visible = true;
       } else if (game.primaryWeapon === "sniper") {
         world.barrelGroup.scale.set(1, 1, 2.8);
         world.barrelGroup.position.set(0, 0, 0.4);
         if (world.rifleMag) world.rifleMag.visible = false;
-        if (world.sniperScope) world.sniperScope.visible = false;
+        if (world.weaponTopDetails) world.weaponTopDetails.visible = false;
       }
       
       if (world.weaponTip) {
