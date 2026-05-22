@@ -948,6 +948,8 @@
     const GRENADE_SPLASH_RADIUS = 17.5;
     const GRENADE_MAX_DAMAGE = 185;
     const HOLES_PER_TOURNAMENT = 3;
+    const FPS_COUNTDOWN_DURATION = 3;
+    const WEAPON_SWAP_DURATION = 0.28;
 
     const holeCatalog = [
       {
@@ -1070,6 +1072,10 @@
       activeWeapon: "gun",
       meleeSwingTimer: 0,
       primaryWeapon: "pistol",
+      weaponSwapTimer: 0,
+      weaponSwapCommitted: true,
+      pendingActiveWeapon: "gun",
+      pendingPrimaryWeapon: "pistol",
       ammo: { pistol: 7, rifle: 25, sniper: 5 },
       reloading: false,
       reloadTimer: 0,
@@ -1158,48 +1164,47 @@
 
     window.addEventListener("resize", resize);
     window.addEventListener("keydown", (event) => {
+      const inputCode = codeFromKeyEvent(event);
       if (event.code === "Escape" && game.phase === "fps") {
         document.exitPointerLock?.();
         input.aiming = false;
       }
       ensureAudio();
       input.keys.add(event.code);
-      if (game.phase === "golf" && ["Space", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
-      if ((game.phase === "fps" || game.phase === "fpsVictoryLap") && event.code.startsWith("Arrow")) event.preventDefault();
+      input.keys.add(inputCode);
+      if (game.phase === "golf" && ["Space", "ArrowLeft", "ArrowRight"].includes(inputCode)) event.preventDefault();
+      if ((game.phase === "fps" || game.phase === "fpsVictoryLap") && inputCode.startsWith("Arrow")) event.preventDefault();
       
       if (game.phase === "fps" || game.phase === "fpsVictoryLap") {
         // Request pointer lock on first interaction
         if (!input.pointerLocked) requestPointerLockSafe();
 
-        if (game.countdown > 0) {
-          // Weapon select phase: keyboard navigation is arrow-only so WASD stays reserved for movement.
-          if (event.code === "ArrowLeft" || event.code === "ArrowUp") {
-            cycleWeaponCard(-1);
-            event.preventDefault();
-          } else if (event.code === "ArrowRight" || event.code === "ArrowDown") {
-            cycleWeaponCard(1);
-            event.preventDefault();
-          }
-        } else {
+        if (game.countdown <= 0) {
           // Allow winner to switch and inspect during victory lap
           const isWinner = game.phase === "fps" || (game.phase === "fpsVictoryLap" && game.localIndex === game.result.winner);
           if (isWinner) {
-            if (event.code === "KeyR") {
+            if (inputCode === "KeyR") {
               startReload();
             }
-            if (event.code === "ArrowLeft") {
+            if (inputCode === "ArrowLeft") {
               cycleWeaponCard(-1);
-              switchWeapon("gun");
-            } else if (event.code === "ArrowRight") {
+            } else if (inputCode === "ArrowRight") {
               cycleWeaponCard(1);
+            } else if (inputCode === "ArrowUp") {
               switchWeapon("gun");
-            } else if (event.code === "ArrowUp") {
-              switchWeapon("gun");
-            } else if (event.code === "ArrowDown") {
+            } else if (inputCode === "ArrowDown") {
               switchWeapon("melee");
-            } else if (event.code === "KeyF" && !game.reloading && game.meleeSwingTimer <= 0) {
+            } else if (inputCode === "Digit1") {
+              pickWeaponCard("pistol", true);
+            } else if (inputCode === "Digit2") {
+              pickWeaponCard("rifle", true);
+            } else if (inputCode === "Digit3") {
+              pickWeaponCard("sniper", true);
+            } else if (inputCode === "Digit4") {
+              switchWeapon("melee");
+            } else if (inputCode === "KeyF" && !game.reloading && game.meleeSwingTimer <= 0) {
               game.inspectTimer = 2.0;
-            } else if (event.code === "KeyG") {
+            } else if (inputCode === "KeyG") {
               throwGrenade();
             }
           }
@@ -1207,12 +1212,14 @@
       }
     });
     window.addEventListener("keyup", (event) => {
-      if (game.phase === "golf" && event.code === "Space" && canControlGolf() && !game.ballMoving && game.aimPower > 0.04) {
+      const inputCode = codeFromKeyEvent(event);
+      if (game.phase === "golf" && inputCode === "Space" && canControlGolf() && !game.ballMoving && game.aimPower > 0.04) {
         simulateShot(game.aimAngle, game.aimPower, true);
         game.aimPower = 0;
         powerFill.style.width = "0%";
       }
       input.keys.delete(event.code);
+      input.keys.delete(inputCode);
     });
     document.addEventListener("pointerlockchange", () => input.pointerLocked = document.pointerLockElement === canvas);
     document.addEventListener("mousemove", onMouseMove);
@@ -1334,7 +1341,25 @@
     sensitivityInput.addEventListener("input", () => syncSensitivity(sensitivityInput.value));
     menuSensitivityInput.addEventListener("input", () => syncSensitivity(menuSensitivityInput.value));
 
+    window.addEventListener("wheel", (event) => {
+      if ((game.phase !== "fps" && game.phase !== "fpsVictoryLap") || game.countdown > 0) return;
+      const isWinner = game.phase === "fps" || (game.phase === "fpsVictoryLap" && game.localIndex === game.result.winner);
+      if (!isWinner) return;
+      cycleActiveWeapon(event.deltaY > 0 ? 1 : -1);
+      event.preventDefault();
+    }, { passive: false });
+
     phraseInput.value = generatePhrase();
+
+    function codeFromKeyEvent(event) {
+      if (event.code) return event.code;
+      const key = event.key || "";
+      if (key === " ") return "Space";
+      if (key.startsWith("Arrow")) return key;
+      if (/^[a-z]$/i.test(key)) return `Key${key.toUpperCase()}`;
+      if (/^[0-9]$/.test(key)) return `Digit${key}`;
+      return key;
+    }
 
     function setupLighting() {
       const hemi = new THREE.HemisphereLight(0xdff8ff, 0x426a42, 1.8);
@@ -1400,8 +1425,7 @@
 
       const hills = [
         { x: -4.8, z: -3.6, r: 1.35, c: 0x72cf83 },
-        { x: 4.2, z: 3.6, r: 1.65, c: 0x48a565 },
-        { x: 0.7, z: -4.7, r: 0.9, c: 0x72cf83 }
+        { x: 4.2, z: 3.6, r: 1.65, c: 0x48a565 }
       ];
 
       for (const hill of hills) {
@@ -2627,8 +2651,8 @@
     function enterFps(announce, options = {}) {
       game.phase = "fps";
       game.fpsMockStatic = Boolean(options.staticMock);
-      game.countdown = 10;
-      game.weaponSelectTimer = 10;
+      game.countdown = FPS_COUNTDOWN_DURATION;
+      game.weaponSelectTimer = FPS_COUNTDOWN_DURATION;
       fps.startedAt = performance.now();
       world.golfRoot.visible = false;
       world.arenaRoot.visible = true;
@@ -2654,16 +2678,18 @@
       game.activeWeapon = "gun";
       game.meleeSwingTimer = 0;
       game.primaryWeapon = "pistol";
+      game.weaponSwapTimer = 0;
+      game.weaponSwapCommitted = true;
+      game.pendingActiveWeapon = "gun";
+      game.pendingPrimaryWeapon = "pistol";
       syncPrimaryWeaponModel();
       game.ammo = { pistol: 7, rifle: 25, sniper: 5 };
       game.reloading = false;
       game.reloadTimer = 0;
       game.grenadeCooldown = 0;
 
-      // Show weapon selection overlay
-      weaponSelectOverlay.classList.remove("hidden");
-      weaponSelectTimer.textContent = "10";
-      // Reset card selection to pistol
+      weaponSelectOverlay.classList.add("hidden");
+      weaponSelectTimer.textContent = "";
       weaponCards.forEach(c => c.classList.remove("active"));
       const pistolCard = document.querySelector(".weapon-card[data-weapon='pistol']");
       if (pistolCard) pistolCard.classList.add("active");
@@ -2699,26 +2725,20 @@
       updatePlayerMeshes();
       updateHud();
       if (announce) send({ type: "phaseFps" });
-      // Don't lock pointer yet — let user interact with weapon-select overlay
-      document.exitPointerLock?.();
+      requestPointerLockSafe();
     }
 
     function updateFps(dt, now) {
-      game.countdown = Math.max(0, 10 - (now - fps.startedAt) / 1000);
+      game.countdown = Math.max(0, FPS_COUNTDOWN_DURATION - (now - fps.startedAt) / 1000);
 
       if (game.countdown > 0) {
         const secs = Math.ceil(game.countdown);
-        weaponSelectTimer.textContent = secs.toString();
-        countdown.textContent = "";
+        weaponSelectTimer.textContent = "";
+        countdown.textContent = secs.toString();
       } else {
-        // First frame at zero — hide weapon select overlay and lock pointer
-        if (!weaponSelectOverlay.classList.contains("hidden")) {
-          weaponSelectOverlay.classList.add("hidden");
-          syncPrimaryWeaponModel();
-          requestPointerLockSafe();
-        }
+        weaponSelectOverlay.classList.add("hidden");
         countdown.textContent = "FRAG!";
-        if (now - fps.startedAt > 10600) countdown.textContent = "";
+        if (now - fps.startedAt > (FPS_COUNTDOWN_DURATION * 1000 + 600)) countdown.textContent = "";
       }
 
       if (game.meleeSwingTimer > 0) {
@@ -2728,6 +2748,8 @@
       if (game.inspectTimer > 0) {
         game.inspectTimer -= dt;
       }
+
+      updateWeaponSwap(dt);
 
       if (game.jumpCooldown > 0) game.jumpCooldown -= dt;
       if (game.healCooldown > 0) game.healCooldown -= dt;
@@ -3134,6 +3156,10 @@
 
       const inactiveMeleePos = new THREE.Vector3(0.38, -1.2, -0.65);
       const inactiveMeleeRot = new THREE.Euler(0.8, -0.35, 0.2);
+      const swapProgress = game.weaponSwapTimer > 0
+        ? 1 - (game.weaponSwapTimer / WEAPON_SWAP_DURATION)
+        : 1;
+      const swapDip = game.weaponSwapTimer > 0 ? Math.sin(swapProgress * Math.PI) : 0;
 
       if (game.activeWeapon === "gun") {
         world.weapon.visible = true;
@@ -3170,6 +3196,11 @@
           targetGunRot.z += rotate;
           targetGunRot.x += rotate * 0.2;
           targetGunRot.y += Math.sin(progress * Math.PI) * 0.6; // Turn to show side
+        }
+
+        if (swapDip > 0) {
+          targetGunPos.y -= 0.72 * swapDip;
+          targetGunRot.x -= 0.46 * swapDip;
         }
 
         // Smoothly lerp gun to active (or reload-dip) pose
@@ -3212,6 +3243,11 @@
           targetMeleePos.x -= Math.sin(progress * Math.PI) * 0.1;
         }
 
+        if (swapDip > 0) {
+          targetMeleePos.y -= 0.72 * swapDip;
+          targetMeleeRot.x += 0.42 * swapDip;
+        }
+
         world.meleeWeapon.position.lerp(targetMeleePos, alpha);
         world.meleeWeapon.rotation.x += (targetMeleeRot.x - world.meleeWeapon.rotation.x) * alpha;
         world.meleeWeapon.rotation.y += (targetMeleeRot.y - world.meleeWeapon.rotation.y) * alpha;
@@ -3233,7 +3269,7 @@
     }
 
     function triggerAttack() {
-      if (game.phase !== "fps" || game.countdown > 0) return;
+      if (game.phase !== "fps" || game.countdown > 0 || game.weaponSwapTimer > 0) return;
       game.inspectTimer = 0;
       if (game.activeWeapon === "gun") {
         fireHitscan();
@@ -3243,7 +3279,7 @@
     }
 
     function throwGrenade() {
-      if (game.phase !== "fps" || game.countdown > 0 || game.grenadeCooldown > 0) return;
+      if (game.phase !== "fps" || game.countdown > 0 || game.grenadeCooldown > 0 || game.weaponSwapTimer > 0) return;
       const shooter = fps.players[game.localIndex];
       const origin = new THREE.Vector3(shooter.pos.x, shooter.pos.y + (shooter.currentCamHeight || 0.72), shooter.pos.z);
       const direction = directionFromAngles(input.yaw, input.pitch).normalize();
@@ -3991,40 +4027,90 @@
     }
     function switchWeapon(weaponType) {
       if ((game.phase !== "fps" && game.phase !== "fpsVictoryLap") || game.countdown > 0) return;
-      game.activeWeapon = weaponType;
-      if (weaponType === "melee") {
-        game.reloading = false;
-      }
-      updateHud();
+      requestWeaponSwap(weaponType, game.primaryWeapon);
     }
 
-    function selectPrimaryWeapon(wp) {
-      game.primaryWeapon = wp;
-      syncPrimaryWeaponModel();
-      updateHud();
-      send({
-        type: "fpsWeaponChoice",
-        weapon: wp
-      });
+    function selectPrimaryWeapon(wp, animate = false) {
+      if (animate && game.countdown <= 0) {
+        requestWeaponSwap("gun", wp);
+      } else {
+        applyWeaponState(game.activeWeapon, wp);
+      }
     }
 
     function cycleWeaponCard(direction) {
       if (game.phase !== "fps" && game.phase !== "fpsVictoryLap") return;
-      if (game.phase === "fps" && game.countdown <= 0) {
-        // Still allow switching gun subtype if active weapon is gun
-      }
       const weapons = ["pistol", "rifle", "sniper"];
       const currentIdx = weapons.indexOf(game.primaryWeapon);
       const nextIdx = (currentIdx + direction + weapons.length) % weapons.length;
-      pickWeaponCard(weapons[nextIdx]);
+      pickWeaponCard(weapons[nextIdx], game.countdown <= 0);
     }
 
-    function pickWeaponCard(wp) {
+    function pickWeaponCard(wp, animate = false) {
       if (game.phase !== "fps" && game.phase !== "fpsVictoryLap") return;
       weaponCards.forEach(c => c.classList.remove("active"));
       const card = document.querySelector(`.weapon-card[data-weapon='${wp}']`);
       if (card) card.classList.add("active");
-      selectPrimaryWeapon(wp);
+      selectPrimaryWeapon(wp, animate);
+    }
+
+    function cycleActiveWeapon(direction) {
+      const loadout = [
+        { active: "gun", primary: "pistol" },
+        { active: "gun", primary: "rifle" },
+        { active: "gun", primary: "sniper" },
+        { active: "melee", primary: game.primaryWeapon }
+      ];
+      const currentIdx = game.activeWeapon === "melee"
+        ? 3
+        : Math.max(0, loadout.findIndex((item) => item.active === "gun" && item.primary === game.primaryWeapon));
+      const next = loadout[(currentIdx + direction + loadout.length) % loadout.length];
+      if (next.active === "gun") {
+        pickWeaponCard(next.primary, true);
+      } else {
+        switchWeapon("melee");
+      }
+    }
+
+    function requestWeaponSwap(activeWeapon, primaryWeapon = game.primaryWeapon) {
+      if ((game.phase !== "fps" && game.phase !== "fpsVictoryLap") || game.countdown > 0) return;
+      if (game.activeWeapon === activeWeapon && game.primaryWeapon === primaryWeapon && game.weaponSwapTimer <= 0) return;
+      game.pendingActiveWeapon = activeWeapon;
+      game.pendingPrimaryWeapon = primaryWeapon;
+      game.weaponSwapTimer = WEAPON_SWAP_DURATION;
+      game.weaponSwapCommitted = false;
+      game.inspectTimer = 0;
+      input.aiming = false;
+      updateHud();
+    }
+
+    function updateWeaponSwap(dt) {
+      if (game.weaponSwapTimer <= 0) return;
+      game.weaponSwapTimer = Math.max(0, game.weaponSwapTimer - dt);
+      if (!game.weaponSwapCommitted && game.weaponSwapTimer <= WEAPON_SWAP_DURATION * 0.5) {
+        applyWeaponState(game.pendingActiveWeapon, game.pendingPrimaryWeapon);
+        game.weaponSwapCommitted = true;
+      }
+      if (game.weaponSwapTimer <= 0) {
+        game.weaponSwapCommitted = true;
+      }
+    }
+
+    function applyWeaponState(activeWeapon, primaryWeapon = game.primaryWeapon) {
+      const primaryChanged = game.primaryWeapon !== primaryWeapon;
+      game.activeWeapon = activeWeapon;
+      game.primaryWeapon = primaryWeapon;
+      if (activeWeapon === "melee") {
+        game.reloading = false;
+      }
+      if (primaryChanged) {
+        syncPrimaryWeaponModel();
+        send({
+          type: "fpsWeaponChoice",
+          weapon: primaryWeapon
+        });
+      }
+      updateHud();
     }
 
     function syncPrimaryWeaponModel() {
