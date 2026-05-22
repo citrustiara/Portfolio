@@ -2521,15 +2521,19 @@
 
     function resetGolfHole() {
       const hole = holes[game.holeIndex];
-      clearCourseGeometry();
-      buildGolfCourse(hole);
-      for (const bumperDef of hole.bumpers) addBumper(bumperDef);
+      rebuildGolfHoleGeometry(hole);
       world.ball.position.copy(hole.start);
       world.ballVel.set(0, 0, 0);
       world.cup.position.copy(hole.cup);
       world.cup.position.y = CUP_SURFACE_Y;
       game.ballMoving = false;
       shotArrow.classList.add("hidden");
+    }
+
+    function rebuildGolfHoleGeometry(hole) {
+      clearCourseGeometry();
+      buildGolfCourse(hole);
+      for (const bumperDef of hole.bumpers) addBumper(bumperDef);
     }
 
     function clearCourseGeometry() {
@@ -2687,6 +2691,11 @@
 
     function onPointerMove(event) {
       if (!game.dragging || game.phase !== "golf") return;
+      if (!canControlGolf()) {
+        game.dragging = false;
+        shotArrow.classList.add("hidden");
+        return;
+      }
       const dx = event.clientX - game.dragStart.x;
       const dy = event.clientY - game.dragStart.y;
       game.aimAngle = game.dragStart.angle - dx * GOLF_AIM_SENSITIVITY;
@@ -2700,6 +2709,11 @@
       game.dragging = false;
       shotArrow.classList.add("hidden");
       canvas.releasePointerCapture(event.pointerId);
+      if (!canControlGolf()) {
+        game.aimPower = 0;
+        powerFill.style.width = "0%";
+        return;
+      }
       if (game.aimPower > 0.01) {
         const angle = game.aimAngle;
         const shotPower = game.aimPower;
@@ -2977,19 +2991,32 @@
     function applyGolfState(state) {
       if (!state) return;
       game.golfResolveToken += 1;
+      const previousCourseIds = holes.map((hole) => hole.id).join(",");
       if (state.courseIds) applyTournamentHoleIds(state.courseIds);
+      const courseChanged = previousCourseIds !== holes.map((hole) => hole.id).join(",");
+      const previousHoleIndex = game.holeIndex;
       game.currentPlayer = state.currentPlayer;
       game.holeIndex = state.holeIndex;
       game.holeScores = state.holeScores;
       game.strokesThisHole = state.strokesThisHole;
       const activeHole = holes[game.holeIndex];
-      clearBumpers();
-      for (const bumperDef of activeHole.bumpers) addBumper(bumperDef);
+      if (!activeHole) return;
+      if (courseChanged || previousHoleIndex !== game.holeIndex) {
+        rebuildGolfHoleGeometry(activeHole);
+      } else if (world.coursePieces.length === 0) {
+        rebuildGolfHoleGeometry(activeHole);
+      }
       world.cup.position.copy(activeHole.cup);
       world.cup.position.y = CUP_SURFACE_Y;
       world.ball.position.set(state.ball.x, state.ball.y, state.ball.z);
       world.ballVel.set(state.vel.x, state.vel.y, state.vel.z);
       game.ballMoving = world.ballVel.length() > 0.1;
+      if (!canControlGolf()) {
+        game.dragging = false;
+        game.aimPower = 0;
+        powerFill.style.width = "0%";
+        shotArrow.classList.add("hidden");
+      }
       updateHud();
       if (isGolfComplete()) finishGolf(false);
     }
