@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -191,7 +190,7 @@
       position: relative;
       z-index: 2;
       font-size: 14px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .fps-hud .chip {
@@ -211,7 +210,6 @@
     #healthChip {
       border-color: rgba(255, 80, 80, 0.4);
     }
-
     #healthText {
       color: #ff5050;
     }
@@ -606,17 +604,9 @@
     }
 
     @keyframes damage-flash {
-      0% {
-        opacity: 0;
-      }
-
-      16% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0;
-      }
+      0% { opacity: 0; }
+      16% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     .hidden {
@@ -639,15 +629,8 @@
     }
 
     @keyframes victory-pulse {
-      from {
-        transform: translateX(-50%) scale(1);
-        opacity: 0.9;
-      }
-
-      to {
-        transform: translateX(-50%) scale(1.06);
-        opacity: 1;
-      }
+      from { transform: translateX(-50%) scale(1); opacity: 0.9; }
+      to   { transform: translateX(-50%) scale(1.06); opacity: 1; }
     }
 
     .fps .crosshair,
@@ -671,7 +654,6 @@
         grid-template-columns: 1fr;
       }
     }
-
     .weapon-select-overlay {
       position: absolute;
       inset: 0;
@@ -756,7 +738,6 @@
     }
   </style>
 </head>
-
 <body>
   <canvas id="game"></canvas>
   <div class="overlay" id="overlay">
@@ -811,16 +792,13 @@
       <h1>Golf Duel</h1>
       <p>Share a phrase or jump straight into testing.</p>
       <input id="phraseInput" maxlength="48" spellcheck="false" autocomplete="off" placeholder="room phrase" />
-
-      <div
-        style="margin: 14px auto 10px; width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; background: rgba(0, 0, 0, 0.32); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
-        <label for="menuSensitivityInput"
-          style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--muted); margin: 0 0 2px;">
+      
+      <div style="margin: 14px auto 10px; width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; background: rgba(0, 0, 0, 0.32); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
+        <label for="menuSensitivityInput" style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--muted); margin: 0 0 2px;">
           <span>Aim Sensitivity</span>
           <span id="menuSensitivityValue">1.0x</span>
         </label>
-        <input id="menuSensitivityInput" type="range" min="0.4" max="2.6" step="0.1" value="1"
-          style="min-height: 24px; padding: 0; accent-color: var(--gold); background: transparent; border: 0; cursor: pointer;" />
+        <input id="menuSensitivityInput" type="range" min="0.4" max="2.6" step="0.1" value="1" style="min-height: 24px; padding: 0; accent-color: var(--gold); background: transparent; border: 0; cursor: pointer;" />
       </div>
 
       <div class="menu-grid">
@@ -964,14 +942,16 @@
     const FPS_SNIPER_AIM_FOV = 14;
     const FPS_HEAD_HIT_RADIUS = 0.36;
     const FPS_BODY_HIT_RADIUS = 0.74;
-    const GRENADE_COOLDOWN = 4.5;
+    const GRENADE_COOLDOWN = 6.5;
     const GRENADE_SPEED = 43;
     const GRENADE_GRAVITY = -36;
-    const GRENADE_SPLASH_RADIUS = 17.5;
-    const GRENADE_MAX_DAMAGE = -185;
+    const GRENADE_SPLASH_RADIUS = 15.5;
+    const GRENADE_MAX_DAMAGE = 160;
     const HOLES_PER_TOURNAMENT = 3;
     const FPS_COUNTDOWN_DURATION = 3;
     const WEAPON_SWAP_DURATION = 0.28;
+    const FPS_MAPS_PER_DUEL = 3;
+    const FPS_KILLS_TO_WIN_MAP = 2;
 
     const holeCatalog = [
       {
@@ -1087,6 +1067,11 @@
       ballMoving: false,
       golfResolveToken: 0,
       fpsMockStatic: false,
+      fpsMapIndex: 0,
+      fpsMapWins: [0, 0],
+      fpsKillWins: [0, 0],
+      fpsRoundWinner: null,
+      fpsMatchOver: false,
       countdown: 0,
       result: null,
       lastSend: 0,
@@ -1139,6 +1124,42 @@
       floor: new THREE.MeshStandardMaterial({ color: 0x2d3940, roughness: 0.88 }),
       laser: new THREE.LineBasicMaterial({ color: 0xfff0a6, transparent: true, opacity: 1 })
     };
+
+    const fpsArenaThemes = [
+      {
+        name: "Neon Depot",
+        sky: 0x101822,
+        fog: 0x101822,
+        fogNear: 60,
+        fogFar: 160,
+        floor: 0x2d3940,
+        gridA: 0x78e0ff,
+        gridB: 0x334050,
+        edge: 0x1a3a4a
+      },
+      {
+        name: "Sunlit Rooftops",
+        sky: 0xbdefff,
+        fog: 0xbdefff,
+        fogNear: 70,
+        fogFar: 190,
+        floor: 0xd7e6cf,
+        gridA: 0xffffff,
+        gridB: 0x7cb58e,
+        edge: 0xf7f0c9
+      },
+      {
+        name: "Ember Foundry",
+        sky: 0x140b12,
+        fog: 0x140b12,
+        fogNear: 42,
+        fogFar: 130,
+        floor: 0x2b2020,
+        gridA: 0xff7a2f,
+        gridB: 0x4b2b32,
+        edge: 0x3a1516
+      }
+    ];
 
     const world = {
       golfRoot: new THREE.Group(),
@@ -1196,7 +1217,7 @@
       input.keys.add(inputCode);
       if (game.phase === "golf" && ["Space", "ArrowLeft", "ArrowRight"].includes(inputCode)) event.preventDefault();
       if ((game.phase === "fps" || game.phase === "fpsVictoryLap") && inputCode.startsWith("Arrow")) event.preventDefault();
-
+      
       if (game.phase === "fps" || game.phase === "fpsVictoryLap") {
         // Request pointer lock on first interaction
         if (!input.pointerLocked) requestPointerLockSafe();
@@ -1276,8 +1297,9 @@
     });
     startFpsBtn.addEventListener("click", () => {
       if (game.role !== "guest") {
-        send({ type: "phaseFps" });
-        enterFps(false);
+        resetFpsDuelState();
+        send({ type: "phaseFps", fpsState: serializeFpsDuelState() });
+        enterFps(false, { preserveFpsMatch: true });
       }
     });
     leaveBtn.addEventListener("click", () => {
@@ -1290,7 +1312,7 @@
     });
     restartBtn.addEventListener("click", restartTournament);
     settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("hidden"));
-
+    
     function syncSensitivity(value) {
       const multiplier = Number(value);
       input.mouseSensitivity = FPS_BASE_MOUSE_SENSITIVITY * multiplier;
@@ -1468,30 +1490,43 @@
     function setupArena() {
       const SIZE = 112;
       const HALF = SIZE / 2;
+      const mapIndex = game.fpsMapIndex || 0;
+      const theme = fpsArenaThemes[mapIndex] || fpsArenaThemes[0];
+      applyFpsArenaTheme(theme);
 
       // Reset world obstacles and platforms
       world.obstacles = [];
       world.platforms = [];
 
       // Large open floor
-      const floor = new THREE.Mesh(new THREE.BoxGeometry(SIZE, 0.5, SIZE), materials.floor);
+      const floor = new THREE.Mesh(
+        new THREE.BoxGeometry(SIZE, 0.5, SIZE),
+        new THREE.MeshStandardMaterial({ color: theme.floor, roughness: 0.88 })
+      );
       floor.position.y = -0.25;
       floor.receiveShadow = true;
       world.arenaRoot.add(floor);
 
       // Grid overlay
-      const grid = new THREE.GridHelper(SIZE, SIZE / 2, 0x78e0ff, 0x334050);
+      const grid = new THREE.GridHelper(SIZE, SIZE / 2, theme.gridA, theme.gridB);
       grid.position.y = 0.02;
       world.arenaRoot.add(grid);
 
+      const skyShell = new THREE.Mesh(
+        new THREE.SphereGeometry(170, 32, 16),
+        new THREE.MeshBasicMaterial({ color: theme.sky, side: THREE.BackSide })
+      );
+      skyShell.position.y = 28;
+      world.arenaRoot.add(skyShell);
+
       // Thin perimeter walls
-      const edgeMat = new THREE.MeshBasicMaterial({ color: 0x1a3a4a });
+      const edgeMat = new THREE.MeshBasicMaterial({ color: theme.edge });
       const edgeH = 0.5;
       const wallDefs = [
         { x: 0, z: -HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
-        { x: 0, z: HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
+        { x: 0, z:  HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
         { x: -HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
-        { x: HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
+        { x:  HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
       ];
       for (const w of wallDefs) {
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(w.sx, w.sy, w.sz), edgeMat);
@@ -1502,7 +1537,7 @@
       // Spawn pads
       const spawnPads = [
         { x: -42, z: 0, mat: materials.blue },
-        { x: 42, z: 0, mat: materials.coral }
+        { x:  42, z: 0, mat: materials.coral }
       ];
       for (const pad of spawnPads) {
         const ring = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 0.08, 42), pad.mat);
@@ -1521,7 +1556,7 @@
       // Obstacles and Platforms
       const obstacleMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.7 });
       const glassMat = new THREE.MeshStandardMaterial({ color: 0x6be5ff, roughness: 0.18, metalness: 0.12, transparent: true, opacity: 0.34 });
-
+      
       const box = (x, y, z, sx, sy, sz, color = 0x444444, isPlatform = true) => {
         const mat = color === 0x444444 ? obstacleMat : new THREE.MeshStandardMaterial({ color, roughness: 0.7 });
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
@@ -1578,6 +1613,7 @@
       };
 
       // Complex central structure
+      if (mapIndex === 0) {
       box(0, 0, 0, 8, 12, 8); // Taller Core pillar
       box(0, 5, 0, 24, 0.5, 24, 0x555555); // Larger Top platform
       box(0, 8.5, 0, 10, 0.5, 10, 0x666666); // Higher second tier
@@ -1607,7 +1643,7 @@
       box(-15.5, 5.15, 3.7, 3.2, 0.45, 5.2, 0xb8902f);
       stairRun(15.5, -14.5, 0, 1, 10, 3.0, 1.08, 0.55, 0x287a55);
       box(15.5, 5.15, -3.7, 3.2, 0.45, 5.2, 0x3d9a65);
-
+      
       // Mazelike walls
       // Blue side (negative X)
       box(-15, 0, -10, 2, 4.5, 20);
@@ -1615,7 +1651,7 @@
       box(-32, 0, -5, 2, 4.5, 25);
       box(-28, 0, -18, 12, 4.5, 2);
       box(-12, 0, 25, 2, 6, 8, 0x444444); // Tall pillar
-
+      
       // Coral side (positive X)
       box(15, 0, 10, 2, 4.5, 20);
       box(20, 0, -15, 18, 4.5, 2);
@@ -1699,6 +1735,114 @@
       box(35, 0, -48, 6, 3, 4);
       box(48, 0, 35, 4, 3, 6);
       box(-48, 0, -35, 4, 3, 6);
+      addDepotBuildings(box, platformOnly, decorBox, glassMat);
+      } else if (mapIndex === 1) {
+        buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat);
+      } else {
+        buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat);
+      }
+    }
+
+    function applyFpsArenaTheme(theme) {
+      scene.background = new THREE.Color(theme.sky);
+      scene.fog = new THREE.Fog(theme.fog, theme.fogNear, theme.fogFar);
+    }
+
+    function addDepotBuildings(box, platformOnly, decorBox, glassMat) {
+      const roofMat = new THREE.MeshStandardMaterial({ color: 0x1b252b, roughness: 0.6, metalness: 0.18 });
+      box(-25, 0, -28, 14, 6, 10, 0x27333a);
+      platformOnly(-25, 6.15, -28, 15, 0.5, 11, 0x1b252b);
+      box(-25, 0, -23.2, 3.0, 4.8, 0.7, 0x101820, false);
+      box(-30.5, 0, -28, 0.7, 4.8, 6.4, 0x101820, false);
+      decorBox(-25, 6.44, -28, 15.6, 0.22, 11.6, 0x6be5ff, 0, 0, roofMat);
+
+      box(25, 0, 28, 14, 6, 10, 0x37272d);
+      platformOnly(25, 6.15, 28, 15, 0.5, 11, 0x2a1b1f);
+      box(25, 0, 23.2, 3.0, 4.8, 0.7, 0x1a1014, false);
+      box(30.5, 0, 28, 0.7, 4.8, 6.4, 0x1a1014, false);
+      decorBox(25, 6.44, 28, 15.6, 0.22, 11.6, 0xff9f88, 0, 0, roofMat);
+
+      box(-8, 0, -38, 18, 5.4, 2.2, 0x31424a);
+      platformOnly(-8, 5.55, -38, 19, 0.45, 3.2, 0x26353d);
+      box(8, 0, 38, 18, 5.4, 2.2, 0x4a3138);
+      platformOnly(8, 5.55, 38, 19, 0.45, 3.2, 0x3a252b);
+
+      decorBox(0, 7.05, 0, 30, 0.2, 4.4, 0xffffff, 0, 0, glassMat);
+      decorBox(0, 7.05, 0, 4.4, 0.2, 30, 0xffffff, 0, 0, glassMat);
+    }
+
+    function buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat) {
+      const awningMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.42, metalness: 0.05 });
+      box(0, 0, 0, 13, 7, 13, 0xe8f4d8);
+      platformOnly(0, 7.1, 0, 22, 0.5, 22, 0xf7f0c9);
+      decorBox(0, 7.52, 0, 18, 0.18, 18, 0xffffff, 0, 0, glassMat);
+
+      box(-35, 0, -28, 18, 5.5, 14, 0xb7d6a8);
+      platformOnly(-35, 5.65, -28, 19, 0.5, 15, 0xf2e7b8);
+      box(35, 0, 28, 18, 5.5, 14, 0xf0c58e);
+      platformOnly(35, 5.65, 28, 19, 0.5, 15, 0xfff0c2);
+
+      box(-34, 0, 28, 16, 3.4, 10, 0x80b8d8);
+      platformOnly(-34, 3.55, 28, 17, 0.45, 11, 0xcdefff);
+      box(34, 0, -28, 16, 3.4, 10, 0xea9da1);
+      platformOnly(34, 3.55, -28, 17, 0.45, 11, 0xffdada);
+
+      stairRun(-18, -16, -1, 0, 8, 3.2, 1.2, 0.5, 0xb7d6a8);
+      stairRun(18, 16, 1, 0, 8, 3.2, 1.2, 0.5, 0xf0c58e);
+      stairRun(-18, 15, 0, 1, 7, 3.1, 1.2, 0.46, 0x80b8d8);
+      stairRun(18, -15, 0, -1, 7, 3.1, 1.2, 0.46, 0xea9da1);
+
+      platformOnly(0, 3.0, -34, 24, 0.45, 4.0, 0xf5dd99);
+      platformOnly(0, 3.0, 34, 24, 0.45, 4.0, 0xaed8ff);
+      platformOnly(-34, 4.8, 0, 4.0, 0.45, 24, 0xb0dfa6);
+      platformOnly(34, 4.8, 0, 4.0, 0.45, 24, 0xffb9be);
+
+      box(-8, 0, -6, 3, 3.2, 16, 0xf4f0df);
+      box(8, 0, 6, 3, 3.2, 16, 0xf4f0df);
+      box(0, 0, -22, 10, 2.4, 3.0, 0xffd166);
+      box(0, 0, 22, 10, 2.4, 3.0, 0x7ee2a8);
+      decorBox(-20, 5.95, -28, 11, 0.2, 9, 0xffffff, 0, 0, awningMat);
+      decorBox(20, 5.95, 28, 11, 0.2, 9, 0xffffff, 0, 0, awningMat);
+    }
+
+    function buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat) {
+      const emberMat = new THREE.MeshBasicMaterial({ color: 0xff5a24 });
+      box(0, 0, 0, 10, 9, 10, 0x201719);
+      platformOnly(0, 9.1, 0, 18, 0.55, 18, 0x34202a);
+      decorBox(0, 9.5, 0, 14, 0.16, 14, 0xff7a2f, 0, 0, glassMat);
+
+      box(-32, 0, -32, 16, 7, 16, 0x211111);
+      platformOnly(-32, 7.15, -32, 17, 0.5, 17, 0x4a1f1f);
+      box(32, 0, 32, 16, 7, 16, 0x1a1418);
+      platformOnly(32, 7.15, 32, 17, 0.5, 17, 0x4a2a19);
+      box(-32, 0, 32, 14, 4.5, 14, 0x2b191f);
+      platformOnly(-32, 4.65, 32, 15, 0.5, 15, 0x5a2b21);
+      box(32, 0, -32, 14, 4.5, 14, 0x271e15);
+      platformOnly(32, 4.65, -32, 15, 0.5, 15, 0x6a3c1c);
+
+      box(0, 0, -35, 34, 5.5, 3, 0x321617);
+      box(0, 0, 35, 34, 5.5, 3, 0x321617);
+      box(-35, 0, 0, 3, 5.5, 34, 0x321617);
+      box(35, 0, 0, 3, 5.5, 34, 0x321617);
+      platformOnly(0, 5.75, -35, 36, 0.45, 4, 0x6e2a1a);
+      platformOnly(0, 5.75, 35, 36, 0.45, 4, 0x6e2a1a);
+      platformOnly(-35, 5.75, 0, 4, 0.45, 36, 0x6e2a1a);
+      platformOnly(35, 5.75, 0, 4, 0.45, 36, 0x6e2a1a);
+
+      stairRun(-18, -24, 1, 0, 9, 3.2, 1.15, 0.58, 0x5c271a);
+      stairRun(18, 24, -1, 0, 9, 3.2, 1.15, 0.58, 0x5c271a);
+      stairRun(-24, 18, 0, -1, 8, 3.2, 1.15, 0.56, 0x3f2024);
+      stairRun(24, -18, 0, 1, 8, 3.2, 1.15, 0.56, 0x3f2024);
+
+      for (const z of [-18, 18]) {
+        decorBox(0, 0.05, z, 22, 0.08, 5, 0xff5a24, 0, 0, emberMat);
+        box(-14, 0, z, 3, 1.5, 7, 0x201719);
+        box(14, 0, z, 3, 1.5, 7, 0x201719);
+      }
+      box(-8, 0, 0, 3, 4.5, 22, 0x181012);
+      box(8, 0, 0, 3, 4.5, 22, 0x181012);
+      platformOnly(0, 3.4, -12, 20, 0.42, 3, 0x7a351f);
+      platformOnly(0, 3.4, 12, 20, 0.42, 3, 0x7a351f);
     }
 
     function makePlayerMesh(material) {
@@ -1725,7 +1869,7 @@
       const headGroup = new THREE.Group();
       headGroup.name = "headGroup";
       headGroup.position.y = 1.35; // Position for neck/head
-
+      
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 16), material);
       head.castShadow = true;
       const brow = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.08, 0.07), darkMat);
@@ -1761,11 +1905,11 @@
       const meleePart = new THREE.Group();
       meleePart.name = "melee";
       meleePart.visible = false;
-
+      
       const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.75, 8), materials.wall);
-      clubShaft.position.set(0.3, -0.2, -0.2);
+      clubShaft.position.set(0.3, -0.2, -0.2); 
       clubShaft.rotation.x = Math.PI / 3;
-
+      
       const clubHead = new THREE.Group();
       clubHead.position.set(0.3, -0.5, -0.4);
       clubHead.rotation.set(Math.PI / 3, 0.95, -0.15);
@@ -1777,7 +1921,7 @@
       clubHeel.rotation.z = Math.PI / 2;
       clubHeel.position.set(-0.08, 0.012, 0);
       clubHead.add(clubFace, clubToe, clubHeel);
-
+      
       meleePart.add(clubShaft, clubHead);
       headGroup.add(meleePart);
 
@@ -1907,49 +2051,49 @@
       world.weaponTip = new THREE.Group();
       world.weaponTip.position.set(0, 0.08, -0.84);
       world.weapon.add(world.weaponTip);
-
-      // --- MELEE WEAPON (Golf Club) ---
-      world.meleeWeapon = new THREE.Group();
-      world.meleeWeapon.visible = false;
-
-      // Grip (rubber/carbon fiber wrapping)
-      const clubGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.28, 12), matGrip);
-      clubGrip.rotation.x = Math.PI / 2;
-      clubGrip.position.set(0, 0, 0);
-      world.meleeWeapon.add(clubGrip);
-
-      // Shaft (carbon/chrome steel tubing)
-      const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.9, 12), matLight);
-      clubShaft.rotation.x = Math.PI / 2;
-      clubShaft.position.set(0, 0, -0.58);
-      world.meleeWeapon.add(clubShaft);
-
-      // Hosel / connector
-      const clubHosel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.08, 10), matDark);
-      clubHosel.rotation.x = Math.PI / 2;
-      clubHosel.rotation.z = -0.2;
-      clubHosel.position.set(0, -0.01, -1.02);
-      world.meleeWeapon.add(clubHosel);
-
-      // Club head (sleek premium hybrid club head)
-      const clubHeadGroup = new THREE.Group();
-      clubHeadGroup.position.set(0.08, -0.05, -1.06);
-      clubHeadGroup.rotation.set(0.22, 1.05, -0.14);
-
-      const clubHeadBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.07, 0.12), matDark);
-      clubHeadGroup.add(clubHeadBody);
-
-      const clubHeadPlate = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.012, 0.105), matGold);
-      clubHeadPlate.position.set(0, -0.038, 0);
-      const clubToe = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.09, 0.14), matLight);
-      clubToe.position.set(0.16, 0.005, 0.02);
-      const clubGrooveA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.014, 0.01), matGold);
-      clubGrooveA.position.set(0.01, -0.045, -0.026);
-      const clubGrooveB = clubGrooveA.clone();
-      clubGrooveB.position.z = 0.026;
-      clubHeadGroup.add(clubHeadPlate, clubToe, clubGrooveA, clubGrooveB);
-
-      world.meleeWeapon.add(clubHeadGroup);
+ 
+       // --- MELEE WEAPON (Golf Club) ---
+       world.meleeWeapon = new THREE.Group();
+       world.meleeWeapon.visible = false;
+ 
+       // Grip (rubber/carbon fiber wrapping)
+       const clubGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.28, 12), matGrip);
+       clubGrip.rotation.x = Math.PI / 2;
+       clubGrip.position.set(0, 0, 0);
+       world.meleeWeapon.add(clubGrip);
+ 
+       // Shaft (carbon/chrome steel tubing)
+       const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.9, 12), matLight);
+       clubShaft.rotation.x = Math.PI / 2;
+       clubShaft.position.set(0, 0, -0.58);
+       world.meleeWeapon.add(clubShaft);
+ 
+       // Hosel / connector
+       const clubHosel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.08, 10), matDark);
+       clubHosel.rotation.x = Math.PI / 2;
+       clubHosel.rotation.z = -0.2;
+       clubHosel.position.set(0, -0.01, -1.02);
+       world.meleeWeapon.add(clubHosel);
+ 
+       // Club head (sleek premium hybrid club head)
+       const clubHeadGroup = new THREE.Group();
+       clubHeadGroup.position.set(0.08, -0.05, -1.06);
+       clubHeadGroup.rotation.set(0.22, 1.05, -0.14);
+ 
+       const clubHeadBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.07, 0.12), matDark);
+       clubHeadGroup.add(clubHeadBody);
+ 
+       const clubHeadPlate = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.012, 0.105), matGold);
+       clubHeadPlate.position.set(0, -0.038, 0);
+       const clubToe = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.09, 0.14), matLight);
+       clubToe.position.set(0.16, 0.005, 0.02);
+       const clubGrooveA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.014, 0.01), matGold);
+       clubGrooveA.position.set(0.01, -0.045, -0.026);
+       const clubGrooveB = clubGrooveA.clone();
+       clubGrooveB.position.z = 0.026;
+       clubHeadGroup.add(clubHeadPlate, clubToe, clubGrooveA, clubGrooveB);
+ 
+       world.meleeWeapon.add(clubHeadGroup);
 
       camera.add(world.weapon);
       camera.add(world.meleeWeapon);
@@ -2042,7 +2186,7 @@
       game.connected = false;
       game.fpsMockStatic = false;
       showNetwork("Practice match", room);
-
+      
       showLobby();
     }
 
@@ -2083,7 +2227,8 @@
       }
 
       if (message.type === "phaseFps") {
-        enterFps(false);
+        applyFpsDuelState(message.fpsState);
+        enterFps(false, { preserveFpsMatch: true });
       }
 
       if (message.type === "fpsWeaponChoice") {
@@ -2142,7 +2287,8 @@
       }
 
       if (message.type === "matchResult") {
-        startVictoryLap(message.winner, message.reason, false);
+        applyFpsDuelState(message.fpsState);
+        startVictoryLap(message.winner, message.reason, false, Boolean(message.fpsState));
       }
 
       if (message.type === "restart") {
@@ -2325,7 +2471,7 @@
 
     function requestPointerLockSafe() {
       const result = canvas.requestPointerLock?.();
-      if (result?.catch) result.catch(() => { });
+      if (result?.catch) result.catch(() => {});
     }
 
     function onMouseMove(event) {
@@ -2670,7 +2816,44 @@
       camera.lookAt(target.x, target.y + 0.25, target.z);
     }
 
+    function resetFpsDuelState() {
+      game.fpsMapIndex = 0;
+      game.fpsMapWins = [0, 0];
+      game.fpsKillWins = [0, 0];
+      game.fpsRoundWinner = null;
+      game.fpsMatchOver = false;
+    }
+
+    function serializeFpsDuelState() {
+      return {
+        mapIndex: game.fpsMapIndex,
+        mapWins: [...game.fpsMapWins],
+        killWins: [...game.fpsKillWins],
+        matchOver: game.fpsMatchOver
+      };
+    }
+
+    function applyFpsDuelState(state) {
+      if (!state) return;
+      game.fpsMapIndex = Math.max(0, Math.min(FPS_MAPS_PER_DUEL - 1, state.mapIndex ?? 0));
+      game.fpsMapWins = Array.isArray(state.mapWins) ? [...state.mapWins] : [0, 0];
+      game.fpsKillWins = Array.isArray(state.killWins) ? [...state.killWins] : [0, 0];
+      game.fpsMatchOver = Boolean(state.matchOver);
+    }
+
+    function rebuildArenaMap() {
+      world.arenaRoot.clear();
+      world.obstacles = [];
+      world.platforms = [];
+      world.playerMeshes = [];
+      world.lasers = [];
+      world.grenades = [];
+      world.explosions = [];
+      setupArena();
+    }
+
     function enterFps(announce, options = {}) {
+      if (!options.preserveFpsMatch) resetFpsDuelState();
       game.phase = "fps";
       game.fpsMockStatic = Boolean(options.staticMock);
       game.countdown = FPS_COUNTDOWN_DURATION;
@@ -2678,22 +2861,21 @@
       fps.startedAt = performance.now();
       world.golfRoot.visible = false;
       world.arenaRoot.visible = true;
+      rebuildArenaMap();
       power.classList.add("hidden");
       resultPanel.classList.add("hidden");
       menu.classList.add("hidden");
       lobby.classList.add("hidden");
 
       clearFpsEffects();
-      damageLayer.replaceChildren(); activeDamagePops.forEach(pop => pop.element.remove());
+      damageLayer.replaceChildren();      activeDamagePops.forEach(pop => pop.element.remove());
       activeDamagePops.length = 0;
 
       overlay.classList.add("fps");
-      scene.background = new THREE.Color(0x101822);
-      scene.fog = new THREE.Fog(0x101822, 60, 160);
       camera.up.set(0, 1, 0);
       camera.fov = FPS_DEFAULT_FOV;
       camera.updateProjectionMatrix();
-
+      
       world.weapon.visible = true;
       world.meleeWeapon.visible = false;
       input.aiming = false;
@@ -2726,7 +2908,7 @@
       fps.players[1].health = 100;
       fps.players[0].yaw = Math.PI / 2;
       fps.players[1].yaw = -Math.PI / 2;
-
+      
       fps.players[0].sliding = false;
       fps.players[1].sliding = false;
       fps.players[0].slideTimer = 0;
@@ -2746,7 +2928,7 @@
       syncPrimaryWeaponModel();
       updatePlayerMeshes();
       updateHud();
-      if (announce) send({ type: "phaseFps" });
+      if (announce) send({ type: "phaseFps", fpsState: serializeFpsDuelState() });
       requestPointerLockSafe();
     }
 
@@ -2809,7 +2991,7 @@
       local.yaw = input.yaw;
       local.pitch = input.pitch;
       local.weapon = game.activeWeapon;
-
+      
       if (game.countdown <= 0) updateFpsMovement(local, dt);
       updateRemotePlayers(dt, now);
       if (game.role === "solo" && !game.fpsMockStatic) updatePracticeOpponent(dt);
@@ -2934,9 +3116,9 @@
           player.sliding = false;
         } else {
           // Slide speed decay towards run speed
-          const startSpeed = game.activeWeapon === "melee" ? 28.0 : 23.0;
-          const endSpeed = game.activeWeapon === "melee" ? 17.5 : 12.5;
-          const currentSpeed = endSpeed + (startSpeed - endSpeed) * (player.slideTimer / 0.65);
+          const startSpeed = game.activeWeapon === "melee" ? 26.5 : 21.5;
+          const endSpeed = game.activeWeapon === "melee" ? 16.5 : 11.5;
+          const currentSpeed = endSpeed + (startSpeed - endSpeed) * (player.slideTimer / 0.6);
           player.vel.x = player.slideDir.x * currentSpeed;
           player.vel.z = player.slideDir.z * currentSpeed;
         }
@@ -2948,10 +3130,10 @@
         // Can only slide if moving
         if (horizontalVel.length() > 2.0) {
           player.sliding = true;
-          player.slideTimer = 0.65;
+          player.slideTimer = 0.6;
           player.slideDir.copy(horizontalVel).normalize();
-
-          const startSpeed = game.activeWeapon === "melee" ? 28.0 : 23.0;
+          
+          const startSpeed = game.activeWeapon === "melee" ? 26.5 : 21.5;
           player.vel.x = player.slideDir.x * startSpeed;
           player.vel.z = player.slideDir.z * startSpeed;
         }
@@ -2995,10 +3177,10 @@
 
       const horizontal = new THREE.Vector3(player.vel.x, 0, player.vel.z);
       const maxSpeed = game.activeWeapon === "melee" ? 17.5 : 12.5;
-
+      
       // Speed cap: sliding allows exceeding normal speed; air speeds preserve slide jump momentum.
-      const speedCap = player.sliding
-        ? (game.activeWeapon === "melee" ? 28.0 : 23.0)
+      const speedCap = player.sliding 
+        ? (game.activeWeapon === "melee" ? 26.5 : 21.5)
         : (player.grounded ? maxSpeed : Math.max(maxSpeed, horizontal.length()));
 
       if (horizontal.length() > speedCap) {
@@ -3021,7 +3203,7 @@
       }
 
       player.vel.y += fps.gravity * dt;
-
+      
       const movingOnGround = player.grounded && !player.sliding && (
         input.keys.has("KeyW") || input.keys.has("KeyA") || input.keys.has("KeyS") || input.keys.has("KeyD")
       );
@@ -3033,7 +3215,7 @@
       // --- Collision Detection ---
       const playerRadius = 0.45;
       const playerHeight = 1.8;
-
+      
       // 1. Move Y and check floor/platform collision
       player.pos.y += player.vel.y * dt;
       player.grounded = false;
@@ -3047,8 +3229,8 @@
         for (const platform of world.platforms) {
           const box = new THREE.Box3().setFromObject(platform);
           if (player.pos.x + playerRadius > box.min.x && player.pos.x - playerRadius < box.max.x &&
-            player.pos.z + playerRadius > box.min.z && player.pos.z - playerRadius < box.max.z) {
-
+              player.pos.z + playerRadius > box.min.z && player.pos.z - playerRadius < box.max.z) {
+            
             // If we are falling and our feet are above the platform top
             if (player.vel.y <= 0 && player.pos.y >= box.max.y - 0.5 && player.pos.y <= box.max.y + 0.1) {
               player.pos.y = box.max.y;
@@ -3069,10 +3251,10 @@
         // Add player radius to box for AABB check
         box.expandByScalar(playerRadius);
         if (box.containsPoint(new THREE.Vector3(player.pos.x, player.pos.y + 0.5, player.pos.z))) {
-          // Basic push-back logic
-          player.pos.x = oldX;
-          player.vel.x *= -0.2;
-          break;
+           // Basic push-back logic
+           player.pos.x = oldX;
+           player.vel.x *= -0.2;
+           break;
         }
       }
 
@@ -3084,9 +3266,9 @@
         const box = new THREE.Box3().setFromObject(obs);
         box.expandByScalar(playerRadius);
         if (box.containsPoint(new THREE.Vector3(player.pos.x, player.pos.y + 0.5, player.pos.z))) {
-          player.pos.z = oldZ;
-          player.vel.z *= -0.2;
-          break;
+           player.pos.z = oldZ;
+           player.vel.z *= -0.2;
+           break;
         }
       }
 
@@ -3141,7 +3323,7 @@
 
     function updateFpsCamera(player, dt) {
       const direction = directionFromAngles(input.yaw, input.pitch);
-
+      
       const targetCamHeight = player.sliding ? 0.32 : 0.72;
       if (player.currentCamHeight === undefined) player.currentCamHeight = 0.72;
       player.currentCamHeight += (targetCamHeight - player.currentCamHeight) * Math.min(1, dt * 14);
@@ -3551,14 +3733,14 @@
       // Hit detection using Raycaster for wall penetration
       const ray = new THREE.Raycaster(origin, direction, 0, 150);
       const intersects = ray.intersectObjects(world.obstacles);
-
+      
       let wallHit = null;
       if (intersects.length > 0) {
         wallHit = intersects[0];
       }
 
       const playerHitResult = rayHitsPlayer(origin, direction, opponent);
-
+      
       let finalHit = false;
       let finalDmg = 0;
       let finalHeadshot = false;
@@ -3644,7 +3826,7 @@
       if (distToHead < 2.6 || distToBody < 2.6) {
         const toOpponentHead = headCenter.clone().sub(origin).normalize();
         const toOpponentBody = bodyCenter.clone().sub(origin).normalize();
-
+        
         const headCos = direction.dot(toOpponentHead);
         const bodyCos = direction.dot(toOpponentBody);
 
@@ -3769,8 +3951,8 @@
       for (let i = 0; i <= segments; i++) {
         const theta = -Math.PI / 3 + (i / segments) * (2 * Math.PI / 3);
         const offset = right.clone().multiplyScalar(Math.sin(theta) * radius)
-          .add(direction.clone().multiplyScalar(Math.cos(theta) * radius))
-          .add(up.clone().multiplyScalar(Math.sin(theta * 0.5) * 0.35));
+                              .add(direction.clone().multiplyScalar(Math.cos(theta) * radius))
+                              .add(up.clone().multiplyScalar(Math.sin(theta * 0.5) * 0.35));
         points.push(origin.clone().add(offset));
       }
 
@@ -3806,7 +3988,7 @@
       for (let i = world.lasers.length - 1; i >= 0; i--) {
         const laser = world.lasers[i];
         laser.ttl -= dt;
-
+        
         const opacity = Math.max(0, laser.ttl / laser.maxTtl);
         if (laser.beam.isGroup) {
           laser.beam.children.forEach(child => {
@@ -3922,20 +4104,45 @@
         }
       }
     }
-    function startVictoryLap(winner, reason, announce = true) {
+    function startVictoryLap(winner, reason, announce = true, alreadyRecorded = false) {
       if (game.phase === "result" || game.phase === "fpsVictoryLap") return;
+      let mapOver = false;
+      let matchOver = reason === "strokes";
+
+      if (reason === "deathmatch" && !alreadyRecorded) {
+        game.fpsKillWins[winner] += 1;
+        mapOver = game.fpsKillWins[winner] >= FPS_KILLS_TO_WIN_MAP ||
+          (game.fpsKillWins[0] + game.fpsKillWins[1]) >= 3;
+        if (mapOver) {
+          game.fpsMapWins[winner] += 1;
+          matchOver = game.fpsMapWins[winner] >= 2 || game.fpsMapIndex >= FPS_MAPS_PER_DUEL - 1;
+          game.fpsMatchOver = matchOver;
+        }
+      } else if (reason === "deathmatch") {
+        mapOver = game.fpsKillWins[winner] >= FPS_KILLS_TO_WIN_MAP ||
+          (game.fpsKillWins[0] + game.fpsKillWins[1]) >= 3;
+        matchOver = game.fpsMatchOver;
+      }
+
       game.phase = "fpsVictoryLap";
-      game.result = { winner, reason };
+      game.result = { winner, reason, mapOver, matchOver };
+      game.fpsRoundWinner = winner;
       game.victoryLapStart = performance.now();
 
       // Show victory banner text over gameplay
       const banner = document.createElement("div");
       banner.className = "victory-banner";
       banner.id = "victoryBanner";
-      banner.textContent = winner === game.localIndex ? "YOU WIN" : (game.role === "solo" ? `PLAYER ${winner + 1} WINS` : "YOU LOSE");
+      if (reason === "deathmatch" && !matchOver) {
+        banner.textContent = mapOver
+          ? (winner === game.localIndex ? "MAP WON" : (game.role === "solo" ? `PLAYER ${winner + 1} WINS MAP` : "MAP LOST"))
+          : (winner === game.localIndex ? "ROUND WON" : (game.role === "solo" ? `PLAYER ${winner + 1} TAKES ROUND` : "ROUND LOST"));
+      } else {
+        banner.textContent = winner === game.localIndex ? "YOU WIN" : (game.role === "solo" ? `PLAYER ${winner + 1} WINS` : "YOU LOSE");
+      }
       overlay.appendChild(banner);
 
-      if (announce) send({ type: "matchResult", winner, reason });
+      if (announce) send({ type: "matchResult", winner, reason, fpsState: serializeFpsDuelState() });
       updateHud();
     }
 
@@ -3960,14 +4167,14 @@
       resultTitle.textContent = winnerLabel;
       const totals = totalStrokes();
       resultBody.textContent = reason === "deathmatch"
-        ? `Tie broken by deathmatch. Golf card: ${totals[0]} - ${totals[1]}.`
+        ? `Deathmatch maps: ${game.fpsMapWins[0]} - ${game.fpsMapWins[1]}. Golf card: ${totals[0]} - ${totals[1]}.`
         : `Final golf card: ${totals[0]} - ${totals[1]}.`;
       updateHud();
     }
 
     function restartTournament(announce = true) {
       if (announce && game.role === "guest") return; // Only host/solo can trigger
-
+      
       resultPanel.classList.add("hidden");
       if (announce) {
         send({ type: "restart" });
@@ -3987,7 +4194,7 @@
       weaponSelectOverlay.classList.add("hidden");
       overlay.classList.remove("fps");
       showMenuScene();
-
+      
       // Update lobby buttons based on role
       if (game.role === "guest") {
         startGolfBtn.classList.add("hidden");
@@ -4002,17 +4209,19 @@
 
     function updateHud() {
       const totals = totalStrokes();
-      holeText.textContent = game.phase === "fps" ? "Tie" : `${game.holeIndex + 1}`;
-      if (game.phase === "fps" || game.phase === "fpsVictoryLap") {
-        turnText.textContent = "Live";
+      const isFps = game.phase === "fps" || game.phase === "fpsVictoryLap";
+      holeText.textContent = isFps ? `D${game.fpsMapIndex + 1}` : `${game.holeIndex + 1}`;
+      if (isFps) {
+        turnText.textContent = `${game.fpsKillWins[0]}-${game.fpsKillWins[1]}`;
       } else if (game.role === "solo") {
         turnText.textContent = `P${game.currentPlayer + 1}`;
       } else {
         turnText.textContent = game.currentPlayer === game.localIndex ? "You" : "Them";
       }
-      strokeText.textContent = `${totals[0]} - ${totals[1]}`;
+      strokeText.textContent = isFps
+        ? `Maps ${game.fpsMapWins[0]} - ${game.fpsMapWins[1]}`
+        : `${totals[0]} - ${totals[1]}`;
 
-      const isFps = game.phase === "fps" || game.phase === "fpsVictoryLap";
       healthChip.classList.toggle("hidden", !isFps);
       healthText.textContent = `${Math.ceil(fps.players[game.localIndex].health)}`;
 
@@ -4037,7 +4246,7 @@
         ? (game.primaryWeapon === "pistol" ? "Pistol" : (game.primaryWeapon === "rifle" ? "Rifle" : "Sniper"))
         : "Club");
 
-      ammoChip.classList.toggle("hidden", !isFps || game.activeWeapon !== "gun"); if (game.activeWeapon === "gun") {
+      ammoChip.classList.toggle("hidden", !isFps || game.activeWeapon !== "gun");      if (game.activeWeapon === "gun") {
         const currentAmmo = game.ammo[game.primaryWeapon];
         const maxAmmo = game.primaryWeapon === "pistol" ? 7 : (game.primaryWeapon === "rifle" ? 25 : 5);
         ammoText.textContent = game.reloading ? "RELOAD" : `${currentAmmo} / ${maxAmmo}`;
@@ -4106,6 +4315,16 @@
       updateHud();
     }
 
+    function continueFpsDuel() {
+      const banner = document.getElementById("victoryBanner");
+      if (banner) banner.remove();
+      if (game.result?.mapOver) {
+        game.fpsMapIndex = Math.min(FPS_MAPS_PER_DUEL - 1, game.fpsMapIndex + 1);
+        game.fpsKillWins = [0, 0];
+      }
+      enterFps(false, { preserveFpsMatch: true, staticMock: game.fpsMockStatic });
+    }
+
     function updateWeaponSwap(dt) {
       if (game.weaponSwapTimer <= 0) return;
       game.weaponSwapTimer = Math.max(0, game.weaponSwapTimer - dt);
@@ -4168,7 +4387,7 @@
         if (world.weaponFrame) world.weaponFrame.scale.set(0.92, 0.92, 1.36);
         if (world.rifleMag) world.rifleMag.visible = false;
       }
-
+      
       if (world.weaponTip) {
         if (game.primaryWeapon === "pistol") {
           world.weaponTip.position.set(0, 0.08, -0.48);
@@ -4220,12 +4439,12 @@
 
         // Continue rendering the FPS world for 5 seconds after the kill
         const elapsed = (now - game.victoryLapStart) / 1000;
-
+        
         // If local player is the winner, they can still move
         // If local player is the loser, they spectate the winner
         const spectatorTarget = fps.players[game.result.winner];
         const isWinner = game.localIndex === game.result.winner;
-
+        
         if (isWinner) {
           // Winner's camera and movement are updated within updateFps via updateFpsCamera/updateFpsMovement
         } else {
@@ -4247,8 +4466,12 @@
           if (meleeNode) meleeNode.visible = (spectatorTarget.weapon === "melee");
         }
 
-        if (elapsed >= 5) {
-          finishMatch(game.result.winner, game.result.reason);
+        if (elapsed >= 3.2) {
+          if (game.result.reason === "deathmatch" && !game.result.matchOver) {
+            continueFpsDuel();
+          } else {
+            finishMatch(game.result.winner, game.result.reason);
+          }
         }
       }
 
@@ -4257,5 +4480,4 @@
     }
   </script>
 </body>
-
 </html>
