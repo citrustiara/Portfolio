@@ -207,6 +207,44 @@
       margin-top: 4px;
     }
 
+    .kill-notice {
+      position: absolute;
+      right: 18px;
+      top: 76px;
+      min-width: 210px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 111, 97, 0.48);
+      background: rgba(20, 8, 10, 0.72);
+      color: #fff;
+      text-align: right;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .radar-marker {
+      position: absolute;
+      width: 74px;
+      height: 74px;
+      margin-left: -37px;
+      margin-top: -37px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 209, 102, 0.96);
+      background: rgba(255, 209, 102, 0.18);
+      color: #fff2a8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 24px rgba(255, 209, 102, 0.52);
+      pointer-events: none;
+    }
+
     #healthChip {
       border-color: rgba(255, 80, 80, 0.4);
     }
@@ -755,6 +793,12 @@
 
     <div class="fps-hud" id="fpsHud">
       <div class="ability-container hidden" id="abilityContainer">
+        <div class="ability-slot" id="radarAbility">
+          <span class="key-hint">5</span>
+          <div class="cooldown-overlay" id="radarOverlay"></div>
+          <span class="cooldown-text" id="radarCDText"></span>
+          <span class="ability-icon">◎</span>
+        </div>
         <div class="ability-slot" id="jumpAbility">
           <span class="key-hint">E</span>
           <div class="cooldown-overlay" id="jumpOverlay"></div>
@@ -778,6 +822,8 @@
       <div class="chip hidden" id="weaponChip">Weapon<strong id="weaponText">Gun</strong></div>
       <div class="chip hidden" id="ammoChip">Ammo<strong id="ammoText">7 / 7</strong></div>
     </div>
+    <div class="kill-notice hidden" id="killNotice"></div>
+    <div class="radar-marker hidden" id="radarMarker">ENEMY</div>
 
     <button class="settings" id="settingsBtn" aria-label="Settings" title="Settings">⚙</button>
     <div class="settings-panel hidden" id="settingsPanel">
@@ -838,7 +884,7 @@
       <div class="weapon-cards">
         <div class="weapon-card active" data-weapon="pistol">
           <h3>PISTOL</h3>
-          <div class="weapon-stat">Damage: 20 (40 Crit)</div>
+          <div class="weapon-stat">Damage: 34 (68 Crit)</div>
           <div class="weapon-stat">Ammo: 7 Rounds</div>
           <div class="weapon-stat">Type: Semi-Auto</div>
         </div>
@@ -881,8 +927,10 @@
     const abilityContainer = document.querySelector("#abilityContainer");
     const jumpOverlay = document.querySelector("#jumpOverlay");
     const healOverlay = document.querySelector("#healOverlay");
+    const radarOverlay = document.querySelector("#radarOverlay");
     const jumpCDText = document.querySelector("#jumpCDText");
     const healCDText = document.querySelector("#healCDText");
+    const radarCDText = document.querySelector("#radarCDText");
     const power = document.querySelector("#power");
     const powerFill = document.querySelector("#powerFill");
     const shotArrow = document.querySelector("#shotArrow");
@@ -907,6 +955,8 @@
     const damageVignette = document.querySelector("#damageVignette");
     const grenadeOverlay = document.querySelector("#grenadeOverlay");
     const grenadeCDText = document.querySelector("#grenadeCDText");
+    const killNotice = document.querySelector("#killNotice");
+    const radarMarker = document.querySelector("#radarMarker");
 
     const lobby = document.querySelector("#lobby");
     const lobbyStatus = document.querySelector("#lobbyStatus");
@@ -945,93 +995,135 @@
     const GRENADE_COOLDOWN = 6.5;
     const GRENADE_SPEED = 43;
     const GRENADE_GRAVITY = -36;
-    const GRENADE_SPLASH_RADIUS = 15.5;
-    const GRENADE_MAX_DAMAGE = 160;
+    const GRENADE_SPLASH_RADIUS = 13.5;
+    const GRENADE_MAX_DAMAGE = 145;
     const HOLES_PER_TOURNAMENT = 3;
     const FPS_COUNTDOWN_DURATION = 3;
     const WEAPON_SWAP_DURATION = 0.28;
     const FPS_MAPS_PER_DUEL = 3;
     const FPS_KILLS_TO_WIN_MAP = 2;
+    const RADAR_DURATION = 2;
+    const RADAR_COOLDOWN = 9;
 
     const holeCatalog = [
       {
-        id: "dogleg-left",
-        name: "Dogleg Left",
-        start: new THREE.Vector3(-7.4, 0.34, 4.8),
-        cup: new THREE.Vector3(7.2, 0.34, -4.8),
-        walls: { x: 9, z: 6 },
+        id: "ice-runway",
+        name: "Ice Runway",
+        start: new THREE.Vector3(-23.5, 0.34, 0),
+        cup: new THREE.Vector3(23.5, 0.34, 0),
+        walls: { x: 27, z: 5.5 },
+        surfaces: [
+          { x: 0, z: 0, sx: 54, sz: 11 }
+        ],
+        ice: [
+          { x: -7, z: 0, sx: 13, sz: 6.4 },
+          { x: 10.8, z: 1.6, sx: 9.5, sz: 3.2 }
+        ],
         bumpers: [
-          { x: -2.2, z: 1.8, sx: 4.9, sz: 0.34, rot: -0.64 },
-          { x: 1.8, z: -1.5, sx: 5.2, sz: 0.34, rot: -0.64 },
-          { x: 4.9, z: 2.4, sx: 2.6, sz: 0.34, rot: 0.42 }
+          { x: -2.5, z: -2.7, sx: 6.8, sz: 0.34, rot: 0.36 },
+          { x: 7.4, z: 2.8, sx: 7.2, sz: 0.34, rot: -0.34 },
+          { x: 17.2, z: -1.9, sx: 4.8, sz: 0.34, rot: 0.72 }
         ]
       },
       {
-        id: "s-bend",
-        name: "S Bend",
-        start: new THREE.Vector3(7.2, 0.34, 5),
-        cup: new THREE.Vector3(-7.4, 0.34, -5),
-        walls: { x: 9, z: 6 },
+        id: "long-canal",
+        name: "Long Canal",
+        start: new THREE.Vector3(0, 0.34, 13.6),
+        cup: new THREE.Vector3(0, 0.34, -13.7),
+        walls: { x: 7.2, z: 16 },
+        surfaces: [
+          { x: 0, z: 0, sx: 14.4, sz: 32 }
+        ],
+        ice: [
+          { x: 0, z: 4.8, sx: 9.4, sz: 5.5 },
+          { x: -2.3, z: -7.7, sx: 5.5, sz: 5.8 }
+        ],
         bumpers: [
-          { x: 3.9, z: 1.9, sx: 3.6, sz: 0.34, rot: 0.48 },
-          { x: 0.1, z: -0.3, sx: 4.8, sz: 0.34, rot: -0.72 },
-          { x: -4.3, z: -2.5, sx: 3.2, sz: 0.34, rot: 0.58 },
-          { x: -1.8, z: 3.4, sx: 1.9, sz: 0.34, rot: Math.PI / 2 }
+          { x: -3.7, z: 7.2, sx: 5.6, sz: 0.34, rot: Math.PI / 2 },
+          { x: 3.8, z: 1.4, sx: 5.8, sz: 0.34, rot: Math.PI / 2 },
+          { x: -3.2, z: -4.5, sx: 4.2, sz: 0.34, rot: Math.PI / 2 },
+          { x: 2.0, z: -10.3, sx: 5.2, sz: 0.34, rot: -0.28 }
         ]
       },
       {
-        id: "switchback",
-        name: "Switchback",
-        start: new THREE.Vector3(-7.6, 0.34, -4.8),
-        cup: new THREE.Vector3(7.4, 0.34, 4.8),
-        walls: { x: 9, z: 6 },
+        id: "l-bend",
+        name: "L Bend",
+        start: new THREE.Vector3(-19.4, 0.34, 6),
+        cup: new THREE.Vector3(14.4, 0.34, -13.7),
+        walls: { x: 23, z: 17 },
+        surfaces: [
+          { x: -8, z: 6, sx: 30, sz: 11 },
+          { x: 13.5, z: -4.8, sx: 11, sz: 28 }
+        ],
+        ice: [
+          { x: 13.5, z: -3.2, sx: 6.4, sz: 10.4 }
+        ],
         bumpers: [
-          { x: -4.6, z: -0.5, sx: 4.7, sz: 0.34, rot: 0.08 },
-          { x: -1.0, z: 2.3, sx: 4.4, sz: 0.34, rot: -0.58 },
-          { x: 3.0, z: -1.0, sx: 4.9, sz: 0.34, rot: 0.55 },
-          { x: 3.2, z: 3.0, sx: 1.8, sz: 0.34, rot: Math.PI / 2 }
+          { x: -1.4, z: 0.5, sx: 9.2, sz: 0.34, rot: 0.52 },
+          { x: 8.4, z: 5.9, sx: 6.8, sz: 0.34, rot: Math.PI / 2 },
+          { x: 16.4, z: -7.5, sx: 6.2, sz: 0.34, rot: Math.PI / 2 },
+          { x: 10.3, z: -13.9, sx: 5.0, sz: 0.34, rot: 0 }
         ]
       },
       {
-        id: "pinball-corners",
-        name: "Pinball Corners",
-        start: new THREE.Vector3(-7.7, 0.34, 0.2),
-        cup: new THREE.Vector3(7.5, 0.34, -0.3),
-        walls: { x: 9, z: 6 },
+        id: "circle-loop",
+        name: "Circle Loop",
+        start: new THREE.Vector3(-10.5, 0.34, 0),
+        cup: new THREE.Vector3(10.5, 0.34, 0),
+        walls: { x: 14, z: 14 },
+        surfaces: [
+          { type: "circle", x: 0, z: 0, r: 14 }
+        ],
+        ice: [
+          { type: "circle", x: 0, z: 0, r: 4.4 }
+        ],
         bumpers: [
-          { x: -4.4, z: -3.4, sx: 3.2, sz: 0.34, rot: 0.74 },
-          { x: -1.2, z: 3.1, sx: 4.0, sz: 0.34, rot: -0.68 },
-          { x: 2.5, z: -2.9, sx: 4.0, sz: 0.34, rot: 0.68 },
-          { x: 5.2, z: 3.0, sx: 2.7, sz: 0.34, rot: -0.74 },
-          { x: 0.6, z: 0.0, sx: 1.5, sz: 0.34, rot: Math.PI / 2 }
+          { x: 0, z: -6.2, sx: 9.2, sz: 0.34, rot: 0.25 },
+          { x: 0, z: 6.2, sx: 9.2, sz: 0.34, rot: -0.25 },
+          { x: -6.4, z: 0, sx: 4.8, sz: 0.34, rot: Math.PI / 2 },
+          { x: 6.4, z: 0, sx: 4.8, sz: 0.34, rot: Math.PI / 2 }
         ]
       },
       {
-        id: "horseshoe",
-        name: "Horseshoe",
-        start: new THREE.Vector3(0, 0.34, 5.0),
-        cup: new THREE.Vector3(0.1, 0.34, -4.9),
-        walls: { x: 9, z: 6 },
+        id: "wide-horseshoe",
+        name: "Wide Horseshoe",
+        start: new THREE.Vector3(-16.5, 0.34, -8.5),
+        cup: new THREE.Vector3(-16.4, 0.34, 8.5),
+        walls: { x: 23, z: 14 },
+        surfaces: [
+          { x: -11.5, z: -8.5, sx: 23, sz: 9 },
+          { x: 4.5, z: 0, sx: 9, sz: 26 },
+          { x: -11.5, z: 8.5, sx: 23, sz: 9 }
+        ],
+        ice: [
+          { x: 4.5, z: 0, sx: 5.4, sz: 12.2 }
+        ],
         bumpers: [
-          { x: -3.5, z: 1.6, sx: 5.4, sz: 0.34, rot: Math.PI / 2 },
-          { x: 3.5, z: 1.6, sx: 5.4, sz: 0.34, rot: Math.PI / 2 },
-          { x: 0, z: -1.2, sx: 4.2, sz: 0.34, rot: 0 },
-          { x: -5.8, z: -2.8, sx: 2.4, sz: 0.34, rot: -0.58 },
-          { x: 5.8, z: -2.8, sx: 2.4, sz: 0.34, rot: 0.58 }
+          { x: -7.0, z: -3.0, sx: 12.0, sz: 0.34, rot: 0.62 },
+          { x: -7.0, z: 3.0, sx: 12.0, sz: 0.34, rot: -0.62 },
+          { x: 8.7, z: -7.7, sx: 6.3, sz: 0.34, rot: 0.4 },
+          { x: 8.7, z: 7.7, sx: 6.3, sz: 0.34, rot: -0.4 }
         ]
       },
       {
-        id: "zigzag-gate",
-        name: "Zigzag Gate",
-        start: new THREE.Vector3(7.4, 0.34, -4.9),
-        cup: new THREE.Vector3(-7.3, 0.34, 4.8),
-        walls: { x: 9, z: 6 },
+        id: "zigzag-freeze",
+        name: "Zigzag Freeze",
+        start: new THREE.Vector3(22.4, 0.34, -7.2),
+        cup: new THREE.Vector3(-22.5, 0.34, 7.2),
+        walls: { x: 26, z: 10.5 },
+        surfaces: [
+          { x: 0, z: 0, sx: 52, sz: 21 }
+        ],
+        ice: [
+          { x: 13.3, z: -4.5, sx: 9.5, sz: 4.2, rot: -0.32 },
+          { x: -7.5, z: 2.6, sx: 11.0, sz: 4.2, rot: 0.25 }
+        ],
         bumpers: [
-          { x: 4.8, z: -1.8, sx: 3.4, sz: 0.34, rot: -0.48 },
-          { x: 1.8, z: 1.7, sx: 3.4, sz: 0.34, rot: 0.48 },
-          { x: -1.8, z: -1.7, sx: 3.4, sz: 0.34, rot: -0.48 },
-          { x: -4.8, z: 1.8, sx: 3.4, sz: 0.34, rot: 0.48 },
-          { x: 0, z: 0, sx: 1.6, sz: 0.34, rot: Math.PI / 2 }
+          { x: 15.2, z: 2.1, sx: 8.5, sz: 0.34, rot: 0.64 },
+          { x: 6.2, z: -3.2, sx: 8.5, sz: 0.34, rot: -0.64 },
+          { x: -4.2, z: 3.1, sx: 8.5, sz: 0.34, rot: 0.64 },
+          { x: -14.2, z: -2.2, sx: 8.5, sz: 0.34, rot: -0.64 },
+          { x: -21.1, z: 5.5, sx: 4.2, sz: 0.34, rot: 0.2 }
         ]
       }
     ];
@@ -1078,18 +1170,22 @@
       lastShotAt: 0,
       activeWeapon: "gun",
       meleeSwingTimer: 0,
-      primaryWeapon: "pistol",
+      primaryWeapon: "rifle",
       weaponSwapTimer: 0,
       weaponSwapCommitted: true,
       pendingActiveWeapon: "gun",
-      pendingPrimaryWeapon: "pistol",
+      pendingPrimaryWeapon: "rifle",
       ammo: { pistol: 7, rifle: 25, sniper: 5 },
+      lastKilledBy: "",
+      killNoticeTimer: 0,
       reloading: false,
       reloadTimer: 0,
       inspectTimer: 0,
       jumpCooldown: 0,
       healCooldown: 0,
       grenadeCooldown: 0,
+      radarCooldown: 0,
+      radarTimer: 0,
       weaponSelectTimer: 0
     };
 
@@ -1128,33 +1224,39 @@
     const fpsArenaThemes = [
       {
         name: "Neon Depot",
-        sky: 0x101822,
-        fog: 0x101822,
-        fogNear: 60,
-        fogFar: 160,
-        floor: 0x2d3940,
+      sky: 0x101822,
+      fog: 0x101822,
+      fogNear: 60,
+      fogFar: 160,
+      shape: "long",
+      bounds: { x: 72, z: 34 },
+      floor: 0x2d3940,
         gridA: 0x78e0ff,
         gridB: 0x334050,
         edge: 0x1a3a4a
       },
       {
         name: "Sunlit Rooftops",
-        sky: 0xbdefff,
-        fog: 0xbdefff,
-        fogNear: 70,
-        fogFar: 190,
-        floor: 0xd7e6cf,
+      sky: 0xbdefff,
+      fog: 0xbdefff,
+      fogNear: 70,
+      fogFar: 190,
+      shape: "l",
+      bounds: { x: 58, z: 58 },
+      floor: 0xd7e6cf,
         gridA: 0xffffff,
         gridB: 0x7cb58e,
         edge: 0xf7f0c9
       },
       {
         name: "Ember Foundry",
-        sky: 0x140b12,
-        fog: 0x140b12,
-        fogNear: 42,
-        fogFar: 130,
-        floor: 0x2b2020,
+      sky: 0x140b12,
+      fog: 0x140b12,
+      fogNear: 42,
+      fogFar: 130,
+      shape: "circle",
+      bounds: { x: 54, z: 54 },
+      floor: 0x2b2020,
         gridA: 0xff7a2f,
         gridB: 0x4b2b32,
         edge: 0x3a1516
@@ -1165,6 +1267,8 @@
       golfRoot: new THREE.Group(),
       arenaRoot: new THREE.Group(),
       courseRoot: new THREE.Group(),
+      coursePieces: [],
+      icePatches: [],
       bumpers: [],
       mounds: [],
       obstacles: [],
@@ -1249,6 +1353,8 @@
               game.inspectTimer = 2.0;
             } else if (inputCode === "KeyG") {
               throwGrenade();
+            } else if (inputCode === "Digit5") {
+              activateRadar();
             }
           }
         }
@@ -1421,31 +1527,11 @@
     }
 
     function setupGolfObjects() {
-      const island = new THREE.Mesh(new THREE.CylinderGeometry(17, 18.5, 1.2, 7), materials.greenDark);
+      const island = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.2, 9), materials.greenDark);
       island.position.y = -0.68;
       island.rotation.y = 0.22;
       island.receiveShadow = true;
       world.golfRoot.add(island);
-
-      const floor = new THREE.Mesh(new THREE.BoxGeometry(18, 0.38, 12), materials.green);
-      floor.position.y = 0;
-      floor.receiveShadow = true;
-      world.courseRoot.add(floor);
-
-      const wallShapes = [
-        { x: 0, z: -6.15, sx: 18.6, sz: 0.45 },
-        { x: 0, z: 6.15, sx: 18.6, sz: 0.45 },
-        { x: -9.15, z: 0, sx: 0.45, sz: 12.6 },
-        { x: 9.15, z: 0, sx: 0.45, sz: 12.6 }
-      ];
-
-      for (const shape of wallShapes) {
-        const wall = new THREE.Mesh(new THREE.BoxGeometry(shape.sx, 0.75, shape.sz), materials.wall);
-        wall.position.set(shape.x, 0.46, shape.z);
-        wall.castShadow = true;
-        wall.receiveShadow = true;
-        world.courseRoot.add(wall);
-      }
 
       world.cup = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 40), materials.cup);
       world.cup.position.y = CUP_SURFACE_Y;
@@ -1467,48 +1553,43 @@
       world.ball.receiveShadow = true;
       world.courseRoot.add(world.ball);
 
-      const hills = [
-        { x: -4.8, z: -3.6, r: 1.35, c: 0x72cf83 },
-        { x: 4.2, z: 3.6, r: 1.65, c: 0x48a565 }
-      ];
-
-      for (const hill of hills) {
-        const mound = new THREE.Mesh(
-          new THREE.SphereGeometry(hill.r, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2),
-          new THREE.MeshStandardMaterial({ color: hill.c, roughness: 0.88 })
-        );
-        mound.position.set(hill.x, 0.16, hill.z);
-        mound.scale.y = 0.55;
-        mound.receiveShadow = true;
-        world.courseRoot.add(mound);
-        world.mounds.push({ x: hill.x, z: hill.z, radius: hill.r * 0.86 });
-      }
-
       world.golfRoot.add(world.courseRoot);
     }
 
     function setupArena() {
-      const SIZE = 112;
-      const HALF = SIZE / 2;
       const mapIndex = game.fpsMapIndex || 0;
       const theme = fpsArenaThemes[mapIndex] || fpsArenaThemes[0];
+      const boundsX = theme.bounds.x;
+      const boundsZ = theme.bounds.z;
+      const gridSize = Math.max(boundsX, boundsZ) * 2;
       applyFpsArenaTheme(theme);
 
       // Reset world obstacles and platforms
       world.obstacles = [];
       world.platforms = [];
 
-      // Large open floor
-      const floor = new THREE.Mesh(
-        new THREE.BoxGeometry(SIZE, 0.5, SIZE),
-        new THREE.MeshStandardMaterial({ color: theme.floor, roughness: 0.88 })
-      );
-      floor.position.y = -0.25;
-      floor.receiveShadow = true;
-      world.arenaRoot.add(floor);
+      const floorMat = new THREE.MeshStandardMaterial({ color: theme.floor, roughness: 0.88 });
+      const addFloor = (x, z, sx, sz) => {
+        const floor = new THREE.Mesh(new THREE.BoxGeometry(sx, 0.5, sz), floorMat);
+        floor.position.set(x, -0.25, z);
+        floor.receiveShadow = true;
+        world.arenaRoot.add(floor);
+      };
+
+      if (theme.shape === "circle") {
+        const floor = new THREE.Mesh(new THREE.CylinderGeometry(boundsX, boundsX, 0.5, 80), floorMat);
+        floor.position.y = -0.25;
+        floor.receiveShadow = true;
+        world.arenaRoot.add(floor);
+      } else if (theme.shape === "l") {
+        addFloor(-16, 0, 84, 36);
+        addFloor(25, -20, 36, 76);
+      } else {
+        addFloor(0, 0, boundsX * 2, boundsZ * 2);
+      }
 
       // Grid overlay
-      const grid = new THREE.GridHelper(SIZE, SIZE / 2, theme.gridA, theme.gridB);
+      const grid = new THREE.GridHelper(gridSize, gridSize / 2, theme.gridA, theme.gridB);
       grid.position.y = 0.02;
       world.arenaRoot.add(grid);
 
@@ -1522,16 +1603,37 @@
       // Thin perimeter walls
       const edgeMat = new THREE.MeshBasicMaterial({ color: theme.edge });
       const edgeH = 0.5;
-      const wallDefs = [
-        { x: 0, z: -HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
-        { x: 0, z:  HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
-        { x: -HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
-        { x:  HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
-      ];
+      const wallDefs = theme.shape === "l"
+        ? [
+            { x: -16, z: -18, sx: 84, sy: edgeH, sz: 0.6 },
+            { x: -16, z: 18, sx: 84, sy: edgeH, sz: 0.6 },
+            { x: -58, z: 0, sx: 0.6, sy: edgeH, sz: 36 },
+            { x: 26, z: 18, sx: 0.6, sy: edgeH, sz: 36 },
+            { x: 7, z: -58, sx: 0.6, sy: edgeH, sz: 40 },
+            { x: 43, z: -20, sx: 0.6, sy: edgeH, sz: 76 },
+            { x: 25, z: -58, sx: 36, sy: edgeH, sz: 0.6 }
+          ]
+        : theme.shape === "circle"
+        ? []
+        : [
+            { x: 0, z: -boundsZ, sx: boundsX * 2, sy: edgeH, sz: 0.4 },
+            { x: 0, z:  boundsZ, sx: boundsX * 2, sy: edgeH, sz: 0.4 },
+            { x: -boundsX, z: 0, sx: 0.4, sy: edgeH, sz: boundsZ * 2 },
+            { x:  boundsX, z: 0, sx: 0.4, sy: edgeH, sz: boundsZ * 2 },
+          ];
       for (const w of wallDefs) {
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(w.sx, w.sy, w.sz), edgeMat);
         mesh.position.set(w.x, w.sy / 2, w.z);
         world.arenaRoot.add(mesh);
+      }
+      if (theme.shape === "circle") {
+        for (let i = 0; i < 20; i++) {
+          const angle = (i / 20) * Math.PI * 2;
+          const mesh = new THREE.Mesh(new THREE.BoxGeometry(16, edgeH, 0.55), edgeMat);
+          mesh.position.set(Math.sin(angle) * boundsX, edgeH / 2, Math.cos(angle) * boundsX);
+          mesh.rotation.y = angle;
+          world.arenaRoot.add(mesh);
+        }
       }
 
       // Spawn pads
@@ -1612,11 +1714,31 @@
         decorBox(x + sign * 7.6, 2.15, z + 1.5, 1.0, 0.22, 7.5, 0xffd166, 0, 0);
       };
 
+      const enterableBuilding = (x, z, sx, sz, h, color, roofColor = color, doorSide = "front") => {
+        const wallT = 0.75;
+        const doorW = Math.min(5.2, sx * 0.34);
+        const sideWall = (side, px, pz, wx, wz) => box(px, 0, pz, wx, h, wz, color);
+        if (doorSide === "front") {
+          sideWall("frontL", x - (sx - doorW) / 4, z - sz / 2, (sx - doorW) / 2, wallT);
+          sideWall("frontR", x + (sx - doorW) / 4, z - sz / 2, (sx - doorW) / 2, wallT);
+        } else {
+          sideWall("front", x, z - sz / 2, sx, wallT);
+        }
+        if (doorSide === "back") {
+          sideWall("backL", x - (sx - doorW) / 4, z + sz / 2, (sx - doorW) / 2, wallT);
+          sideWall("backR", x + (sx - doorW) / 4, z + sz / 2, (sx - doorW) / 2, wallT);
+        } else {
+          sideWall("back", x, z + sz / 2, sx, wallT);
+        }
+        sideWall("left", x - sx / 2, z, wallT, sz);
+        sideWall("right", x + sx / 2, z, wallT, sz);
+        platformOnly(x, h + 0.15, z, sx + 1.2, 0.5, sz + 1.2, roofColor);
+      };
+
       // Complex central structure
       if (mapIndex === 0) {
-      box(0, 0, 0, 8, 12, 8); // Taller Core pillar
-      box(0, 5, 0, 24, 0.5, 24, 0x555555); // Larger Top platform
-      box(0, 8.5, 0, 10, 0.5, 10, 0x666666); // Higher second tier
+      enterableBuilding(-17, 0, 16, 14, 4.2, 0x27333a, 0x1b252b, "front");
+      enterableBuilding(17, 0, 16, 14, 4.2, 0x37272d, 0x2a1b1f, "back");
       decorBox(0, 5.54, -12.6, 18, 0.08, 0.5, 0x5ab0ff);
       decorBox(0, 5.54, 12.6, 18, 0.08, 0.5, 0xff6f61);
       decorBox(-12.6, 5.54, 0, 0.5, 0.08, 18, 0x7ee2a8);
@@ -1735,11 +1857,11 @@
       box(35, 0, -48, 6, 3, 4);
       box(48, 0, 35, 4, 3, 6);
       box(-48, 0, -35, 4, 3, 6);
-      addDepotBuildings(box, platformOnly, decorBox, glassMat);
+      addDepotBuildings(box, platformOnly, decorBox, glassMat, enterableBuilding);
       } else if (mapIndex === 1) {
-        buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat);
+        buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat, enterableBuilding);
       } else {
-        buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat);
+        buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat, enterableBuilding);
       }
     }
 
@@ -1748,18 +1870,12 @@
       scene.fog = new THREE.Fog(theme.fog, theme.fogNear, theme.fogFar);
     }
 
-    function addDepotBuildings(box, platformOnly, decorBox, glassMat) {
+    function addDepotBuildings(box, platformOnly, decorBox, glassMat, enterableBuilding) {
       const roofMat = new THREE.MeshStandardMaterial({ color: 0x1b252b, roughness: 0.6, metalness: 0.18 });
-      box(-25, 0, -28, 14, 6, 10, 0x27333a);
-      platformOnly(-25, 6.15, -28, 15, 0.5, 11, 0x1b252b);
-      box(-25, 0, -23.2, 3.0, 4.8, 0.7, 0x101820, false);
-      box(-30.5, 0, -28, 0.7, 4.8, 6.4, 0x101820, false);
+      enterableBuilding(-25, -28, 14, 10, 5.7, 0x27333a, 0x1b252b, "front");
       decorBox(-25, 6.44, -28, 15.6, 0.22, 11.6, 0x6be5ff, 0, 0, roofMat);
 
-      box(25, 0, 28, 14, 6, 10, 0x37272d);
-      platformOnly(25, 6.15, 28, 15, 0.5, 11, 0x2a1b1f);
-      box(25, 0, 23.2, 3.0, 4.8, 0.7, 0x1a1014, false);
-      box(30.5, 0, 28, 0.7, 4.8, 6.4, 0x1a1014, false);
+      enterableBuilding(25, 28, 14, 10, 5.7, 0x37272d, 0x2a1b1f, "back");
       decorBox(25, 6.44, 28, 15.6, 0.22, 11.6, 0xff9f88, 0, 0, roofMat);
 
       box(-8, 0, -38, 18, 5.4, 2.2, 0x31424a);
@@ -1771,21 +1887,18 @@
       decorBox(0, 7.05, 0, 4.4, 0.2, 30, 0xffffff, 0, 0, glassMat);
     }
 
-    function buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat) {
+    function buildRooftopArena(box, platformOnly, decorBox, stairRun, glassMat, enterableBuilding) {
       const awningMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.42, metalness: 0.05 });
-      box(0, 0, 0, 13, 7, 13, 0xe8f4d8);
-      platformOnly(0, 7.1, 0, 22, 0.5, 22, 0xf7f0c9);
+      enterableBuilding(25, -16, 14, 18, 6.8, 0xe8f4d8, 0xf7f0c9, "front");
       decorBox(0, 7.52, 0, 18, 0.18, 18, 0xffffff, 0, 0, glassMat);
 
-      box(-35, 0, -28, 18, 5.5, 14, 0xb7d6a8);
-      platformOnly(-35, 5.65, -28, 19, 0.5, 15, 0xf2e7b8);
-      box(35, 0, 28, 18, 5.5, 14, 0xf0c58e);
-      platformOnly(35, 5.65, 28, 19, 0.5, 15, 0xfff0c2);
+      enterableBuilding(-35, -28, 18, 14, 5.2, 0xb7d6a8, 0xf2e7b8, "front");
+      enterableBuilding(35, 28, 18, 14, 5.2, 0xf0c58e, 0xfff0c2, "back");
+      enterableBuilding(-52, 6, 9, 9, 11.5, 0x6aa9cc, 0xcdefff, "front");
+      enterableBuilding(42, -50, 9, 9, 12.5, 0xe98b91, 0xffdada, "back");
 
-      box(-34, 0, 28, 16, 3.4, 10, 0x80b8d8);
-      platformOnly(-34, 3.55, 28, 17, 0.45, 11, 0xcdefff);
-      box(34, 0, -28, 16, 3.4, 10, 0xea9da1);
-      platformOnly(34, 3.55, -28, 17, 0.45, 11, 0xffdada);
+      enterableBuilding(-34, 28, 16, 10, 3.2, 0x80b8d8, 0xcdefff, "back");
+      enterableBuilding(34, -28, 16, 10, 3.2, 0xea9da1, 0xffdada, "front");
 
       stairRun(-18, -16, -1, 0, 8, 3.2, 1.2, 0.5, 0xb7d6a8);
       stairRun(18, 16, 1, 0, 8, 3.2, 1.2, 0.5, 0xf0c58e);
@@ -1805,20 +1918,17 @@
       decorBox(20, 5.95, 28, 11, 0.2, 9, 0xffffff, 0, 0, awningMat);
     }
 
-    function buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat) {
+    function buildFoundryArena(box, platformOnly, decorBox, stairRun, glassMat, enterableBuilding) {
       const emberMat = new THREE.MeshBasicMaterial({ color: 0xff5a24 });
-      box(0, 0, 0, 10, 9, 10, 0x201719);
-      platformOnly(0, 9.1, 0, 18, 0.55, 18, 0x34202a);
+      enterableBuilding(0, -24, 12, 12, 8.8, 0x201719, 0x34202a, "front");
       decorBox(0, 9.5, 0, 14, 0.16, 14, 0xff7a2f, 0, 0, glassMat);
 
-      box(-32, 0, -32, 16, 7, 16, 0x211111);
-      platformOnly(-32, 7.15, -32, 17, 0.5, 17, 0x4a1f1f);
-      box(32, 0, 32, 16, 7, 16, 0x1a1418);
-      platformOnly(32, 7.15, 32, 17, 0.5, 17, 0x4a2a19);
-      box(-32, 0, 32, 14, 4.5, 14, 0x2b191f);
-      platformOnly(-32, 4.65, 32, 15, 0.5, 15, 0x5a2b21);
-      box(32, 0, -32, 14, 4.5, 14, 0x271e15);
-      platformOnly(32, 4.65, -32, 15, 0.5, 15, 0x6a3c1c);
+      enterableBuilding(-32, -32, 16, 16, 6.8, 0x211111, 0x4a1f1f, "front");
+      enterableBuilding(32, 32, 16, 16, 6.8, 0x1a1418, 0x4a2a19, "back");
+      enterableBuilding(-32, 32, 14, 14, 4.3, 0x2b191f, 0x5a2b21, "back");
+      enterableBuilding(32, -32, 14, 14, 4.3, 0x271e15, 0x6a3c1c, "front");
+      enterableBuilding(-46, 0, 10, 10, 13.5, 0x231018, 0x7a351f, "front");
+      enterableBuilding(46, 0, 10, 10, 13.5, 0x231018, 0x7a351f, "back");
 
       box(0, 0, -35, 34, 5.5, 3, 0x321617);
       box(0, 0, 35, 34, 5.5, 3, 0x321617);
@@ -2261,7 +2371,10 @@
           const popOffset = message.headshot ? 1.75 : 1.3;
           showDamageDealt(dmg, fps.players[game.localIndex].pos.clone().add(new THREE.Vector3(0, popOffset, 0)), message.headshot);
           showDamageTaken(dmg);
-          if (fps.players[game.localIndex].health <= 0) startVictoryLap(1 - game.localIndex, "deathmatch", false);
+          if (fps.players[game.localIndex].health <= 0) {
+            showKilledBy(message.isMelee ? "Club" : weaponLabel(message.weapon));
+            startVictoryLap(1 - game.localIndex, "deathmatch", false);
+          }
         }
       }
 
@@ -2282,7 +2395,10 @@
           fps.players[game.localIndex].health = Math.max(0, fps.players[game.localIndex].health - message.damage);
           showDamageDealt(message.damage, fps.players[game.localIndex].pos.clone().add(new THREE.Vector3(0, 1.1, 0)), false);
           showDamageTaken(message.damage);
-          if (fps.players[game.localIndex].health <= 0) startVictoryLap(message.owner, "deathmatch", false);
+          if (fps.players[game.localIndex].health <= 0) {
+            showKilledBy("Grenade");
+            startVictoryLap(message.owner, "deathmatch", false);
+          }
         }
       }
 
@@ -2405,7 +2521,8 @@
 
     function resetGolfHole() {
       const hole = holes[game.holeIndex];
-      clearBumpers();
+      clearCourseGeometry();
+      buildGolfCourse(hole);
       for (const bumperDef of hole.bumpers) addBumper(bumperDef);
       world.ball.position.copy(hole.start);
       world.ballVel.set(0, 0, 0);
@@ -2415,9 +2532,132 @@
       shotArrow.classList.add("hidden");
     }
 
-    function clearBumpers() {
+    function clearCourseGeometry() {
+      for (const piece of world.coursePieces) world.courseRoot.remove(piece);
       for (const bumper of world.bumpers) world.courseRoot.remove(bumper.mesh);
+      world.coursePieces = [];
+      world.icePatches = [];
       world.bumpers = [];
+      world.mounds = [];
+    }
+
+    function buildGolfCourse(hole) {
+      for (const surface of hole.surfaces || [{ x: 0, z: 0, sx: hole.walls.x * 2, sz: hole.walls.z * 2 }]) {
+        addCourseSurface(surface);
+      }
+      addCourseBoundary(hole);
+      for (const ice of hole.ice || []) addIcePatch(ice);
+      for (const mound of hole.mounds || defaultMoundsForHole(hole)) addMound(mound);
+    }
+
+    function addCourseSurface(def) {
+      let mesh;
+      if (def.type === "circle") {
+        mesh = new THREE.Mesh(new THREE.CylinderGeometry(def.r, def.r, 0.38, 72), materials.green);
+        mesh.position.set(def.x, 0, def.z);
+      } else {
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(def.sx, 0.38, def.sz), materials.green);
+        mesh.position.set(def.x, 0, def.z);
+        mesh.rotation.y = def.rot || 0;
+      }
+      mesh.receiveShadow = true;
+      world.courseRoot.add(mesh);
+      world.coursePieces.push(mesh);
+    }
+
+    function addCourseBoundary(hole) {
+      if ((hole.surfaces || []).length > 1) {
+        addCourseWall({ x: 0, z: -hole.walls.z - 0.22, sx: hole.walls.x * 2 + 0.45, sz: 0.45 });
+        addCourseWall({ x: 0, z: hole.walls.z + 0.22, sx: hole.walls.x * 2 + 0.45, sz: 0.45 });
+        addCourseWall({ x: -hole.walls.x - 0.22, z: 0, sx: 0.45, sz: hole.walls.z * 2 + 0.45 });
+        addCourseWall({ x: hole.walls.x + 0.22, z: 0, sx: 0.45, sz: hole.walls.z * 2 + 0.45 });
+        return;
+      }
+      for (const surface of hole.surfaces || []) {
+        if (surface.type === "circle") {
+          const segments = 24;
+          for (let i = 0; i < segments; i++) {
+            const angle = (i / segments) * Math.PI * 2;
+            addCourseWall({
+              x: surface.x + Math.sin(angle) * surface.r,
+              z: surface.z + Math.cos(angle) * surface.r,
+              sx: (Math.PI * surface.r * 2) / segments + 0.4,
+              sz: 0.45,
+              rot: angle
+            });
+          }
+        } else {
+          const rot = surface.rot || 0;
+          const c = Math.cos(rot);
+          const s = Math.sin(rot);
+          const place = (lx, lz, sx, sz) => addCourseWall({
+            x: surface.x + lx * c - lz * s,
+            z: surface.z + lx * s + lz * c,
+            sx,
+            sz,
+            rot
+          });
+          place(0, -surface.sz / 2 - 0.22, surface.sx + 0.45, 0.45);
+          place(0, surface.sz / 2 + 0.22, surface.sx + 0.45, 0.45);
+          place(-surface.sx / 2 - 0.22, 0, 0.45, surface.sz + 0.45);
+          place(surface.sx / 2 + 0.22, 0, 0.45, surface.sz + 0.45);
+        }
+      }
+    }
+
+    function addCourseWall(def) {
+      const wall = new THREE.Mesh(new THREE.BoxGeometry(def.sx, 0.75, def.sz), materials.wall);
+      wall.position.set(def.x, 0.46, def.z);
+      wall.rotation.y = def.rot || 0;
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      world.courseRoot.add(wall);
+      world.coursePieces.push(wall);
+      world.bumpers.push({ ...def, mesh: wall });
+    }
+
+    function addIcePatch(def) {
+      let mesh;
+      const iceMat = new THREE.MeshStandardMaterial({
+        color: 0x9ee8ff,
+        roughness: 0.08,
+        metalness: 0.05,
+        transparent: true,
+        opacity: 0.72,
+        emissive: 0x1b6175
+      });
+      if (def.type === "circle") {
+        mesh = new THREE.Mesh(new THREE.CylinderGeometry(def.r, def.r, 0.035, 48), iceMat);
+        mesh.position.set(def.x, 0.22, def.z);
+      } else {
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(def.sx, 0.035, def.sz), iceMat);
+        mesh.position.set(def.x, 0.22, def.z);
+        mesh.rotation.y = def.rot || 0;
+      }
+      mesh.receiveShadow = true;
+      world.courseRoot.add(mesh);
+      world.coursePieces.push(mesh);
+      world.icePatches.push({ ...def, mesh });
+    }
+
+    function addMound(hill) {
+      const mound = new THREE.Mesh(
+        new THREE.SphereGeometry(hill.r, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+        new THREE.MeshStandardMaterial({ color: hill.c || 0x72cf83, roughness: 0.88 })
+      );
+      mound.position.set(hill.x, 0.16, hill.z);
+      mound.scale.y = 0.55;
+      mound.receiveShadow = true;
+      world.courseRoot.add(mound);
+      world.coursePieces.push(mound);
+      world.mounds.push({ x: hill.x, z: hill.z, radius: hill.r * 0.86 });
+    }
+
+    function defaultMoundsForHole(hole) {
+      return [
+        { x: hole.start.x * 0.35, z: hole.start.z * 0.35, r: 1.25, c: 0x72cf83 },
+        { x: hole.cup.x * 0.32, z: hole.cup.z * 0.32, r: 1.45, c: 0x48a565 }
+      ];
     }
 
     function addBumper(def) {
@@ -2603,7 +2843,7 @@
         return;
       }
 
-      const drag = Math.pow(GOLF_GROUND_FRICTION, dt * 60);
+      const drag = Math.pow(ballIsOnIce() ? 1 : GOLF_GROUND_FRICTION, dt * 60);
       world.ballVel.multiplyScalar(drag);
       if (world.ballVel.length() < 0.12) {
         world.ballVel.set(0, 0, 0);
@@ -2618,6 +2858,22 @@
       }
 
       updateGolfCamera(dt);
+    }
+
+    function ballIsOnIce() {
+      return world.icePatches.some((patch) => pointInPatch(world.ball.position, patch));
+    }
+
+    function pointInPatch(point, patch) {
+      if (patch.type === "circle") {
+        return Math.hypot(point.x - patch.x, point.z - patch.z) <= patch.r;
+      }
+      const rot = -(patch.rot || 0);
+      const dx = point.x - patch.x;
+      const dz = point.z - patch.z;
+      const localX = dx * Math.cos(rot) - dz * Math.sin(rot);
+      const localZ = dx * Math.sin(rot) + dz * Math.cos(rot);
+      return Math.abs(localX) <= patch.sx / 2 && Math.abs(localZ) <= patch.sz / 2;
     }
 
     function resolveBumperCollision(bumper) {
@@ -2881,22 +3137,31 @@
       input.aiming = false;
       game.activeWeapon = "gun";
       game.meleeSwingTimer = 0;
-      game.primaryWeapon = "pistol";
+      game.primaryWeapon = "rifle";
       game.weaponSwapTimer = 0;
       game.weaponSwapCommitted = true;
       game.pendingActiveWeapon = "gun";
-      game.pendingPrimaryWeapon = "pistol";
+      game.pendingPrimaryWeapon = "rifle";
       syncPrimaryWeaponModel();
       game.ammo = { pistol: 7, rifle: 25, sniper: 5 };
       game.reloading = false;
       game.reloadTimer = 0;
+      game.jumpCooldown = 0;
+      game.healCooldown = 0;
       game.grenadeCooldown = 0;
+      game.radarCooldown = 0;
+      game.radarTimer = 0;
+      game.lastKilledBy = "";
+      game.killNoticeTimer = 0;
+      killNotice.classList.add("hidden");
+      radarMarker.classList.add("hidden");
+      damageVignette.classList.remove("active");
 
       weaponSelectOverlay.classList.add("hidden");
       weaponSelectTimer.textContent = "";
       weaponCards.forEach(c => c.classList.remove("active"));
-      const pistolCard = document.querySelector(".weapon-card[data-weapon='pistol']");
-      if (pistolCard) pistolCard.classList.add("active");
+      const rifleCard = document.querySelector(".weapon-card[data-weapon='rifle']");
+      if (rifleCard) rifleCard.classList.add("active");
 
       fps.players[0].pos.set(-42, 1, 0);
       fps.players[1].pos.set(42, 1, 0);
@@ -2917,6 +3182,8 @@
       fps.players[1].slideDir = new THREE.Vector3();
       fps.players[0].weapon = "gun";
       fps.players[1].weapon = "gun";
+      fps.players[0].primaryWeapon = "rifle";
+      fps.players[1].primaryWeapon = "rifle";
       fps.players[0].currentCamHeight = 0.72;
       fps.players[1].currentCamHeight = 0.72;
       resetNetworkMotion(fps.players[0], performance.now());
@@ -2958,6 +3225,10 @@
       if (game.jumpCooldown > 0) game.jumpCooldown -= dt;
       if (game.healCooldown > 0) game.healCooldown -= dt;
       if (game.grenadeCooldown > 0) game.grenadeCooldown -= dt;
+      if (game.radarCooldown > 0) game.radarCooldown -= dt;
+      if (game.radarTimer > 0) game.radarTimer -= dt;
+      if (game.killNoticeTimer > 0) game.killNoticeTimer -= dt;
+      if (game.killNoticeTimer <= 0) killNotice.classList.add("hidden");
 
       // Abilities (only during active fps phase)
       if (game.phase === "fps" && game.countdown <= 0) {
@@ -3001,6 +3272,7 @@
       updateGrenades(dt);
       updateExplosions(dt);
       updateDamagePops(dt);
+      updateRadarMarker();
 
       if (game.role !== "solo" && now - game.lastSend > 33) {
         game.lastSend = now;
@@ -3272,13 +3544,24 @@
         }
       }
 
-      const half = fps.arenaHalf;
-      if (Math.abs(player.pos.x) > half) {
-        player.pos.x = Math.sign(player.pos.x) * half;
+      const theme = fpsArenaThemes[game.fpsMapIndex || 0] || fpsArenaThemes[0];
+      const boundX = theme.bounds.x;
+      const boundZ = theme.bounds.z;
+      if (theme.shape === "circle") {
+        const flat = new THREE.Vector3(player.pos.x, 0, player.pos.z);
+        if (flat.length() > boundX) {
+          flat.setLength(boundX);
+          player.pos.x = flat.x;
+          player.pos.z = flat.z;
+          player.vel.x *= -0.25;
+          player.vel.z *= -0.25;
+        }
+      } else if (Math.abs(player.pos.x) > boundX) {
+        player.pos.x = Math.sign(player.pos.x) * boundX;
         player.vel.x *= -0.35;
       }
-      if (Math.abs(player.pos.z) > half) {
-        player.pos.z = Math.sign(player.pos.z) * half;
+      if (theme.shape !== "circle" && Math.abs(player.pos.z) > boundZ) {
+        player.pos.z = Math.sign(player.pos.z) * boundZ;
         player.vel.z *= -0.35;
       }
 
@@ -3746,7 +4029,7 @@
       let finalHeadshot = false;
       let laserLength = 80;
 
-      const baseDmg = { pistol: 20, rifle: 10, sniper: 65 };
+      const baseDmg = { pistol: 34, rifle: 10, sniper: 65 };
       const rawDmg = baseDmg[game.primaryWeapon];
 
       if (playerHitResult) {
@@ -4051,6 +4334,22 @@
       }, 420);
     }
 
+    function showKilledBy(label) {
+      game.lastKilledBy = label || "Unknown";
+      game.killNoticeTimer = 4;
+      killNotice.textContent = `Killed by ${game.lastKilledBy}`;
+      killNotice.classList.remove("hidden");
+    }
+
+    function weaponLabel(type) {
+      if (type === "pistol") return "Pistol";
+      if (type === "rifle") return "Rifle";
+      if (type === "sniper") return "Sniper";
+      if (type === "melee") return "Club";
+      if (type === "grenade") return "Grenade";
+      return "Unknown";
+    }
+
     function updateDamagePops(dt) {
       for (let i = activeDamagePops.length - 1; i >= 0; i--) {
         const pop = activeDamagePops[i];
@@ -4128,6 +4427,12 @@
       game.result = { winner, reason, mapOver, matchOver };
       game.fpsRoundWinner = winner;
       game.victoryLapStart = performance.now();
+      radarMarker.classList.add("hidden");
+      if (winner !== game.localIndex) {
+        damageVignette.classList.remove("active");
+        activeDamagePops.forEach(pop => pop.element.remove());
+        activeDamagePops.length = 0;
+      }
 
       // Show victory banner text over gameplay
       const banner = document.createElement("div");
@@ -4144,6 +4449,27 @@
 
       if (announce) send({ type: "matchResult", winner, reason, fpsState: serializeFpsDuelState() });
       updateHud();
+    }
+
+    function activateRadar() {
+      if (game.phase !== "fps" || game.countdown > 0 || game.radarCooldown > 0) return;
+      game.radarTimer = RADAR_DURATION;
+      game.radarCooldown = RADAR_COOLDOWN;
+      updateRadarMarker();
+      updateHud();
+    }
+
+    function updateRadarMarker() {
+      if (game.radarTimer <= 0 || (game.phase !== "fps" && game.phase !== "fpsVictoryLap")) {
+        radarMarker.classList.add("hidden");
+        return;
+      }
+      const enemy = fps.players[1 - game.localIndex];
+      if (!enemy) return;
+      const screen = toScreen(enemy.pos.clone().add(new THREE.Vector3(0, 1.15, 0)));
+      radarMarker.style.left = `${Math.max(38, Math.min(window.innerWidth - 38, screen.x))}px`;
+      radarMarker.style.top = `${Math.max(38, Math.min(window.innerHeight - 38, screen.y))}px`;
+      radarMarker.classList.remove("hidden");
     }
 
     function finishMatch(winner, reason) {
@@ -4235,6 +4561,10 @@
         const healProgress = Math.max(0, game.healCooldown / 10.0);
         healOverlay.style.height = `${healProgress * 100}%`;
         healCDText.textContent = game.healCooldown > 0 ? Math.ceil(game.healCooldown) : "";
+
+        const radarProgress = Math.max(0, game.radarCooldown / RADAR_COOLDOWN);
+        radarOverlay.style.height = `${radarProgress * 100}%`;
+        radarCDText.textContent = game.radarCooldown > 0 ? Math.ceil(game.radarCooldown) : "";
 
         const grenadeProgress = Math.max(0, game.grenadeCooldown / GRENADE_COOLDOWN);
         grenadeOverlay.style.height = `${grenadeProgress * 100}%`;
@@ -4341,6 +4671,7 @@
       const primaryChanged = game.primaryWeapon !== primaryWeapon;
       game.activeWeapon = activeWeapon;
       game.primaryWeapon = primaryWeapon;
+      fps.players[game.localIndex].primaryWeapon = primaryWeapon;
       if (activeWeapon === "melee") {
         game.reloading = false;
       }
