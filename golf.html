@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -190,7 +191,7 @@
       position: relative;
       z-index: 2;
       font-size: 14px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .fps-hud .chip {
@@ -210,6 +211,7 @@
     #healthChip {
       border-color: rgba(255, 80, 80, 0.4);
     }
+
     #healthText {
       color: #ff5050;
     }
@@ -604,9 +606,17 @@
     }
 
     @keyframes damage-flash {
-      0% { opacity: 0; }
-      16% { opacity: 1; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 0;
+      }
+
+      16% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
     }
 
     .hidden {
@@ -629,8 +639,15 @@
     }
 
     @keyframes victory-pulse {
-      from { transform: translateX(-50%) scale(1); opacity: 0.9; }
-      to   { transform: translateX(-50%) scale(1.06); opacity: 1; }
+      from {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.9;
+      }
+
+      to {
+        transform: translateX(-50%) scale(1.06);
+        opacity: 1;
+      }
     }
 
     .fps .crosshair,
@@ -654,6 +671,7 @@
         grid-template-columns: 1fr;
       }
     }
+
     .weapon-select-overlay {
       position: absolute;
       inset: 0;
@@ -738,6 +756,7 @@
     }
   </style>
 </head>
+
 <body>
   <canvas id="game"></canvas>
   <div class="overlay" id="overlay">
@@ -792,13 +811,16 @@
       <h1>Golf Duel</h1>
       <p>Share a phrase or jump straight into testing.</p>
       <input id="phraseInput" maxlength="48" spellcheck="false" autocomplete="off" placeholder="room phrase" />
-      
-      <div style="margin: 14px auto 10px; width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; background: rgba(0, 0, 0, 0.32); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
-        <label for="menuSensitivityInput" style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--muted); margin: 0 0 2px;">
+
+      <div
+        style="margin: 14px auto 10px; width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; background: rgba(0, 0, 0, 0.32); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
+        <label for="menuSensitivityInput"
+          style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--muted); margin: 0 0 2px;">
           <span>Aim Sensitivity</span>
           <span id="menuSensitivityValue">1.0x</span>
         </label>
-        <input id="menuSensitivityInput" type="range" min="0.4" max="2.6" step="0.1" value="1" style="min-height: 24px; padding: 0; accent-color: var(--gold); background: transparent; border: 0; cursor: pointer;" />
+        <input id="menuSensitivityInput" type="range" min="0.4" max="2.6" step="0.1" value="1"
+          style="min-height: 24px; padding: 0; accent-color: var(--gold); background: transparent; border: 0; cursor: pointer;" />
       </div>
 
       <div class="menu-grid">
@@ -946,7 +968,7 @@
     const GRENADE_SPEED = 43;
     const GRENADE_GRAVITY = -36;
     const GRENADE_SPLASH_RADIUS = 17.5;
-    const GRENADE_MAX_DAMAGE = 185;
+    const GRENADE_MAX_DAMAGE = -185;
     const HOLES_PER_TOURNAMENT = 3;
     const FPS_COUNTDOWN_DURATION = 3;
     const WEAPON_SWAP_DURATION = 0.28;
@@ -1174,7 +1196,7 @@
       input.keys.add(inputCode);
       if (game.phase === "golf" && ["Space", "ArrowLeft", "ArrowRight"].includes(inputCode)) event.preventDefault();
       if ((game.phase === "fps" || game.phase === "fpsVictoryLap") && inputCode.startsWith("Arrow")) event.preventDefault();
-      
+
       if (game.phase === "fps" || game.phase === "fpsVictoryLap") {
         // Request pointer lock on first interaction
         if (!input.pointerLocked) requestPointerLockSafe();
@@ -1268,7 +1290,7 @@
     });
     restartBtn.addEventListener("click", restartTournament);
     settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("hidden"));
-    
+
     function syncSensitivity(value) {
       const multiplier = Number(value);
       input.mouseSensitivity = FPS_BASE_MOUSE_SENSITIVITY * multiplier;
@@ -1467,9 +1489,9 @@
       const edgeH = 0.5;
       const wallDefs = [
         { x: 0, z: -HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
-        { x: 0, z:  HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
+        { x: 0, z: HALF, sx: SIZE, sy: edgeH, sz: 0.4 },
         { x: -HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
-        { x:  HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
+        { x: HALF, z: 0, sx: 0.4, sy: edgeH, sz: SIZE },
       ];
       for (const w of wallDefs) {
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(w.sx, w.sy, w.sz), edgeMat);
@@ -1480,7 +1502,7 @@
       // Spawn pads
       const spawnPads = [
         { x: -42, z: 0, mat: materials.blue },
-        { x:  42, z: 0, mat: materials.coral }
+        { x: 42, z: 0, mat: materials.coral }
       ];
       for (const pad of spawnPads) {
         const ring = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 0.08, 42), pad.mat);
@@ -1499,7 +1521,7 @@
       // Obstacles and Platforms
       const obstacleMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.7 });
       const glassMat = new THREE.MeshStandardMaterial({ color: 0x6be5ff, roughness: 0.18, metalness: 0.12, transparent: true, opacity: 0.34 });
-      
+
       const box = (x, y, z, sx, sy, sz, color = 0x444444, isPlatform = true) => {
         const mat = color === 0x444444 ? obstacleMat : new THREE.MeshStandardMaterial({ color, roughness: 0.7 });
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
@@ -1585,7 +1607,7 @@
       box(-15.5, 5.15, 3.7, 3.2, 0.45, 5.2, 0xb8902f);
       stairRun(15.5, -14.5, 0, 1, 10, 3.0, 1.08, 0.55, 0x287a55);
       box(15.5, 5.15, -3.7, 3.2, 0.45, 5.2, 0x3d9a65);
-      
+
       // Mazelike walls
       // Blue side (negative X)
       box(-15, 0, -10, 2, 4.5, 20);
@@ -1593,7 +1615,7 @@
       box(-32, 0, -5, 2, 4.5, 25);
       box(-28, 0, -18, 12, 4.5, 2);
       box(-12, 0, 25, 2, 6, 8, 0x444444); // Tall pillar
-      
+
       // Coral side (positive X)
       box(15, 0, 10, 2, 4.5, 20);
       box(20, 0, -15, 18, 4.5, 2);
@@ -1703,7 +1725,7 @@
       const headGroup = new THREE.Group();
       headGroup.name = "headGroup";
       headGroup.position.y = 1.35; // Position for neck/head
-      
+
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 16), material);
       head.castShadow = true;
       const brow = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.08, 0.07), darkMat);
@@ -1739,11 +1761,11 @@
       const meleePart = new THREE.Group();
       meleePart.name = "melee";
       meleePart.visible = false;
-      
+
       const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.75, 8), materials.wall);
-      clubShaft.position.set(0.3, -0.2, -0.2); 
+      clubShaft.position.set(0.3, -0.2, -0.2);
       clubShaft.rotation.x = Math.PI / 3;
-      
+
       const clubHead = new THREE.Group();
       clubHead.position.set(0.3, -0.5, -0.4);
       clubHead.rotation.set(Math.PI / 3, 0.95, -0.15);
@@ -1755,7 +1777,7 @@
       clubHeel.rotation.z = Math.PI / 2;
       clubHeel.position.set(-0.08, 0.012, 0);
       clubHead.add(clubFace, clubToe, clubHeel);
-      
+
       meleePart.add(clubShaft, clubHead);
       headGroup.add(meleePart);
 
@@ -1885,49 +1907,49 @@
       world.weaponTip = new THREE.Group();
       world.weaponTip.position.set(0, 0.08, -0.84);
       world.weapon.add(world.weaponTip);
- 
-       // --- MELEE WEAPON (Golf Club) ---
-       world.meleeWeapon = new THREE.Group();
-       world.meleeWeapon.visible = false;
- 
-       // Grip (rubber/carbon fiber wrapping)
-       const clubGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.28, 12), matGrip);
-       clubGrip.rotation.x = Math.PI / 2;
-       clubGrip.position.set(0, 0, 0);
-       world.meleeWeapon.add(clubGrip);
- 
-       // Shaft (carbon/chrome steel tubing)
-       const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.9, 12), matLight);
-       clubShaft.rotation.x = Math.PI / 2;
-       clubShaft.position.set(0, 0, -0.58);
-       world.meleeWeapon.add(clubShaft);
- 
-       // Hosel / connector
-       const clubHosel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.08, 10), matDark);
-       clubHosel.rotation.x = Math.PI / 2;
-       clubHosel.rotation.z = -0.2;
-       clubHosel.position.set(0, -0.01, -1.02);
-       world.meleeWeapon.add(clubHosel);
- 
-       // Club head (sleek premium hybrid club head)
-       const clubHeadGroup = new THREE.Group();
-       clubHeadGroup.position.set(0.08, -0.05, -1.06);
-       clubHeadGroup.rotation.set(0.22, 1.05, -0.14);
- 
-       const clubHeadBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.07, 0.12), matDark);
-       clubHeadGroup.add(clubHeadBody);
- 
-       const clubHeadPlate = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.012, 0.105), matGold);
-       clubHeadPlate.position.set(0, -0.038, 0);
-       const clubToe = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.09, 0.14), matLight);
-       clubToe.position.set(0.16, 0.005, 0.02);
-       const clubGrooveA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.014, 0.01), matGold);
-       clubGrooveA.position.set(0.01, -0.045, -0.026);
-       const clubGrooveB = clubGrooveA.clone();
-       clubGrooveB.position.z = 0.026;
-       clubHeadGroup.add(clubHeadPlate, clubToe, clubGrooveA, clubGrooveB);
- 
-       world.meleeWeapon.add(clubHeadGroup);
+
+      // --- MELEE WEAPON (Golf Club) ---
+      world.meleeWeapon = new THREE.Group();
+      world.meleeWeapon.visible = false;
+
+      // Grip (rubber/carbon fiber wrapping)
+      const clubGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.28, 12), matGrip);
+      clubGrip.rotation.x = Math.PI / 2;
+      clubGrip.position.set(0, 0, 0);
+      world.meleeWeapon.add(clubGrip);
+
+      // Shaft (carbon/chrome steel tubing)
+      const clubShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.9, 12), matLight);
+      clubShaft.rotation.x = Math.PI / 2;
+      clubShaft.position.set(0, 0, -0.58);
+      world.meleeWeapon.add(clubShaft);
+
+      // Hosel / connector
+      const clubHosel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.08, 10), matDark);
+      clubHosel.rotation.x = Math.PI / 2;
+      clubHosel.rotation.z = -0.2;
+      clubHosel.position.set(0, -0.01, -1.02);
+      world.meleeWeapon.add(clubHosel);
+
+      // Club head (sleek premium hybrid club head)
+      const clubHeadGroup = new THREE.Group();
+      clubHeadGroup.position.set(0.08, -0.05, -1.06);
+      clubHeadGroup.rotation.set(0.22, 1.05, -0.14);
+
+      const clubHeadBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.07, 0.12), matDark);
+      clubHeadGroup.add(clubHeadBody);
+
+      const clubHeadPlate = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.012, 0.105), matGold);
+      clubHeadPlate.position.set(0, -0.038, 0);
+      const clubToe = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.09, 0.14), matLight);
+      clubToe.position.set(0.16, 0.005, 0.02);
+      const clubGrooveA = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.014, 0.01), matGold);
+      clubGrooveA.position.set(0.01, -0.045, -0.026);
+      const clubGrooveB = clubGrooveA.clone();
+      clubGrooveB.position.z = 0.026;
+      clubHeadGroup.add(clubHeadPlate, clubToe, clubGrooveA, clubGrooveB);
+
+      world.meleeWeapon.add(clubHeadGroup);
 
       camera.add(world.weapon);
       camera.add(world.meleeWeapon);
@@ -2020,7 +2042,7 @@
       game.connected = false;
       game.fpsMockStatic = false;
       showNetwork("Practice match", room);
-      
+
       showLobby();
     }
 
@@ -2303,7 +2325,7 @@
 
     function requestPointerLockSafe() {
       const result = canvas.requestPointerLock?.();
-      if (result?.catch) result.catch(() => {});
+      if (result?.catch) result.catch(() => { });
     }
 
     function onMouseMove(event) {
@@ -2662,7 +2684,7 @@
       lobby.classList.add("hidden");
 
       clearFpsEffects();
-      damageLayer.replaceChildren();      activeDamagePops.forEach(pop => pop.element.remove());
+      damageLayer.replaceChildren(); activeDamagePops.forEach(pop => pop.element.remove());
       activeDamagePops.length = 0;
 
       overlay.classList.add("fps");
@@ -2671,7 +2693,7 @@
       camera.up.set(0, 1, 0);
       camera.fov = FPS_DEFAULT_FOV;
       camera.updateProjectionMatrix();
-      
+
       world.weapon.visible = true;
       world.meleeWeapon.visible = false;
       input.aiming = false;
@@ -2704,7 +2726,7 @@
       fps.players[1].health = 100;
       fps.players[0].yaw = Math.PI / 2;
       fps.players[1].yaw = -Math.PI / 2;
-      
+
       fps.players[0].sliding = false;
       fps.players[1].sliding = false;
       fps.players[0].slideTimer = 0;
@@ -2787,7 +2809,7 @@
       local.yaw = input.yaw;
       local.pitch = input.pitch;
       local.weapon = game.activeWeapon;
-      
+
       if (game.countdown <= 0) updateFpsMovement(local, dt);
       updateRemotePlayers(dt, now);
       if (game.role === "solo" && !game.fpsMockStatic) updatePracticeOpponent(dt);
@@ -2928,7 +2950,7 @@
           player.sliding = true;
           player.slideTimer = 0.65;
           player.slideDir.copy(horizontalVel).normalize();
-          
+
           const startSpeed = game.activeWeapon === "melee" ? 28.0 : 23.0;
           player.vel.x = player.slideDir.x * startSpeed;
           player.vel.z = player.slideDir.z * startSpeed;
@@ -2973,9 +2995,9 @@
 
       const horizontal = new THREE.Vector3(player.vel.x, 0, player.vel.z);
       const maxSpeed = game.activeWeapon === "melee" ? 17.5 : 12.5;
-      
+
       // Speed cap: sliding allows exceeding normal speed; air speeds preserve slide jump momentum.
-      const speedCap = player.sliding 
+      const speedCap = player.sliding
         ? (game.activeWeapon === "melee" ? 28.0 : 23.0)
         : (player.grounded ? maxSpeed : Math.max(maxSpeed, horizontal.length()));
 
@@ -2999,7 +3021,7 @@
       }
 
       player.vel.y += fps.gravity * dt;
-      
+
       const movingOnGround = player.grounded && !player.sliding && (
         input.keys.has("KeyW") || input.keys.has("KeyA") || input.keys.has("KeyS") || input.keys.has("KeyD")
       );
@@ -3011,7 +3033,7 @@
       // --- Collision Detection ---
       const playerRadius = 0.45;
       const playerHeight = 1.8;
-      
+
       // 1. Move Y and check floor/platform collision
       player.pos.y += player.vel.y * dt;
       player.grounded = false;
@@ -3025,8 +3047,8 @@
         for (const platform of world.platforms) {
           const box = new THREE.Box3().setFromObject(platform);
           if (player.pos.x + playerRadius > box.min.x && player.pos.x - playerRadius < box.max.x &&
-              player.pos.z + playerRadius > box.min.z && player.pos.z - playerRadius < box.max.z) {
-            
+            player.pos.z + playerRadius > box.min.z && player.pos.z - playerRadius < box.max.z) {
+
             // If we are falling and our feet are above the platform top
             if (player.vel.y <= 0 && player.pos.y >= box.max.y - 0.5 && player.pos.y <= box.max.y + 0.1) {
               player.pos.y = box.max.y;
@@ -3047,10 +3069,10 @@
         // Add player radius to box for AABB check
         box.expandByScalar(playerRadius);
         if (box.containsPoint(new THREE.Vector3(player.pos.x, player.pos.y + 0.5, player.pos.z))) {
-           // Basic push-back logic
-           player.pos.x = oldX;
-           player.vel.x *= -0.2;
-           break;
+          // Basic push-back logic
+          player.pos.x = oldX;
+          player.vel.x *= -0.2;
+          break;
         }
       }
 
@@ -3062,9 +3084,9 @@
         const box = new THREE.Box3().setFromObject(obs);
         box.expandByScalar(playerRadius);
         if (box.containsPoint(new THREE.Vector3(player.pos.x, player.pos.y + 0.5, player.pos.z))) {
-           player.pos.z = oldZ;
-           player.vel.z *= -0.2;
-           break;
+          player.pos.z = oldZ;
+          player.vel.z *= -0.2;
+          break;
         }
       }
 
@@ -3119,7 +3141,7 @@
 
     function updateFpsCamera(player, dt) {
       const direction = directionFromAngles(input.yaw, input.pitch);
-      
+
       const targetCamHeight = player.sliding ? 0.32 : 0.72;
       if (player.currentCamHeight === undefined) player.currentCamHeight = 0.72;
       player.currentCamHeight += (targetCamHeight - player.currentCamHeight) * Math.min(1, dt * 14);
@@ -3529,14 +3551,14 @@
       // Hit detection using Raycaster for wall penetration
       const ray = new THREE.Raycaster(origin, direction, 0, 150);
       const intersects = ray.intersectObjects(world.obstacles);
-      
+
       let wallHit = null;
       if (intersects.length > 0) {
         wallHit = intersects[0];
       }
 
       const playerHitResult = rayHitsPlayer(origin, direction, opponent);
-      
+
       let finalHit = false;
       let finalDmg = 0;
       let finalHeadshot = false;
@@ -3622,7 +3644,7 @@
       if (distToHead < 2.6 || distToBody < 2.6) {
         const toOpponentHead = headCenter.clone().sub(origin).normalize();
         const toOpponentBody = bodyCenter.clone().sub(origin).normalize();
-        
+
         const headCos = direction.dot(toOpponentHead);
         const bodyCos = direction.dot(toOpponentBody);
 
@@ -3747,8 +3769,8 @@
       for (let i = 0; i <= segments; i++) {
         const theta = -Math.PI / 3 + (i / segments) * (2 * Math.PI / 3);
         const offset = right.clone().multiplyScalar(Math.sin(theta) * radius)
-                              .add(direction.clone().multiplyScalar(Math.cos(theta) * radius))
-                              .add(up.clone().multiplyScalar(Math.sin(theta * 0.5) * 0.35));
+          .add(direction.clone().multiplyScalar(Math.cos(theta) * radius))
+          .add(up.clone().multiplyScalar(Math.sin(theta * 0.5) * 0.35));
         points.push(origin.clone().add(offset));
       }
 
@@ -3784,7 +3806,7 @@
       for (let i = world.lasers.length - 1; i >= 0; i--) {
         const laser = world.lasers[i];
         laser.ttl -= dt;
-        
+
         const opacity = Math.max(0, laser.ttl / laser.maxTtl);
         if (laser.beam.isGroup) {
           laser.beam.children.forEach(child => {
@@ -3945,7 +3967,7 @@
 
     function restartTournament(announce = true) {
       if (announce && game.role === "guest") return; // Only host/solo can trigger
-      
+
       resultPanel.classList.add("hidden");
       if (announce) {
         send({ type: "restart" });
@@ -3965,7 +3987,7 @@
       weaponSelectOverlay.classList.add("hidden");
       overlay.classList.remove("fps");
       showMenuScene();
-      
+
       // Update lobby buttons based on role
       if (game.role === "guest") {
         startGolfBtn.classList.add("hidden");
@@ -4015,7 +4037,7 @@
         ? (game.primaryWeapon === "pistol" ? "Pistol" : (game.primaryWeapon === "rifle" ? "Rifle" : "Sniper"))
         : "Club");
 
-      ammoChip.classList.toggle("hidden", !isFps || game.activeWeapon !== "gun");      if (game.activeWeapon === "gun") {
+      ammoChip.classList.toggle("hidden", !isFps || game.activeWeapon !== "gun"); if (game.activeWeapon === "gun") {
         const currentAmmo = game.ammo[game.primaryWeapon];
         const maxAmmo = game.primaryWeapon === "pistol" ? 7 : (game.primaryWeapon === "rifle" ? 25 : 5);
         ammoText.textContent = game.reloading ? "RELOAD" : `${currentAmmo} / ${maxAmmo}`;
@@ -4146,7 +4168,7 @@
         if (world.weaponFrame) world.weaponFrame.scale.set(0.92, 0.92, 1.36);
         if (world.rifleMag) world.rifleMag.visible = false;
       }
-      
+
       if (world.weaponTip) {
         if (game.primaryWeapon === "pistol") {
           world.weaponTip.position.set(0, 0.08, -0.48);
@@ -4198,12 +4220,12 @@
 
         // Continue rendering the FPS world for 5 seconds after the kill
         const elapsed = (now - game.victoryLapStart) / 1000;
-        
+
         // If local player is the winner, they can still move
         // If local player is the loser, they spectate the winner
         const spectatorTarget = fps.players[game.result.winner];
         const isWinner = game.localIndex === game.result.winner;
-        
+
         if (isWinner) {
           // Winner's camera and movement are updated within updateFps via updateFpsCamera/updateFpsMovement
         } else {
@@ -4235,4 +4257,5 @@
     }
   </script>
 </body>
+
 </html>
