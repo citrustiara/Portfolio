@@ -60,6 +60,13 @@ export function rebuildGolfHoleGeometry(hole) {
   clearCourseGeometry();
   buildGolfCourse(hole);
   for (const bumperDef of hole.bumpers) addBumper(bumperDef);
+  if (world.golfIsland) {
+    if ((hole.surfaces && hole.surfaces.length > 1) || hole.id === "circle-loop") {
+      world.golfIsland.material = world.lavaMaterial;
+    } else {
+      world.golfIsland.material = materials.greenDark;
+    }
+  }
 }
 
 export function clearCourseGeometry() {

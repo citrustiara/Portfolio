@@ -131,8 +131,11 @@ function updateGolf(dt) {
   } else {
     power.classList.remove("hidden");
     if (canControlGolf()) {
-      if (input.keys.has("ArrowLeft")) game.aimAngle -= GOLF_AIM_SENSITIVITY * 150 * dt;
-      if (input.keys.has("ArrowRight")) game.aimAngle += GOLF_AIM_SENSITIVITY * 150 * dt;
+      if (input.keys.has("ArrowLeft") || input.keys.has("ArrowRight")) {
+        if (input.keys.has("ArrowLeft")) game.aimAngle -= GOLF_AIM_SENSITIVITY * 150 * dt;
+        if (input.keys.has("ArrowRight")) game.aimAngle += GOLF_AIM_SENSITIVITY * 150 * dt;
+        game.golfShotDir.set(Math.cos(game.aimAngle), 0, Math.sin(game.aimAngle));
+      }
       if (input.keys.has("Space")) {
         game.aimPower += dt * 0.8 * input.golfChargeDir;
         if (game.aimPower >= 1) { game.aimPower = 1; input.golfChargeDir = -1; }
@@ -201,7 +204,7 @@ function resolveGolfBall(dt) {
     game.golfFalling = false;
     world.ball.position.y = 0.34;
   }
-  for (const mound of world.mounds) { const d = flatDistance(world.ball.position, mound); if (d < mound.radius) { const push = world.ball.position.clone().sub(new THREE.Vector3(mound.x, 0, mound.z)).normalize(); world.ballVel.addScaledVector(push, (1.0 - d / mound.radius) * 12 * dt); } }
+  for (const mound of world.mounds) { const d = flatDistance(world.ball.position, mound); if (d < mound.radius + 0.34) { const push = world.ball.position.clone().sub(new THREE.Vector3(mound.x, 0, mound.z)).normalize(); const overlap = (mound.radius + 0.34) - d; world.ball.position.addScaledVector(push, overlap); if (world.ballVel.dot(push) < 0) world.ballVel.reflect(push).multiplyScalar(0.8); } }
   for (const b of world.bumpers) resolveGolfBumperCollision(b);
   const distToCup = flatDistance(world.ball.position, world.cup.position); if (distToCup < CUP_PULL_RADIUS) { world.ballVel.addScaledVector(world.cup.position.clone().sub(world.ball.position).normalize(), CUP_PULL_FORCE * dt * 60); if (distToCup < CUP_SINK_RADIUS && world.ballVel.length() < CUP_SINK_SPEED_MAX) { scoreHole(); return; } }
   if (world.ballVel.length() < 0.08) { world.ballVel.set(0, 0, 0); game.ballMoving = false; world.ball.position.y = 0.34; nextTurn(); }
