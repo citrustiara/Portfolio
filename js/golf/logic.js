@@ -45,7 +45,8 @@ export function resetGolfHole() {
   if (!hole) return;
   rebuildGolfHoleGeometry(hole);
   world.ball.position.copy(hole.start);
-  game.lastShotPosition.copy(hole.start);
+  world.ball.position.y = 0.53;
+  game.lastShotPosition.copy(world.ball.position);
   game.golfFalling = false;
   world.ballVel.set(0, 0, 0);
   world.cup.position.copy(hole.cup);
@@ -61,11 +62,7 @@ export function rebuildGolfHoleGeometry(hole) {
   buildGolfCourse(hole);
   for (const bumperDef of hole.bumpers) addBumper(bumperDef);
   if (world.golfIsland) {
-    if ((hole.surfaces && hole.surfaces.length > 1) || hole.id === "circle-loop") {
-      world.golfIsland.material = world.lavaMaterial;
-    } else {
-      world.golfIsland.material = materials.greenDark;
-    }
+    world.golfIsland.material = materials.lava;
   }
 }
 
@@ -208,10 +205,11 @@ function addBumper(def) {
 }
 
 export function setupGolfObjects() {
-  const island = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.2, 9), materials.greenDark);
+  const island = new THREE.Mesh(new THREE.CylinderGeometry(34, 36, 1.2, 9), materials.lava);
   island.position.y = -0.68;
   island.rotation.y = 0.22;
   island.receiveShadow = true;
+  world.golfIsland = island;
   world.golfRoot.add(island);
 
   world.cup = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 40), materials.cup);
