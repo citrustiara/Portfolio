@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyNote - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <nav aria-label="Main navigation">
+                <a href="../../o-mnie.html" class="nav-link">About</a>
+                <a href="../../projekty.html" class="nav-link active">Work</a>
+                <a href="../../blog.html" class="nav-link">Notes</a>
+                <a href="../../pl/projekty/keynote/index.html" class="language-switch" aria-label="Polish version">PL</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article class="wide">
+                <a href="../../projekty.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>
+                    Work
+                </a>
+
+                <span class="kicker">Local AI / Audio tooling / TUI</span>
+                <h1>KeyNote</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/KeyNote" target="_blank" rel="noopener">GitHub</a></div>
+
+                <div class="grid-12">
+                    <div style="grid-column: 1 / span 7;">
+                        <p class="lead">
+                            A voice-controlled note-taking and audio-to-text test harness for local multimodal models.
+                            KeyNote combines push-to-talk recording, prompt modes, local SQLite storage, exports,
+                            clipboard workflows, and a terminal UI around a <code>llama-server</code> transcription loop.
+                        </p>
+                    </div>
+                    <aside class="module is-accent" style="grid-column: 9 / span 4;">
+                        <span class="kicker">Workflow</span>
+                        <h3>Press to note</h3>
+                        <p>Use a configurable shortcut, speak, process locally, then save or paste the result into the active app.</p>
+                    </aside>
+                </div>
+
+                <h2>What It Does</h2>
+                <p>
+                    The project started as a way to test local audio-to-text capabilities in multimodal LLMs. It grew
+                    into a compact note system: notes can be created from recordings, appended through a separate
+                    hotkey, searched later, exported to Markdown, and transformed with reusable prompt modes.
+                </p>
+
+                <h2>System Pieces</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Role</th>
+                            <th>Implementation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Capture</td>
+                            <td>Push-to-talk and long recordings</td>
+                            <td>Global hotkeys, audio device selection, microphone or loopback input.</td>
+                        </tr>
+                        <tr class="is-emphasis">
+                            <td>Processing</td>
+                            <td>Local transcription and mode prompts</td>
+                            <td>Requests to a local <code>llama-server</code>, with modes such as mail, Slack, transcript, and summarize.</td>
+                        </tr>
+                        <tr>
+                            <td>Storage</td>
+                            <td>Searchable local notes</td>
+                            <td>SQLite-backed notes, metadata, active-note appends, and Markdown export.</td>
+                        </tr>
+                        <tr>
+                            <td>Interface</td>
+                            <td>CLI, TUI, and desktop overlay</td>
+                            <td>Click commands, Textual screens, clipboard automation, and a compact mode/status overlay.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Design Notes</h2>
+                <ul>
+                    <li>Balancing quick push-to-talk capture with longer recordings that need chunked processing.</li>
+                    <li>Keeping prompt modes editable while still making them easy to switch with hotkeys.</li>
+                    <li>Handling local-only data, clipboard paste, and app focus without turning the tool into a cloud service.</li>
+                    <li>Making the same note store usable from both direct CLI commands and an interactive terminal UI.</li>
+                </ul>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

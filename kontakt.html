@@ -1,63 +1,69 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kontakt - Maciej Łukasiewicz">
-    <title>Kontakt - Maciej Łukasiewicz</title>
+    <meta name="description" content="Contact links for Maciej Łukasiewicz.">
+    <title>Contact - Maciej Łukasiewicz</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <header>
         <div class="container">
-            <a href="index.html" class="logo">ML</a>
-            <button class="hamburger" aria-label="Menu"
-                onclick="document.querySelector('nav').classList.toggle('open')">
+            <a href="index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <nav>
-                <a href="o-mnie.html" class="nav-link">O mnie</a>
-                <a href="projekty.html" class="nav-link">Projekty</a>
-                <a href="blog.html" class="nav-link">Blog</a>
-                <a href="kontakt.html" class="nav-link active">Kontakt</a>
+            <nav aria-label="Main navigation">
+                <a href="o-mnie.html" class="nav-link">About</a>
+                <a href="projekty.html" class="nav-link">Work</a>
+                <a href="blog.html" class="nav-link">Notes</a>
+                <a href="pl/kontakt.html" class="language-switch" aria-label="Polish version">PL</a>
             </nav>
         </div>
     </header>
 
     <main>
         <div class="container">
-            <section>
-                <h1>Kontakt</h1>
-                <!-- <p style="margin-bottom: 1.5rem;">Napisz do mnie!</p> -->
+            <section class="section-heading">
+                <h1>Contact</h1>
+                <p>This page stays available for direct links, but contact is no longer a separate navigation tab because the same links live in the footer and about page.</p>
+            </section>
 
+            <section>
                 <ul class="item-list">
                     <li class="item">
                         <a href="mailto:maciek.lukasiewicz61@gmail.com">
-                            <h3>Email</h3>
-                            <p class="meta">maciek.lukasiewicz61@gmail.com</p>
+                            <span class="item-index">Email</span>
+                            <span>
+                                <h3>maciek.lukasiewicz61@gmail.com</h3>
+                                <p>The most direct way to reach me.</p>
+                            </span>
+                            <span class="item-action">Write</span>
                         </a>
                     </li>
                     <li class="item">
                         <a href="https://github.com/citrustiara" target="_blank" rel="noopener">
-                            <h3>GitHub</h3>
-                            <p class="meta">citrustiara</p>
+                            <span class="item-index">Code</span>
+                            <span>
+                                <h3>GitHub</h3>
+                                <p>Repositories, experiments, and older coursework.</p>
+                            </span>
+                            <span class="item-action">Open</span>
                         </a>
                     </li>
                     <li class="item">
-                        <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
-                            rel="noopener">
-                            <h3>LinkedIn</h3>
-                            <p class="meta">Maciej Łukasiewicz</p>
-                        </a>
-                    </li>
-                    <li class="item">
-                        <a href="https://www.instagram.com/m.lukasiewiicz/" target="_blank" rel="noopener">
-                            <h3>Instagram</h3>
-                            <p class="meta">@m.lukasiewiicz</p>
+                        <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">
+                            <span class="item-index">Profile</span>
+                            <span>
+                                <h3>LinkedIn</h3>
+                                <p>Education, public profile, and professional contact.</p>
+                            </span>
+                            <span class="item-action">Open</span>
                         </a>
                     </li>
                 </ul>
@@ -69,15 +75,15 @@
         <div class="container">
             <span>© <span id="year"></span> Maciej Łukasiewicz</span>
             <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
                 <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
-                    rel="noopener">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
             </div>
         </div>
     </footer>
 
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById("year").textContent = new Date().getFullYear();
     </script>
 </body>
 

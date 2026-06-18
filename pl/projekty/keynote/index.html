@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyNote - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <nav aria-label="Główna nawigacja">
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Notatki</a>
+                <a href="../../../projekty/keynote/index.html" class="language-switch" aria-label="English version">EN</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article class="wide">
+                <a href="../../projekty.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>
+                    Projekty
+                </a>
+
+                <span class="kicker">Lokalne AI / Audio tooling / TUI</span>
+                <h1>KeyNote</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/KeyNote" target="_blank" rel="noopener">GitHub</a></div>
+
+                <div class="grid-12">
+                    <div style="grid-column: 1 / span 7;">
+                        <p class="lead">
+                            Narzędzie do notatek głosowych i testowania audio-to-text na lokalnych modelach multimodalnych.
+                            KeyNote łączy push-to-talk, tryby promptów, lokalny zapis w SQLite, eksport, workflow schowka
+                            i terminalowy UI wokół pętli transkrypcji przez <code>llama-server</code>.
+                        </p>
+                    </div>
+                    <aside class="module is-accent" style="grid-column: 9 / span 4;">
+                        <span class="kicker">Workflow</span>
+                        <h3>Naciśnij i notuj</h3>
+                        <p>Użyj konfigurowalnego skrótu, mów, przetwórz lokalnie, a wynik zapisz albo wklej do aktywnej aplikacji.</p>
+                    </aside>
+                </div>
+
+                <h2>Co robi</h2>
+                <p>
+                    Projekt zaczął się jako sposób na testowanie lokalnych możliwości audio-to-text w modelach
+                    multimodalnych. Z czasem stał się małym systemem notatek: nagrania tworzą nowe wpisy, osobny skrót
+                    dopisuje do aktywnej notatki, treść można przeszukiwać, eksportować do Markdowna i przetwarzać
+                    przez wielokrotnego użytku tryby promptów.
+                </p>
+
+                <h2>Części systemu</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Warstwa</th>
+                            <th>Rola</th>
+                            <th>Implementacja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Capture</td>
+                            <td>Push-to-talk i długie nagrania</td>
+                            <td>Globalne skróty, wybór urządzeń audio, mikrofon albo wejście loopback.</td>
+                        </tr>
+                        <tr class="is-emphasis">
+                            <td>Processing</td>
+                            <td>Lokalna transkrypcja i tryby promptów</td>
+                            <td>Requesty do lokalnego <code>llama-server</code>, z trybami mail, Slack, transcript i summarize.</td>
+                        </tr>
+                        <tr>
+                            <td>Storage</td>
+                            <td>Przeszukiwalne lokalne notatki</td>
+                            <td>SQLite, metadata, dopisywanie do aktywnej notatki i eksport do Markdowna.</td>
+                        </tr>
+                        <tr>
+                            <td>Interface</td>
+                            <td>CLI, TUI i overlay pulpitu</td>
+                            <td>Komendy Click, ekrany Textual, automatyzacja schowka i mały overlay statusu/trybu.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Decyzje projektowe</h2>
+                <ul>
+                    <li>Połączenie szybkiego push-to-talk z dłuższymi nagraniami, które wymagają chunkowanego przetwarzania.</li>
+                    <li>Tryby promptów są edytowalne, ale nadal szybkie do przełączania skrótami.</li>
+                    <li>Dane zostają lokalnie, a narzędzie korzysta ze schowka i aktywnego okna bez budowania usługi cloud.</li>
+                    <li>Ten sam magazyn notatek działa z komend CLI i interaktywnego terminalowego UI.</li>
+                </ul>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

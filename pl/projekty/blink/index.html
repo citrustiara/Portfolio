@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blink</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <p class="brand">Blink</p>
+        <div class="status-grid" aria-live="polite">
+          <span class="status-pill" data-state="idle" id="signalingStatus">Signal offline</span>
+          <span class="status-pill" data-state="idle" id="peerStatus">Peer idle</span>
+          <span class="status-pill" data-state="idle" id="channelStatus">Channel closed</span>
+        </div>
+      </header>
+
+      <section class="notice" id="notice" hidden></section>
+
+      <section class="room-grid" aria-label="Rooms">
+        <article class="panel" id="createPanel">
+          <div class="panel-head">
+            <h2>Create room</h2>
+          </div>
+          <button class="primary-action" id="createRoomButton" type="button">Create</button>
+          <div class="room-output">
+            <label for="createdRoomCode">Room code</label>
+            <div class="copy-row">
+              <input id="createdRoomCode" type="text" readonly value="" placeholder="Waiting" />
+              <button id="copyCodeButton" type="button">Copy</button>
+            </div>
+            <label for="roomLink">Room link</label>
+            <div class="copy-row">
+              <input id="roomLink" type="text" readonly value="" placeholder="Waiting" />
+              <button id="copyLinkButton" type="button">Copy</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="joinPanel">
+          <div class="panel-head">
+            <h2>Join room</h2>
+          </div>
+          <form class="join-form" id="joinForm">
+            <label for="joinRoomInput">Room code or link</label>
+            <input id="joinRoomInput" type="text" autocomplete="off" placeholder="ABC123" />
+            <button class="primary-action" type="submit">Join</button>
+          </form>
+          <div class="room-state">
+            <span>Active room</span>
+            <strong id="activeRoom">None</strong>
+          </div>
+        </article>
+      </section>
+
+      <section class="transfer-area" aria-label="Transfer">
+        <div class="transfer-head">
+          <h2>Transfer</h2>
+          <button id="leaveRoomButton" type="button" disabled>Leave</button>
+        </div>
+
+        <div class="transfer-grid">
+          <section class="transfer-panel">
+            <h3>Send</h3>
+            <label class="file-drop" for="fileInput">
+              <span id="fileLabel">Choose a file</span>
+              <input id="fileInput" type="file" />
+            </label>
+            <div class="file-detail" id="selectedFile">No file selected</div>
+            <button class="primary-action" id="sendFileButton" type="button" disabled>Send file</button>
+            <div class="progress-block">
+              <div class="progress-row">
+                <span>Sent</span>
+                <strong id="sendProgressText">0%</strong>
+              </div>
+              <progress id="sendProgress" value="0" max="100"></progress>
+            </div>
+          </section>
+
+          <section class="transfer-panel">
+            <h3>Receive</h3>
+            <div class="incoming-box">
+              <span id="incomingName">Waiting for file</span>
+              <strong id="incomingSize"></strong>
+            </div>
+            <div class="progress-block">
+              <div class="progress-row">
+                <span>Received</span>
+                <strong id="receiveProgressText">0%</strong>
+              </div>
+              <progress id="receiveProgress" value="0" max="100"></progress>
+            </div>
+            <a class="download-link" id="downloadLink" href="#" download hidden>Download</a>
+          </section>
+        </div>
+      </section>
+
+      <details class="network-panel">
+        <summary>Net</summary>
+        <label for="iceServersInput">ICE servers</label>
+        <textarea id="iceServersInput" rows="5" spellcheck="false"></textarea>
+        <div class="network-actions">
+          <button id="resetIceButton" type="button">Reset</button>
+          <button id="saveIceButton" type="button">Apply</button>
+        </div>
+      </details>
+    </main>
+
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script src="./app.js?v=4" defer></script>
+  </body>
+</html>

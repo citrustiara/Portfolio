@@ -1,174 +1,321 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weeks Left</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap");
 
         :root {
-            /* === LIGHT THEME VARIABLES FROM STYLES.CSS === */
-            --bg: #fffdf7;
-            --text: #1a1a1a;
-            --text-muted: #494949;
-            --accent: #222222;
-            --border: #e0dfd8;
-            --font-sans: 'JetBrains Mono', monospace;
-            --max-width: 1000px;
-            --spacing: 2rem;
+            --bg: #ffffff;
+            --ink: #0b0b0b;
+            --muted: #5f6673;
+            --subtle: #9aa0aa;
+            --line: #e8e8e8;
+            --soft: #f5f5f5;
+            --accent: #ff3b30;
+            --font-sans: "Plus Jakarta Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "Space Grotesk", "IBM Plex Mono", ui-monospace, monospace;
             --dot-size: 8px;
-            --grid-cols: 52;
         }
 
-        @media (max-width: 600px) {
-            :root {
-                --spacing: 1rem;
-                --dot-size: 4px;
-                --grid-cols: 52;
-            }
-        }
-
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            font-family: var(--font-sans);
-            background-color: var(--bg);
-            color: var(--text);
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: var(--spacing);
-            align-items: center;
-            text-align: center;
-        }
-
-        textarea {
-            width: 100%;
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 20px;
+        * {
             box-sizing: border-box;
-            font-size: 16px;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
             font-family: var(--font-sans);
-            resize: none;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        footer {
-            background-color: var(--bg);
-            padding: 0.75rem 0;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .btn {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-family: inherit;
-            font-size: inherit;
+        a {
+            color: inherit;
             text-decoration: none;
-            transition: color 0.15s ease;
         }
 
-        .btn:hover {
+        .topbar {
+            min-height: 64px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 max(16px, calc((100vw - 1180px) / 2));
+        }
+
+        .brand,
+        .lang-link,
+        .kicker,
+        label,
+        button,
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .brand {
+            color: var(--muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand:hover,
+        .lang-link:hover {
             color: var(--accent);
         }
 
-        #birthDate {
-            background-color: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-family: var(--font-sans);
-            padding: 0.5rem;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease;
-            cursor: pointer;
-            margin-bottom: 1rem;
-            width: fit-content;
-            align-self: center;
+        .lang-link {
+            color: var(--subtle);
+            opacity: 0.6;
         }
 
-        #birthDate:focus {
+        .arrow-icon {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2;
+        }
+
+        .shell {
+            width: min(calc(100% - 64px), 1180px);
+            max-width: calc(100vw - 32px);
+            margin: 0 auto;
+            padding: 64px 0 48px;
+        }
+
+        .hero {
+            border-top: 2px solid var(--ink);
+            display: grid;
+            grid-template-columns: minmax(0, 8fr) minmax(260px, 3fr);
+            gap: 32px;
+            align-items: end;
+            padding-top: 16px;
+            margin-bottom: 48px;
+        }
+
+        .hero > *,
+        .input-panel,
+        .input-row {
+            min-width: 0;
+        }
+
+        .kicker {
+            color: var(--accent);
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(44px, 7vw, 78px);
+            font-weight: 800;
+            line-height: 0.98;
+            letter-spacing: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .lead {
+            max-width: 680px;
+            margin: 22px 0 0;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.58;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .input-panel {
+            border-left: 1px solid var(--line);
+            padding-left: 24px;
+            min-width: 0;
+        }
+
+        label {
+            color: var(--muted);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+        }
+
+        input {
+            width: 100%;
+            min-width: 0;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            font: 500 15px var(--font-sans);
+            padding: 0 12px;
+        }
+
+        input:focus {
+            outline: 2px solid var(--ink);
+            outline-offset: 1px;
+        }
+
+        button {
+            min-height: 42px;
+            border: 1px solid var(--ink);
+            background: var(--ink);
+            color: #fff;
+            cursor: pointer;
+            padding: 0 16px;
+        }
+
+        button:hover {
             border-color: var(--accent);
+            background: var(--accent);
+        }
+
+        .result {
+            display: none;
+            margin: 0;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: clamp(44px, 8vw, 92px);
+            font-weight: 800;
+            line-height: 0.95;
+        }
+
+        #summary {
+            display: none;
+            max-width: 620px;
+            margin: 16px 0 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.58;
+        }
+
+        #summary b {
+            color: var(--ink);
+        }
+
+        .grid-panel {
+            border-top: 2px solid var(--ink);
+            padding-top: 16px;
         }
 
         #weeks-grid {
-            display: grid;
-            grid-template-columns: repeat(var(--grid-cols), 1fr);
-            gap: 2px;
-            margin: 0 auto;
+            display: none;
+            grid-template-columns: repeat(52, var(--dot-size));
+            gap: 3px;
             width: fit-content;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .week {
             width: var(--dot-size);
             height: var(--dot-size);
-            background-color: var(--border);
+            background: var(--line);
         }
 
         .week.passed {
-            background-color: var(--accent);
+            background: var(--ink);
         }
 
-        .result {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-top: 2rem;
+        .meta {
+            color: var(--subtle);
+            margin-top: 16px;
         }
 
-        @media (max-width: 600px) {
-            .result {
-                font-size: 1.8rem;
-                margin-top: 1rem;
+        @media (max-width: 760px) {
+            :root {
+                --dot-size: 5px;
             }
-        }
 
-        p {
-            margin-top: 3rem;
-            margin-bottom: 0;
-        }
+            .shell {
+                width: min(calc(100% - 48px), 1180px);
+                max-width: calc(100vw - 48px);
+                padding-top: 48px;
+            }
 
-        #summary {
-            margin-top: 0.5rem;
-            font-size: 1rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-            display: none;
-        }
+            h1 {
+                font-size: clamp(30px, 8.5vw, 38px);
+            }
 
-        #summary b {
-            color: var(--text);
+            .lead {
+                font-size: 15px;
+            }
+
+            .hero {
+                display: block;
+            }
+
+            .input-panel {
+                border-left: 0;
+                border-top: 1px solid var(--line);
+                margin-top: 32px;
+                padding: 16px 0 0;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: fit-content;
+            }
         }
     </style>
 </head>
 
 <body>
+    <header class="topbar">
+        <a class="brand" href="../../projekty.html" aria-label="Back to work">
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M17 17 7 7" />
+                <path d="M17 7H7v10" />
+            </svg>
+            Work
+        </a>
+        <a class="lang-link" href="../../pl/projekty/weeks-left/demo.html" aria-label="Polish version">PL</a>
+    </header>
+
+    <main class="shell">
+        <section class="hero">
+            <div>
+                <span class="kicker">Time grid / 90-year model</span>
+                <h1>Weeks Left</h1>
+                <p class="lead">Enter your birth date and the app maps a 90-year life into one dot per week.</p>
+                <p class="result" id="result"></p>
+                <p id="summary"></p>
+            </div>
+            <aside class="input-panel">
+                <label for="birthDate" id="birthdatetext">Birth date</label>
+                <div class="input-row">
+                    <input type="date" id="birthDate" onkeydown="if(event.key === 'Enter') calculateWeeksLeft()">
+                    <button type="button" id="okbutton" onclick="calculateWeeksLeft();">OK</button>
+                </div>
+            </aside>
+        </section>
+
+        <section class="grid-panel" aria-label="Weeks grid">
+            <div class="weeks-grid" id="weeks-grid"></div>
+            <div class="meta">Each mark is one week.</div>
+        </section>
+    </main>
+
     <script src="script.js"></script>
-    <!-- <h1 id="title">WEEKS LEFT</h1> -->
-    <p style="text-align: center;" id="birthdatetext">enter your birth date:</p>
-    <input type="date" id="birthDate" onkeydown="if(event.key === 'Enter') calculateWeeksLeft()">
-    <button class="btn" id="okbutton" onclick="calculateWeeksLeft();">OK</button>
-    <p class="result" id="result"></p>
-    <div class="weeks-grid" id="weeks-grid"></div>
-    <p id="summary"></p>
 </body>
 
 </html>

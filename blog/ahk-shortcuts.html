@@ -1,28 +1,25 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moje skróty AHK - Maciej Łukasiewicz</title>
+    <title>My AutoHotkey Shortcuts - Maciej Łukasiewicz</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 
 <body>
     <header>
         <div class="container">
-            <a href="../index.html" class="logo">ML</a>
-            <button class="hamburger" aria-label="Menu"
-                onclick="document.querySelector('nav').classList.toggle('open')">
-                <span></span>
-                <span></span>
-                <span></span>
+            <a href="../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
             </button>
-            <nav>
-                <a href="../o-mnie.html" class="nav-link">O mnie</a>
-                <a href="../projekty.html" class="nav-link">Projekty</a>
-                <a href="../blog.html" class="nav-link active">Blog</a>
-                <a href="../kontakt.html" class="nav-link">Kontakt</a>
+            <nav aria-label="Main navigation">
+                <a href="../o-mnie.html" class="nav-link">About</a>
+                <a href="../projekty.html" class="nav-link">Work</a>
+                <a href="../blog.html" class="nav-link active">Notes</a>
+                <a href="../pl/blog/ahk-shortcuts.html" class="language-switch" aria-label="Polish version">PL</a>
             </nav>
         </div>
     </header>
@@ -30,54 +27,35 @@
     <main>
         <div class="container">
             <article>
-                <a href="../blog.html" class="nav-link" style="font-size: 0.875rem;"><svg class="arrow-icon arrow-back"
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <a href="../blog.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M17 17 7 7" />
                         <path d="M17 7H7v10" />
-                    </svg>Blog</a>
+                    </svg>
+                    Notes
+                </a>
 
-                <h1 style="margin-top: 1rem;">Moje skróty AHK</h1>
+                <span class="kicker">Windows automation</span>
+                <h1>My AutoHotkey Shortcuts</h1>
                 <div class="article-meta">2024 · Maciej Łukasiewicz</div>
 
-                <p>
-                    Głównym celem tego skryptu było umożliwienie kontroli muzyki całkowicie w tle. Chciałem móc
-                    zmieniać utwory czy pauzować muzykę bez konieczności robienia Alt-Tab, szukania okna Spotify
-                    czy odrywania rąk od klawiatury. Żadnego przerywania pracy.
+                <p class="lead">
+                    A small AutoHotkey script that keeps frequent actions under the keyboard: media controls, volume,
+                    cursor centering, and quick Notepad launch.
                 </p>
 
-                <h2>Czego używam najczęściej?</h2>
-
-                <p>
-                    <strong>Sterowanie mediami:</strong> Klawiatura, której używam, nie ma dedykowanych przycisków
-                    w wygodnym miejscu. Rozwiązałem to skrótami z klawiszem Alt:
-                </p>
+                <h2>Most Used Bindings</h2>
                 <ul>
-                    <li><code>Alt + Strzałka w lewo</code> – Poprzedni utwór</li>
-                    <li><code>Alt + Strzałka w prawo</code> – Następny utwór</li>
-                    <li><code>Alt + Strzałka w dół</code> – Play / Pause</li>
+                    <li><code>Alt + Left</code>: previous track.</li>
+                    <li><code>Alt + Right</code>: next track.</li>
+                    <li><code>Alt + Down</code>: play or pause.</li>
+                    <li><code>Alt + PageUp</code> / <code>Alt + PageDown</code>: volume control.</li>
+                    <li><code>Alt + C</code>: move the mouse to the center of the main screen.</li>
+                    <li><code>Alt + N</code>: open Notepad.</li>
                 </ul>
 
-                <p>
-                    <strong>Głośność:</strong> Dzięki <code>Alt + PageUp</code> oraz <code>Alt + PageDown</code>
-                    mogę błyskawicznie regulować systemową głośność.
-                </p>
-
-                <p>
-                    <strong>Centrowanie myszki:</strong> Pracując na wielu monitorach czasem gubię kursor.
-                    <code>Alt + C</code> natychmiast przenosi go na środek głównego ekranu.
-                </p>
-
-                <p>
-                    <strong>Szybkie notowanie:</strong> <code>Alt + N</code> odpala Notatnik.
-                </p>
-
-                <h3>Pełny kod skryptu</h3>
-                <p>
-                    Skrypt jest bardzo lekki i nie wymaga niczego poza zainstalowanym AutoHotkey. Poniżej zamieszczam
-                    jego pełną treść:
-                </p>
-
-                <pre style="background: #f4f4f4; padding: 1rem; border-radius: 5px; overflow-x: auto;"><code>; --- Media Controls ---
+                <h2>Script</h2>
+                <pre><code>; --- Media Controls ---
 !Left::Media_Prev
 !Right::Media_Next
 !Down::Media_Play_Pause
@@ -93,21 +71,11 @@
 !c::
 CoordMode, Mouse, Screen
 MouseMove, A_ScreenWidth/2, A_ScreenHeight/2
-return
-
-; --- Text Expansion ---
-::@em::moj.email@example.com</code></pre>
-
-                <h2>Autostart</h2>
-                <p>
-                    Te skróty są dla mnie tak naturalne jak <code>Ctrl+C</code>. Dlatego skrypt wylądował w folderze
-                    Autostart systemu Windows. Uruchamia się cicho w tle przy każdym starcie systemu.
-                </p>
+return</code></pre>
 
                 <p>
-                    Repozytorium na GitHub:
-                    <a href="https://github.com/citrustiara/AHK_Shortcuts" target="_blank"
-                        class="project-link">citrustiara/AHK_Shortcuts</a>
+                    The script lives in Windows startup because the shortcuts became as natural as copy and paste. The
+                    repository is available at <a href="https://github.com/citrustiara/AHK_Shortcuts" target="_blank" rel="noopener">citrustiara/AHK_Shortcuts</a>.
                 </p>
             </article>
         </div>
@@ -117,16 +85,13 @@ return
         <div class="container">
             <span>© <span id="year"></span> Maciej Łukasiewicz</span>
             <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
                 <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
-                    rel="noopener">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
             </div>
         </div>
     </footer>
-
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 
 </html>

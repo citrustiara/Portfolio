@@ -1,92 +1,310 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Notepad</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap");
 
         :root {
-            /* === LIGHT THEME VARIABLES FROM STYLES.CSS === */
-            --bg: #fffdf7;
-            --text: #1a1a1a;
-            --text-muted: #494949;
-            --accent: #222222;
-            --border: #e0dfd8;
-            --font-sans: 'JetBrains Mono', monospace;
+            --bg: #ffffff;
+            --ink: #0b0b0b;
+            --muted: #5f6673;
+            --subtle: #9aa0aa;
+            --line: #e8e8e8;
+            --soft: #f5f5f5;
+            --accent: #ff3b30;
+            --font-sans: "Plus Jakarta Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "Space Grotesk", "IBM Plex Mono", ui-monospace, monospace;
         }
 
-        body,
-        html {
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
             margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
             display: flex;
             flex-direction: column;
             font-family: var(--font-sans);
-            background-color: var(--bg);
-            color: var(--text);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .topbar {
+            min-height: 64px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 max(16px, calc((100vw - 1180px) / 2));
+        }
+
+        .brand,
+        .lang-link,
+        .kicker,
+        .toolbar,
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .brand {
+            color: var(--muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand:hover,
+        .lang-link:hover,
+        .toolbar button:hover,
+        .toolbar a:hover {
+            color: var(--accent);
+        }
+
+        .lang-link {
+            color: var(--subtle);
+            opacity: 0.6;
+        }
+
+        .arrow-icon {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2;
+        }
+
+        .shell {
+            width: min(calc(100% - 64px), 1180px);
+            max-width: calc(100vw - 32px);
+            margin: 0 auto;
+            padding: 56px 0 32px;
+            display: grid;
+            grid-template-rows: auto minmax(360px, 1fr);
+            gap: 32px;
+            flex: 1;
+        }
+
+        .hero {
+            border-top: 2px solid var(--ink);
+            display: grid;
+            grid-template-columns: minmax(0, 8fr) minmax(220px, 3fr);
+            gap: 32px;
+            padding-top: 16px;
+        }
+
+        .hero > *,
+        .side,
+        .toolbar {
+            min-width: 0;
+        }
+
+        .kicker {
+            color: var(--accent);
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(42px, 7vw, 78px);
+            font-weight: 800;
+            line-height: 0.98;
+            letter-spacing: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .lead {
+            max-width: 690px;
+            margin: 22px 0 0;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.58;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .side {
+            border-left: 1px solid var(--line);
+            padding-left: 24px;
+        }
+
+        .side p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .editor-panel {
+            min-height: 420px;
+            border-top: 2px solid var(--ink);
+            display: grid;
+            grid-template-rows: 1fr auto;
+            padding-top: 16px;
         }
 
         textarea {
             width: 100%;
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 20px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: var(--font-sans);
+            min-width: 0;
+            min-height: 360px;
+            border: 0;
+            outline: 0;
             resize: none;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        footer {
-            background-color: var(--bg);
-            padding: 0.75rem 0;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .btn {
-            background: none;
-            border: none;
+            background:
+                linear-gradient(to bottom, transparent 31px, var(--line) 32px),
+                var(--bg);
+            background-size: 100% 32px;
+            color: var(--ink);
+            font: 500 17px/32px var(--font-sans);
             padding: 0;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-family: inherit;
-            font-size: inherit;
-            text-decoration: none;
-            transition: color 0.15s ease;
         }
 
-        .btn:hover {
-            color: var(--accent);
+        textarea::placeholder {
+            color: var(--subtle);
+        }
+
+        textarea:focus {
+            box-shadow: inset 0 2px 0 var(--accent);
+        }
+
+        .toolbar {
+            border-top: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 16px;
+            color: var(--muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: transparent;
+            border: 0;
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+            padding: 0;
+            text-transform: inherit;
+            letter-spacing: inherit;
+        }
+
+        .meta {
+            color: var(--subtle);
+        }
+
+        @media (max-width: 760px) {
+            .shell {
+                width: min(calc(100% - 48px), 1180px);
+                max-width: calc(100vw - 48px);
+                padding-top: 48px;
+            }
+
+            h1 {
+                font-size: clamp(30px, 8.5vw, 38px);
+            }
+
+            .lead,
+            .side p {
+                font-size: 15px;
+            }
+
+            .hero {
+                display: block;
+            }
+
+            .side {
+                border-left: 0;
+                border-top: 1px solid var(--line);
+                margin-top: 32px;
+                padding: 16px 0 0;
+            }
+
+            .toolbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 
 <body>
-    <textarea id="editor" placeholder="Start typing..."></textarea>
+    <header class="topbar">
+        <a class="brand" href="../../projekty.html" aria-label="Back to work">
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M17 17 7 7" />
+                <path d="M17 7H7v10" />
+            </svg>
+            Work
+        </a>
+        <a class="lang-link" href="../../pl/projekty/urlnotepad/demo.html" aria-label="Polish version">PL</a>
+    </header>
 
-    <footer>
-        <button id="copyUrlBtn" class="btn">copy URL</button>
-        <button id="copyTextBtn" class="btn">copy text</button>
-        <a href="../../index.html" class="btn">Home</a>
-    </footer>
+    <main class="shell">
+        <section class="hero">
+            <div>
+                <span class="kicker">Browser tool / No backend</span>
+                <h1>URL Notepad</h1>
+                <p class="lead">A note that lives inside its own URL. Type, copy the link, and the text travels with it.</p>
+            </div>
+            <aside class="side">
+                <span class="kicker">Storage</span>
+                <p>Text is compressed into the URL hash. No server, account, or database.</p>
+            </aside>
+        </section>
+
+        <section class="editor-panel" aria-label="URL notepad editor">
+            <textarea id="editor" placeholder="Start typing..."></textarea>
+            <footer class="toolbar">
+                <div class="actions">
+                    <button id="copyUrlBtn" type="button">Copy URL</button>
+                    <button id="copyTextBtn" type="button">Copy Text</button>
+                    <a href="../../index.html">Home</a>
+                </div>
+                <span class="meta" id="saveState">Auto-saved to URL</span>
+            </footer>
+        </section>
+    </main>
 
     <script>
-        const editor = document.getElementById('editor');
+        const editor = document.getElementById("editor");
+        const saveState = document.getElementById("saveState");
+        const copy = {
+            saved: "Auto-saved to URL",
+            urlCopied: "URL copied",
+            textCopied: "Text copied"
+        };
 
         window.onload = () => {
             const hash = window.location.hash.substring(1);
@@ -97,21 +315,23 @@
         };
 
         let timeout = null;
-        editor.addEventListener('input', () => {
+        editor.addEventListener("input", () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 const compressed = LZString.compressToEncodedURIComponent(editor.value);
-                const newUrl = window.location.pathname + '#' + compressed;
-                window.history.replaceState(null, null, newUrl);
-            }, 654);
+                window.history.replaceState(null, null, window.location.pathname + "#" + compressed);
+                saveState.textContent = copy.saved;
+            }, 360);
         });
 
-        document.getElementById('copyUrlBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href);
+        document.getElementById("copyUrlBtn").addEventListener("click", async () => {
+            await navigator.clipboard.writeText(window.location.href);
+            saveState.textContent = copy.urlCopied;
         });
 
-        document.getElementById('copyTextBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(editor.value);
+        document.getElementById("copyTextBtn").addEventListener("click", async () => {
+            await navigator.clipboard.writeText(editor.value);
+            saveState.textContent = copy.textCopied;
         });
     </script>
 </body>

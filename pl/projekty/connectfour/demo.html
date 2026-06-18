@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Connect Four</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="app-topbar">
+        <a class="brand" href="../../projekty.html" aria-label="Powrót do projektów">
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M17 17 7 7" />
+                <path d="M17 7H7v10" />
+            </svg>
+            Projekty
+        </a>
+        <a class="lang-link" href="../../../projekty/connectfour/demo.html" aria-label="English version">EN</a>
+    </header>
+
+    <main class="app-shell">
+        <section class="hero">
+            <div>
+                <span class="kicker">Gra AI / Alpha-beta pruning</span>
+                <h1>Multi Connect Four</h1>
+                <p class="lead">Graj na czterech planszach naraz. Żeby wygrać, musisz przetrwać wszystkie plansze; jedna przegrana kończy mecz.</p>
+            </div>
+            <aside class="rule-panel">
+                <span class="kicker">Sterowanie</span>
+                <p>Użyj przycisków albo klawiszy <strong>1-7</strong> na aktywnej planszy.</p>
+            </aside>
+        </section>
+
+        <section class="game-container" aria-label="Gra Multi Connect Four">
+            <div class="game-toolbar">
+                <button type="button" onclick="newGames()">Nowa gra</button>
+                <div class="game-info">
+                    <div id="status"></div>
+                    <div class="keyboard-hint">Naciśnij klawisze 1-7, żeby wrzucić token na aktywnej planszy.</div>
+                </div>
+            </div>
+
+            <div class="multi-board-container">
+                <div class="board-wrapper">
+                    <div class="board-header">Plansza 1</div>
+                    <div class="board active-board" id="board-0">
+                        <div class="column-buttons" id="columnButtons-0"></div>
+                        <div class="grid" id="grid-0"></div>
+                    </div>
+                    <div class="board-result" id="result-0"></div>
+                </div>
+
+                <div class="board-wrapper">
+                    <div class="board-header">Plansza 2</div>
+                    <div class="board inactive-board" id="board-1">
+                        <div class="column-buttons" id="columnButtons-1"></div>
+                        <div class="grid" id="grid-1"></div>
+                    </div>
+                    <div class="board-result" id="result-1"></div>
+                </div>
+
+                <div class="board-wrapper">
+                    <div class="board-header">Plansza 3</div>
+                    <div class="board inactive-board" id="board-2">
+                        <div class="column-buttons" id="columnButtons-2"></div>
+                        <div class="grid" id="grid-2"></div>
+                    </div>
+                    <div class="board-result" id="result-2"></div>
+                </div>
+
+                <div class="board-wrapper">
+                    <div class="board-header">Plansza 4</div>
+                    <div class="board inactive-board" id="board-3">
+                        <div class="column-buttons" id="columnButtons-3"></div>
+                        <div class="grid" id="grid-3"></div>
+                    </div>
+                    <div class="board-result" id="result-3"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="connect4.js"></script>
+    <script src="alphabeta-agent.js"></script>
+    <script src="multi-game-ui.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+blog/forceplate_software.txt
+blog/forceplate_hardware.txt
+*.pdf
+*.docx
+*.txt
+*.tex
+CV/*.tex
+CV/
+projekty/hurtownie-danych/README.md

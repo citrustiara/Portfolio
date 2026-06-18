@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wybrane projekty programistyczne Macieja Łukasiewicza.">
+    <title>Projekty - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav aria-label="Główna nawigacja">
+                <a href="o-mnie.html" class="nav-link">O mnie</a>
+                <a href="projekty.html" class="nav-link active">Projekty</a>
+                <a href="blog.html" class="nav-link">Notatki</a>
+                <a href="../projekty.html" class="language-switch" aria-label="English version">EN</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="section-heading">
+                <h1>Projekty</h1>
+                <p>Praktyczne archiwum projektów: część skończona, część celowo mała, część cenna dlatego, że pokazała realne ograniczenia.</p>
+            </section>
+
+            <section>
+                <ul class="item-list">
+                    <li class="item">
+                        <a href="projekty/forceplate/index.html">
+                            <span class="item-index">01 / Embedded</span>
+                            <span>
+                                <h3>Force Plate</h3>
+                                <p>Prototyp sprzętowo-programowy do analizy skoków: ESP32, belki tensometryczne, ADC CS1238, komunikacja szeregowa i wizualizacja w Pythonie.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/hurtownie-danych/index.html">
+                            <span class="item-index">02 / Dane</span>
+                            <span>
+                                <h3>Transit BI Warehouse</h3>
+                                <p>Grupowy projekt hurtowni danych dla modelu operatora tramwajowego: wymagania, ETL w SSIS, kostka OLAP, MDX i raportowanie w Power BI.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/filefinder/index.html">
+                            <span class="item-index">03 / Windows</span>
+                            <span>
+                                <h3>FileFinder</h3>
+                                <p>Prototyp desktopowej wyszukiwarki plików używającej NTFS USN Journal, SQLite i WPF, żeby wyszukiwanie było niemal natychmiastowe.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="https://golf.maciek-lukasiewicz61.workers.dev/" target="_blank" rel="noopener">
+                            <span class="item-index">04 / WebGL</span>
+                            <span>
+                                <h3>Golf Duel</h3>
+                                <p>Przeglądarkowy eksperyment multiplayer łączący golfa i FPS: Three.js, PeerJS, proceduralne areny i współdzielony stan meczu.</p>
+                            </span>
+                        </a>
+                        <a href="https://golf.maciek-lukasiewicz61.workers.dev/" target="_blank" rel="noopener" class="demo-link">Otwórz</a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="projekty/blink/index.html">
+                            <span class="item-index">05 / P2P web</span>
+                            <span>
+                                <h3>Blink</h3>
+                                <p>Statyczna aplikacja WebRTC do przekazywania plików przez PeerJS i bezpośrednie połączenie przeglądarek.</p>
+                            </span>
+                        </a>
+                        <a href="projekty/blink/index.html" class="demo-link">Demo</a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/keynote/index.html">
+                            <span class="item-index">06 / Local AI</span>
+                            <span>
+                                <h3>KeyNote</h3>
+                                <p>Notatki głosowe i test harness audio-to-text dla lokalnych modeli multimodalnych: skróty, tryby promptów, SQLite, CLI i TUI.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="projekty/connectfour/index.html">
+                            <span class="item-index">07 / AI game</span>
+                            <span>
+                                <h3>Multi Connect Four</h3>
+                                <p>Wariant Connect Four na czterech planszach z przeciwnikiem używającym alpha-beta pruning i lekkim interfejsem w czystym JavaScripcie.</p>
+                            </span>
+                        </a>
+                        <a href="projekty/connectfour/demo.html" class="demo-link">Demo</a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/backgammon/index.html">
+                            <span class="item-index">08 / C++</span>
+                            <span>
+                                <h3>Backgammon</h3>
+                                <p>Obiektowe przepisanie gry planszowej w C++ z hierarchią graczy, walidacją ruchów i rozdzieleniem graczy AI oraz człowieka.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/inzynieria-oprogramowania/index.html">
+                            <span class="item-index">09 / Analiza</span>
+                            <span>
+                                <h3>Delivery Schedule Management System</h3>
+                                <p>Projekt z inżynierii oprogramowania: wizja, przypadki użycia, model obiektowy i dynamiczne diagramy UML dla procesu logistycznego.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="projekty/worldchem/index.html">
+                            <span class="item-index">10 / Client web</span>
+                            <span>
+                                <h3>WorldChem Website</h3>
+                                <p>Responsywna strona dla dostawcy surowców chemicznych, z wyszukiwaniem produktów i lekkim statycznym stackiem.</p>
+                            </span>
+                        </a>
+                        <a href="https://worldchem.pl" target="_blank" rel="noopener" class="demo-link">Live</a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="projekty/urlnotepad/index.html">
+                            <span class="item-index">11 / Browser tool</span>
+                            <span>
+                                <h3>URL Notepad</h3>
+                                <p>Bezserwerowy notatnik, który kompresuje tekst do adresu URL, dzięki czemu notatki można zapisać i udostępnić jako link.</p>
+                            </span>
+                        </a>
+                        <a href="projekty/urlnotepad/demo.html" class="demo-link">Demo</a>
+                    </li>
+                    <li class="item">
+                        <a href="projekty/infixtopostfix/index.html">
+                            <span class="item-index">12 / Algorytmy</span>
+                            <span>
+                                <h3>Infix to Postfix</h3>
+                                <p>Konsolowy kalkulator w C++, który konwertuje wyrażenia matematyczne do odwrotnej notacji polskiej.</p>
+                            </span>
+                            <span class="item-action">Opis</span>
+                        </a>
+                    </li>
+                    <li class="item item-with-demo">
+                        <a href="projekty/weeks-left/index.html">
+                            <span class="item-index">13 / Micro tool</span>
+                            <span>
+                                <h3>Weeks Left</h3>
+                                <p>Mała aplikacja-kalendarz życia, która zamienia datę urodzenia w siatkę przeżytych i pozostałych tygodni.</p>
+                            </span>
+                        </a>
+                        <a href="projekty/weeks-left/demo.html" class="demo-link">Demo</a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

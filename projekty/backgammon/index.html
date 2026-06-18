@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -11,18 +11,15 @@
 <body>
     <header>
         <div class="container">
-            <a href="../../index.html" class="logo">ML</a>
-            <button class="hamburger" aria-label="Menu"
-                onclick="document.querySelector('nav').classList.toggle('open')">
-                <span></span>
-                <span></span>
-                <span></span>
+            <a href="../../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
             </button>
-            <nav>
-                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
-                <a href="../../projekty.html" class="nav-link active">Projekty</a>
-                <a href="../../blog.html" class="nav-link">Blog</a>
-                <a href="../../kontakt.html" class="nav-link">Kontakt</a>
+            <nav aria-label="Main navigation">
+                <a href="../../o-mnie.html" class="nav-link">About</a>
+                <a href="../../projekty.html" class="nav-link active">Work</a>
+                <a href="../../blog.html" class="nav-link">Notes</a>
+                <a href="../../pl/projekty/backgammon/index.html" class="language-switch" aria-label="Polish version">PL</a>
             </nav>
         </div>
     </header>
@@ -30,53 +27,44 @@
     <main>
         <div class="container">
             <article>
-                <a href="../../projekty.html" class="nav-link" style="font-size: 0.875rem;"><svg
-                        class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <a href="../../projekty.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M17 17 7 7" />
                         <path d="M17 7H7v10" />
-                    </svg>Projekty</a>
+                    </svg>
+                    Work
+                </a>
 
-                <h1 style="margin-top: 1rem;">Backgammon</h1>
-                <div class="article-meta">2026 ·
-                    <a href="https://github.com/citrustiara/backgammon" target="_blank" rel="noopener">GitHub</a>
-                </div>
+                <span class="kicker">C++ / Object-oriented design</span>
+                <h1>Backgammon</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/backgammon" target="_blank" rel="noopener">GitHub</a></div>
 
-                <h2>O projekcie</h2>
-                <p>
-                    Backgammon to pełna implementacja klasycznej gry planszowej dla dwóch graczy, napisana w C++.
-                    Projekt powstał pierwotnie na zajęcia w 2023 roku, ale tamta wersja była pisana
-                    proceduralnie i ciężko się ją rozwijało. Ta wersja to kompletny rewrite z porządną
-                    architekturą obiektową. Kod jest czytelny, łatwy do rozbudowy i przyjemny w utrzymaniu.
+                <p class="lead">
+                    A complete C++ implementation of classic backgammon. I rewrote an older procedural course project
+                    into a cleaner object-oriented architecture with separated board logic, rendering, move validation,
+                    and player strategies.
                 </p>
 
-                <h2>Architektura i OOP</h2>
+                <h2>Architecture</h2>
                 <p>
-                    Głównym celem rewritea było zastosowanie <strong>właściwych wzorców obiektowych</strong>.
-                    Hierarchia graczy opiera się na klasie abstrakcyjnej <code>Player</code>, z której dziedziczą
-                    konkretne implementacje:
+                    The player system is built around an abstract <code>Player</code> class. Concrete implementations
+                    include a human-controlled player, a random player, and a simple AI player that prioritizes hits and
+                    piece safety.
                 </p>
                 <ul>
-                    <li><strong>Real_player</strong> – sterowany przez człowieka, walidacja wejścia</li>
-                    <li><strong>Rand_player</strong> – wybiera losowy ruch z dostępnych opcji</li>
-                    <li><strong>AI_player</strong> – prosta strategia priorytetyzująca bicie i ochronę własnych
-                        pionków</li>
-                </ul>
-                <p>
-                    Dzięki takiej strukturze dodanie nowego typu gracza sprowadza się do napisania jednej klasy
-                    i nadpisania metody <code>makemove()</code>. Logika gry, renderowanie planszy i obsługa
-                    wejścia są od siebie wyraźnie oddzielone.
-                </p>
-                <h2>Zasady gry</h2>
-                <p>Gra implementuje pełne zasady backgammona:</p>
-                <ul>
-                    <li>Standardowy ruch pionków zgodnie z rzutem kości</li>
-                    <li>Zbijanie pionków przeciwnika (przenoszenie na bar)</li>
-                    <li>Wchodzenie z bara – pionek musi wrócić do gry zanim gracz wykona inny ruch</li>
-                    <li>Dublet – cztery ruchy zamiast dwóch</li>
-                    <li>Zdejmowanie pionków z planszy (bearing off)</li>
-                    <li>Automatyczna walidacja legalności ruchów</li>
+                    <li><strong>Real_player:</strong> validates user input and handles manual moves.</li>
+                    <li><strong>Rand_player:</strong> selects a legal move randomly.</li>
+                    <li><strong>AI_player:</strong> applies a small strategy layer over legal move generation.</li>
                 </ul>
 
+                <h2>Rules Covered</h2>
+                <ul>
+                    <li>Standard checker movement based on dice rolls.</li>
+                    <li>Hitting opponent pieces and moving them to the bar.</li>
+                    <li>Mandatory re-entry from the bar before other moves.</li>
+                    <li>Doubles as four moves instead of two.</li>
+                    <li>Bearing off and full move legality validation.</li>
+                </ul>
             </article>
         </div>
     </main>
@@ -85,16 +73,13 @@
         <div class="container">
             <span>© <span id="year"></span> Maciej Łukasiewicz</span>
             <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
                 <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
-                    rel="noopener">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
             </div>
         </div>
     </footer>
-
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 
 </html>

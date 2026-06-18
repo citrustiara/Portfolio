@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="O mnie - Maciej Łukasiewicz, junior ML engineer i software builder.">
+    <title>O mnie - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu"
+                onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav aria-label="Główna nawigacja">
+                <a href="o-mnie.html" class="nav-link active">O mnie</a>
+                <a href="projekty.html" class="nav-link">Projekty</a>
+                <a href="blog.html" class="nav-link">Notatki</a>
+                <a href="../o-mnie.html" class="language-switch" aria-label="English version">EN</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="section-heading">
+                <h1>O mnie</h1>
+                <p>Junior ML Engineer, student informatyki i builder praktycznych systemów software z czytelną mechaniką.</p>
+            </section>
+
+            <section class="grid-12">
+                <article style="grid-column: 1 / span 7;">
+                    <span class="kicker">Profil</span>
+                    <p class="lead">
+                        Studiuję informatykę na Politechnice Gdańskiej i pracuję jako Junior ML Engineer w LOLML.
+                        Lubię systemy, w których zachowanie modelu, przepływ danych i warstwa produktu są możliwe do
+                        sprawdzenia, poprawienia i wyjaśnienia bez zamieniania całości w czarną skrzynkę.
+                    </p>
+                    <p>
+                        W LOLML pracuję przy workflow CRM z agentami, analizie sesji przeglądarki, badaniach nad
+                        provenance tekstu i automatyzacji hipotecznej. Wspólny mianownik to zamiana chaotycznej pracy
+                        operacyjnej w niezawodny software z czytelnym stanem, dobrymi pętlami feedbacku i użytecznym
+                        interfejsem.
+                    </p>
+                    <p>
+                        Zbudowałem też wysokowydajną infrastrukturę backtestingową do badań ilościowych, używając
+                        podejścia wektorowego i CUDA, żeby duże przeszukiwania strategii stały się praktyczne.
+                    </p>
+                    <p>
+                        Poza listą stanowisk interesują mnie zwarte interfejsy, czytelne pisanie, szybki feedback i
+                        narzędzia, które da się zrozumieć w całości. Fotografia jest dla mnie osobną praktyką wizualną:
+                        portret, event i materiał dokumentalny.
+                    </p>
+                    <p>
+                        Angielski na poziomie C2. Jestem absolwentem dwujęzycznej klasy mat-inf w III LO w Gdyni.
+                    </p>
+                </article>
+
+                <aside class="module is-accent" style="grid-column: 9 / span 4;">
+                    <span class="kicker">Teraz</span>
+                    <h3>Junior ML Engineer w LOLML</h3>
+                    <p>Workflow agentowe, telemetria przeglądarki, narzędzia provenance research i automatyzacja hipoteczna.</p>
+                    <span class="kicker" style="margin-top:20px">Kontakt</span>
+                    <p><a href="mailto:maciek.lukasiewicz61@gmail.com">maciek.lukasiewicz61@gmail.com</a></p>
+                    <p style="margin-top:12px">Gdańsk / Polska</p>
+                </aside>
+            </section>
+
+            <section>
+                <div class="section-heading">
+                    <h2>Doświadczenie</h2>
+                    <p>Krótka oś ostatnich ról.</p>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Rola</th>
+                            <th>Miejsce</th>
+                            <th>Daty</th>
+                            <th>Praca</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="is-emphasis">
+                            <td>Junior ML Engineer</td>
+                            <td>LOLML</td>
+                            <td>mar 2026 - obecnie</td>
+                            <td>Agentic CRM, telemetria przeglądarki, provenance research i automatyzacja hipoteczna.</td>
+                        </tr>
+                        <tr>
+                            <td>Python Developer Intern</td>
+                            <td>Lime Brains</td>
+                            <td>kwi 2026 - maj 2026</td>
+                            <td>Software Python i Vue.js dla Forvis Mazars.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <div class="section-heading">
+                    <h2>Zakres pracy</h2>
+                    <p>Narzędzia i domeny, które regularnie wracają w moich projektach.</p>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Warstwa</th>
+                            <th>Aktualny kierunek</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="is-emphasis">
+                            <td>Systemy agentowe</td>
+                            <td>Orkiestracja workflow, human-in-the-loop review, synchronizacja CRM i niezawodny stan.</td>
+                        </tr>
+                        <tr>
+                            <td>ML i telemetria danych</td>
+                            <td>Analiza sesji przeglądarki, OCR/vision pipelines, ewaluacja provenance i ekstrakcja strukturalna.</td>
+                        </tr>
+                        <tr>
+                            <td>Quant engineering</td>
+                            <td>Wektorowy backtesting, duże przeszukiwania parametrów i raporty badawcze z caveatami walidacji.</td>
+                        </tr>
+                        <tr>
+                            <td>Interfejsy i systemy</td>
+                            <td>Python, Vue.js, JavaScript, narzędzia desktopowe, embedded workflow i czytelne UI.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank"
+                    rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
