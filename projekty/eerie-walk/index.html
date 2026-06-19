@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Eerie Walk - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <nav aria-label="Main navigation">
+                <a href="../../o-mnie.html" class="nav-link">About</a>
+                <a href="../../projekty.html" class="nav-link active">Work</a>
+                <a href="../../blog.html" class="nav-link">Notes</a>
+                <a href="../../pl/projekty/eerie-walk/index.html" class="language-switch" aria-label="Polish version">PL</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>
+                    Work
+                </a>
+
+                <span class="kicker">Raycaster / Horror</span>
+                <h1>The Eerie Walk</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/the-eerie-walk" target="_blank" rel="noopener">GitHub</a> · <a href="demo.html">Demo</a></div>
+
+                <p class="lead">
+                    A browser horror game with no engine and no libraries. Everything you see and hear is drawn and
+                    synthesised by hand in JavaScript: an endless, dark maze of rooms where a flashlight is the only
+                    thing keeping the dark at arm's length. Use headphones.
+                </p>
+
+                <h2>The renderer</h2>
+                <p>
+                    It's an old-school raycaster: a DDA loop casts a ray per screen column into a 480×270 buffer, then
+                    that tiny image gets upscaled with pixelated rendering. Walls, floors, ceilings, and sprites all go
+                    through the same software pipeline, with exponential fog and a flashlight cone doing most of the work
+                    of making it scary.
+                </p>
+
+                <h2>Everything is generated</h2>
+                <ul>
+                    <li>The world is infinite, built from value-noise/fBm over a street grid that's guaranteed to stay walkable.</li>
+                    <li>Every texture (wallpaper, carpet, ceiling, the figure) is drawn procedurally at runtime.</li>
+                    <li>The whole soundscape is Web Audio: the hum, the fluorescent whine, footsteps, whispers, reverb.</li>
+                    <li>A "director" schedules the scares on randomised, cooldown-gated timers and slowly ramps up the dread, so the first minutes are calm and it turns on you later.</li>
+                </ul>
+
+                <h2>Controls</h2>
+                <p>
+                    WASD or arrows to move, mouse to look (click the canvas to capture the pointer), F for the flashlight,
+                    1 to equip the gun once you find it, Esc to release the pointer.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

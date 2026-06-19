@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Eerie Walk - Maciej Łukasiewicz</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="../../index.html" class="logo">Maciej Łukasiewicz</a>
+            <button class="hamburger" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <nav aria-label="Nawigacja główna">
+                <a href="../../o-mnie.html" class="nav-link">O mnie</a>
+                <a href="../../projekty.html" class="nav-link active">Projekty</a>
+                <a href="../../blog.html" class="nav-link">Notatki</a>
+                <a href="../../../projekty/eerie-walk/index.html" class="language-switch" aria-label="English version">EN</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article>
+                <a href="../../projekty.html" class="back-link">
+                    <svg class="arrow-icon arrow-back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17 17 7 7" />
+                        <path d="M17 7H7v10" />
+                    </svg>
+                    Projekty
+                </a>
+
+                <span class="kicker">Raycaster / Horror</span>
+                <h1>The Eerie Walk</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/the-eerie-walk" target="_blank" rel="noopener">GitHub</a> · <a href="demo.html">Demo</a></div>
+
+                <p class="lead">
+                    Przeglądarkowa gra grozy bez silnika i bez bibliotek. Wszystko, co widać i słychać, jest rysowane i
+                    syntezowane ręcznie w JavaScripcie: nieskończony, ciemny labirynt pokoi, w którym latarka to jedyne,
+                    co trzyma ciemność na dystans. Załóż słuchawki.
+                </p>
+
+                <h2>Renderer</h2>
+                <p>
+                    To raycaster starej szkoły: pętla DDA puszcza promień na każdą kolumnę ekranu do bufora 480×270, a
+                    ten mały obraz jest potem skalowany w górę z renderowaniem pikselowym. Ściany, podłogi, sufity i
+                    sprite'y idą przez ten sam software'owy pipeline, a większość roboty w straszeniu robią wykładnicza
+                    mgła i stożek latarki.
+                </p>
+
+                <h2>Wszystko jest generowane</h2>
+                <ul>
+                    <li>Świat jest nieskończony, budowany z value-noise/fBm na siatce ulic, która zawsze zostaje przejezdna.</li>
+                    <li>Każda tekstura (tapeta, wykładzina, sufit, postać) jest rysowana proceduralnie w trakcie działania.</li>
+                    <li>Cała warstwa dźwięku to Web Audio: szum, świergot jarzeniówek, kroki, szepty, pogłos.</li>
+                    <li>„Reżyser" planuje straszaki na losowych timerach z cooldownem i powoli podkręca napięcie, więc pierwsze minuty są spokojne, a robi się nieprzyjemnie później.</li>
+                </ul>
+
+                <h2>Sterowanie</h2>
+                <p>
+                    WASD lub strzałki, żeby się ruszać, mysz do rozglądania się (kliknij canvas, żeby złapać kursor), F
+                    włącza latarkę, 1 wyciąga broń, gdy ją znajdziesz, Esc zwalnia kursor.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© <span id="year"></span> Maciej Łukasiewicz</span>
+            <div class="social-links">
+                <a href="mailto:maciek.lukasiewicz61@gmail.com">Email</a>
+                <a href="https://github.com/citrustiara" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://www.linkedin.com/in/maciej-łukasiewicz-85a264372" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

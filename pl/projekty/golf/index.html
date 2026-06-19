@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blink - Maciej Łukasiewicz</title>
+    <title>Golf Duel - Maciej Łukasiewicz</title>
     <link rel="stylesheet" href="../../styles.css">
 </head>
 
@@ -19,7 +19,7 @@
                 <a href="../../o-mnie.html" class="nav-link">O mnie</a>
                 <a href="../../projekty.html" class="nav-link active">Projekty</a>
                 <a href="../../blog.html" class="nav-link">Notatki</a>
-                <a href="../../../projekty/blink/index.html" class="language-switch" aria-label="English version">EN</a>
+                <a href="../../../projekty/golf/index.html" class="language-switch" aria-label="English version">EN</a>
             </nav>
         </div>
     </header>
@@ -35,29 +35,30 @@
                     Projekty
                 </a>
 
-                <span class="kicker">P2P web / WebRTC</span>
-                <h1>Blink</h1>
-                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/Blink" target="_blank" rel="noopener">GitHub</a> · <a href="demo.html">Demo</a></div>
+                <span class="kicker">WebGL / Multiplayer</span>
+                <h1>Golf Duel</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/GolfShooter" target="_blank" rel="noopener">GitHub</a> · <a href="https://golf.maciek-lukasiewicz61.workers.dev/" target="_blank" rel="noopener">Zagraj</a></div>
 
                 <p class="lead">
-                    Wrzucasz plik w jednej przeglądarce, otwierasz link w drugiej i plik leci prosto między nimi. Nie ma
-                    etapu uploadu ani serwera, który trzyma twoje dane, i o to właśnie chodzi.
+                    Przeglądarkowa gra, która zaczyna się jako turowy mini golf 3D, a gdy trzeba rozstrzygnąć kartę
+                    wyników, wrzuca wszystkich na arenę FPS. Zaczęło się od eksperymentu „czy w ogóle dam radę zrobić to
+                    w Three.js" i rozrosło się dalej.
                 </p>
 
-                <h2>Jak to działa</h2>
-                <p>
-                    Jedna strona tworzy pokój i dostaje krótki kod oraz link do udostępnienia; druga dołącza za jego
-                    pomocą. PeerJS służy tylko do tego, żeby dwie karty się odnalazły. Gdy już się połączą, plik leci
-                    bezpośrednim kanałem danych WebRTC, więc bajty nigdy nie przechodzą przez żaden mój serwer.
-                </p>
-
-                <h2>Warte odnotowania</h2>
+                <h2>Co jest w środku</h2>
                 <ul>
-                    <li>Pliki idą w kawałkach po 16&nbsp;KB, z kontrolą przepływu, żeby duży plik nie rozsadził pamięci.</li>
-                    <li>Za przebicie przez NAT odpowiadają publiczne serwery STUN Google'a; własny ICE/TURN można wkleić w panelu Net.</li>
-                    <li>Całość jest statyczna: zero buildu, zero backendu, tylko strona HTML, arkusz stylów i jeden skrypt.</li>
-                    <li>Przy ostrych NAT-ach w różnych sieciach może być potrzebny serwer TURN, którego Blink domyślnie nie ma.</li>
+                    <li>Dołki mini golfa z rampami, bandami, lodem, wyrzutniami, strefami śmierci, czasem i wspólną kartą wyników.</li>
+                    <li>Rundy FPS z botami, loadoutami, umiejętnościami, powiadomieniami o zabójstwach i ekranami końca meczu.</li>
+                    <li>Multiplayer peer-to-peer: PeerJS ogarnia znalezienie lobby, a sama gra leci bezpośrednio przez WebRTC.</li>
+                    <li>Mapy, bronie, turnieje i loadouty siedzą w JSON-ie, więc mogę je zmieniać bez ruszania kodu.</li>
                 </ul>
+
+                <h2>Jak to zbudowane</h2>
+                <p>
+                    Bez kroku buildu. Three.js wchodzi przez import map, a PeerJS z CDN-u, i całość jest serwowana jako
+                    pliki statyczne. Dzięki temu da się to wrzucić na dowolny statyczny hosting (teraz chodzi na
+                    Cloudflare Workers) i szybko iterować.
+                </p>
             </article>
         </div>
     </main>

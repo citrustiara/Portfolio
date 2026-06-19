@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blink - Maciej Łukasiewicz</title>
+    <title>Golf Duel - Maciej Łukasiewicz</title>
     <link rel="stylesheet" href="../../styles.css">
 </head>
 
@@ -19,7 +19,7 @@
                 <a href="../../o-mnie.html" class="nav-link">About</a>
                 <a href="../../projekty.html" class="nav-link active">Work</a>
                 <a href="../../blog.html" class="nav-link">Notes</a>
-                <a href="../../pl/projekty/blink/index.html" class="language-switch" aria-label="Polish version">PL</a>
+                <a href="../../pl/projekty/golf/index.html" class="language-switch" aria-label="Polish version">PL</a>
             </nav>
         </div>
     </header>
@@ -35,29 +35,30 @@
                     Work
                 </a>
 
-                <span class="kicker">P2P web / WebRTC</span>
-                <h1>Blink</h1>
-                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/Blink" target="_blank" rel="noopener">GitHub</a> · <a href="demo.html">Demo</a></div>
+                <span class="kicker">WebGL / Multiplayer</span>
+                <h1>Golf Duel</h1>
+                <div class="article-meta">2026 · <a href="https://github.com/citrustiara/GolfShooter" target="_blank" rel="noopener">GitHub</a> · <a href="https://golf.maciek-lukasiewicz61.workers.dev/" target="_blank" rel="noopener">Play</a></div>
 
                 <p class="lead">
-                    Drop a file in one browser, open the link in another, and the file moves straight between the two.
-                    There's no upload step and no server holding your data, which is the whole point.
+                    A browser game that starts as turn-based 3D mini golf and, when the scorecard needs settling, drops
+                    everyone into an arena FPS. It started as a "can I even do this in Three.js" experiment and kept
+                    growing.
                 </p>
 
-                <h2>How it works</h2>
-                <p>
-                    One side creates a room and gets a short code plus a shareable link; the other side joins with it.
-                    PeerJS is only used so the two tabs can find each other. Once they're connected, the file travels over
-                    a direct WebRTC data channel, so the bytes never pass through any host I run.
-                </p>
-
-                <h2>Details worth noting</h2>
+                <h2>What's in it</h2>
                 <ul>
-                    <li>Files are sent in 16&nbsp;KB chunks, with backpressure so a big file doesn't blow up memory.</li>
-                    <li>Google's public STUN servers handle NAT traversal; you can paste your own ICE/TURN config in the Net panel.</li>
-                    <li>It's all static: no build step, no backend, just an HTML page, a stylesheet, and one script.</li>
-                    <li>Different networks behind strict NATs may need a TURN server, which Blink doesn't ship by default.</li>
+                    <li>Mini golf holes with ramps, bumpers, ice, launchers, death zones, timers, and shared scorecards.</li>
+                    <li>First-person arena rounds with bots, loadouts, abilities, kill notices, and end-of-match screens.</li>
+                    <li>Peer-to-peer multiplayer: PeerJS handles lobby discovery, then gameplay runs over direct WebRTC.</li>
+                    <li>Maps, weapons, tournaments, and loadouts all live in JSON, so I can tweak them without touching code.</li>
                 </ul>
+
+                <h2>How it's built</h2>
+                <p>
+                    No build step. Three.js comes in through an import map and PeerJS from a CDN, and the whole thing is
+                    served as static files. That keeps it deployable to any static host (it's running on Cloudflare
+                    Workers right now) and quick to iterate on.
+                </p>
             </article>
         </div>
     </main>
